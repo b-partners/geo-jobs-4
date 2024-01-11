@@ -26,7 +26,6 @@ import school.hei.geotiler.endpoint.event.gen.ZoneTilingTaskCreated;
 import school.hei.geotiler.endpoint.rest.model.GeoServerParameter;
 import school.hei.geotiler.file.BucketComponent;
 import school.hei.geotiler.file.FileHash;
-import school.hei.geotiler.mail.Mailer;
 import school.hei.geotiler.repository.ZoneTilingJobRepository;
 import school.hei.geotiler.repository.ZoneTilingTaskRepository;
 import school.hei.geotiler.repository.model.JobStatus;
@@ -43,7 +42,6 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   @Autowired ZoneTilingTaskRepository repository;
   @Autowired ZoneTilingJobRepository zoneTilingJobRepository;
   @MockBean EventProducer eventProducer;
-  @MockBean Mailer mailer;
 
   @BeforeEach
   void setUp() {

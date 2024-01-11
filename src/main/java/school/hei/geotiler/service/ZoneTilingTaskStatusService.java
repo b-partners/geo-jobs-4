@@ -55,6 +55,7 @@ public class ZoneTilingTaskStatusService {
 
     var updated = repository.save(zoneTilingTask);
     zoneTilingJobService.refreshStatus(zoneTilingTask.getJobId());
+
     return updated;
   }
 }
