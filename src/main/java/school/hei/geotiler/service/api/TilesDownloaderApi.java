@@ -1,5 +1,6 @@
 package school.hei.geotiler.service.api;
 
+import static java.nio.file.Files.createTempFile;
 import static school.hei.geotiler.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,9 +8,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -26,13 +25,12 @@ import school.hei.geotiler.repository.model.geo.Parcel;
 @Component
 public class TilesDownloaderApi {
   private final ObjectMapper om;
-  private final String geoTilesDownloaderApiURl;
-  private static final String SERVER = "/tmp/serverInfo.json";
-  private static final String GEOJSON = "/tmp/geojson.geojson";
+  private final String tilesDownloaderApiURl;
 
-  public TilesDownloaderApi(ObjectMapper om, @Value("${tiles.downloader.api.url}") String geoTilesDownloaderApiURl) {
+  public TilesDownloaderApi(
+      ObjectMapper om, @Value("${tiles.downloader.api.url}") String tilesDownloaderApiURl) {
     this.om = om;
-    this.geoTilesDownloaderApiURl = geoTilesDownloaderApiURl;
+    this.tilesDownloaderApiURl = tilesDownloaderApiURl;
   }
 
   public byte[] downloadTiles(Parcel parcel) {
@@ -43,7 +41,7 @@ public class TilesDownloaderApi {
     MultiValueMap<String, HttpEntity<?>> multipartBody = bodies.build();
     HttpEntity<MultiValueMap<String, HttpEntity<?>>> request = new HttpEntity<>(multipartBody);
     UriComponentsBuilder builder =
-        UriComponentsBuilder.fromHttpUrl(geoTilesDownloaderApiURl)
+        UriComponentsBuilder.fromHttpUrl(tilesDownloaderApiURl)
             .queryParam("zoom_size", parcel.getFeature().getZoom());
 
     ResponseEntity<byte[]> responseEntity =
@@ -88,9 +86,8 @@ public class TilesDownloaderApi {
     serverInfo.put("parameter", serverParameter);
     serverInfo.put("concurrency", 1);
 
-    Path serverInfoPath = Path.of(SERVER);
+    Path serverInfoPath = createTempFile(tempFileParcelPrefix(parcel) + "_server", "json");
     File file = serverInfoPath.toFile();
-
     om.writeValue(file, serverInfo);
 
     return file;
@@ -102,19 +99,21 @@ public class TilesDownloaderApi {
     feature.put("type", "Feature");
     feature.put("geometry", parcel.getFeature().getGeometry());
 
-    List<Object> featuresList = new ArrayList<>();
+    var featuresList = new ArrayList<>();
     featuresList.add(feature);
 
     Map<String, Object> featureCollection = new HashMap<>();
     featureCollection.put("type", "FeatureCollection");
     featureCollection.put("features", featuresList);
 
-    Path geojsonPath = Path.of(GEOJSON);
-
+    Path geojsonPath = createTempFile(tempFileParcelPrefix(parcel), "geojson");
     File geojsonFile = geojsonPath.toFile();
-
     om.writeValue(geojsonFile, featureCollection);
 
     return new FileSystemResource(geojsonFile);
+  }
+
+  private static String tempFileParcelPrefix(Parcel parcel) {
+    return "parcel_" + parcel.getId();
   }
 }
