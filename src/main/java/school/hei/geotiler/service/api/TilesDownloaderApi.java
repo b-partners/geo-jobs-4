@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +23,9 @@ import school.hei.geotiler.model.exception.ApiException;
 import school.hei.geotiler.repository.model.geo.Parcel;
 
 @Component
+@AllArgsConstructor
 public class TilesDownloaderApi {
-  @Autowired ObjectMapper om;
+  ObjectMapper om;
   private final String geoTilesDownloaderApiURl =
       "https://gft64kilv5.execute-api.eu-west-3.amazonaws.com/Prod/";
   private final String SERVER = "/tmp/serverInfo.json";
