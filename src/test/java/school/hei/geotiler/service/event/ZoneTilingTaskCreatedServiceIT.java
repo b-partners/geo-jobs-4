@@ -1,25 +1,6 @@
 package school.hei.geotiler.service.event;
 
-import static java.util.UUID.randomUUID;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static school.hei.geotiler.endpoint.rest.model.Status.HealthEnum.SUCCEEDED;
-import static school.hei.geotiler.endpoint.rest.model.Status.ProgressionEnum.FINISHED;
-import static school.hei.geotiler.file.FileHashAlgorithm.SHA256;
-import static school.hei.geotiler.repository.model.Status.HealthStatus.UNKNOWN;
-import static school.hei.geotiler.repository.model.Status.ProgressionStatus.PENDING;
-import static school.hei.geotiler.repository.model.Status.ProgressionStatus.PROCESSING;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,32 +29,44 @@ import school.hei.geotiler.repository.model.ZoneTilingTask;
 import school.hei.geotiler.repository.model.geo.Parcel;
 import school.hei.geotiler.service.api.TilesDownloaderApi;
 
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import static java.util.UUID.randomUUID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static school.hei.geotiler.endpoint.rest.model.Status.HealthEnum.SUCCEEDED;
+import static school.hei.geotiler.endpoint.rest.model.Status.ProgressionEnum.FINISHED;
+import static school.hei.geotiler.file.FileHashAlgorithm.SHA256;
+import static school.hei.geotiler.repository.model.Status.HealthStatus.UNKNOWN;
+import static school.hei.geotiler.repository.model.Status.ProgressionStatus.PENDING;
+import static school.hei.geotiler.repository.model.Status.ProgressionStatus.PROCESSING;
+
 @Slf4j
 class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   @Autowired ZoneTilingTaskCreatedService subject;
   @Autowired
   ZoneTilingController zoneTilingController;
   @MockBean BucketComponent bucketComponent;
-  @MockBean TilesDownloaderApi api;
+  @MockBean TilesDownloaderApi tilesDownloaderApi;
   @Autowired ZoneTilingTaskRepository repository;
   @Autowired ZoneTilingJobRepository zoneTilingJobRepository;
   @MockBean EventProducer eventProducer;
   @Autowired ObjectMapper om;
 
   @BeforeEach
-  void setUp() throws MalformedURLException {
-    when(api.downloadTiles(any()))
+  void setUp() {
+    when(tilesDownloaderApi.downloadTiles(any()))
         .thenAnswer(
-            i -> {
-              try (InputStream is =
-                  this.getClass().getClassLoader().getResourceAsStream("mockData/test.zip"); ) {
-                assert is != null;
-                return is.readAllBytes();
-              }
-            });
+            i -> Paths.get(this.getClass().getClassLoader().getResource("mockData/lyon").toURI()).toFile()
+            );
     when(bucketComponent.upload(any(), any())).thenReturn(new FileHash(SHA256, "mock"));
   }
-
 
   @SneakyThrows
   private school.hei.geotiler.endpoint.rest.model.Parcel expectedParcel(){
@@ -263,8 +256,7 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   @Test
   void send_statusChanged_event_on_each_status_change() {
     String jobId = randomUUID().toString();
-    ZoneTilingJob job =
-        zoneTilingJobRepository.save(zoneTilingJob(jobId));
+    zoneTilingJobRepository.save(zoneTilingJob(jobId));
     String taskId = randomUUID().toString();
     ZoneTilingTask toCreate = zoneTilingTask(jobId, taskId);
     ZoneTilingTask created = repository.save(toCreate);

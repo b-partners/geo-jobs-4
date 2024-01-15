@@ -5,10 +5,12 @@ import static school.hei.geotiler.model.exception.ApiException.ExceptionType.SER
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipFile;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -19,6 +21,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import school.hei.geotiler.file.FileUnzipper;
+import school.hei.geotiler.file.FileWriter;
 import school.hei.geotiler.model.exception.ApiException;
 import school.hei.geotiler.repository.model.geo.Parcel;
 
@@ -26,14 +30,21 @@ import school.hei.geotiler.repository.model.geo.Parcel;
 public class TilesDownloaderApi {
   private final ObjectMapper om;
   private final String tilesDownloaderApiURl;
+  private final FileWriter fileWriter;
+  private final FileUnzipper fileUnzipper;
 
   public TilesDownloaderApi(
-      ObjectMapper om, @Value("${tiles.downloader.api.url}") String tilesDownloaderApiURl) {
+      @Value("${tiles.downloader.api.url}") String tilesDownloaderApiURl,
+      ObjectMapper om,
+      FileWriter fileWriter,
+      FileUnzipper fileUnzipper) {
     this.om = om;
     this.tilesDownloaderApiURl = tilesDownloaderApiURl;
+    this.fileWriter = fileWriter;
+    this.fileUnzipper = fileUnzipper;
   }
 
-  public byte[] downloadTiles(Parcel parcel) {
+  public File downloadTiles(Parcel parcel) {
     RestTemplate restTemplate = new RestTemplate();
     MultipartBodyBuilder bodies = new MultipartBodyBuilder();
     bodies.part("server", new FileSystemResource(getServerInfoFile(parcel)));
@@ -48,9 +59,20 @@ public class TilesDownloaderApi {
         restTemplate.postForEntity(builder.toUriString(), request, byte[].class);
 
     if (responseEntity.getStatusCode().value() == 200) {
-      return responseEntity.getBody();
+      try {
+        return unzip(fileWriter.apply(responseEntity.getBody(), null), parcel);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
     throw new ApiException(SERVER_EXCEPTION, "Server error");
+  }
+
+  private File unzip(File downloadedTiles, Parcel parcel) throws IOException {
+    ZipFile asZipFile = new ZipFile(downloadedTiles);
+    String layer = parcel.getGeoServerParameter().getLayers();
+    Path unzippedPath = fileUnzipper.apply(asZipFile, layer);
+    return unzippedPath.toFile();
   }
 
   @SneakyThrows

@@ -1,10 +1,12 @@
 package school.hei.geotiler.api;
 
 import static java.util.UUID.randomUUID;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.junit.jupiter.api.Test;
@@ -22,7 +24,8 @@ public class TilesDownloaderApiIT extends FacadeIT {
   @Autowired TilesDownloaderApi tilesDownloaderApi;
   @Autowired ObjectMapper om;
 
-  private Parcel parcel() throws MalformedURLException, JsonProcessingException {
+  private Parcel a_parcel_from_lyon(int zoom)
+      throws MalformedURLException, JsonProcessingException {
     return Parcel.builder()
         .id(randomUUID().toString())
         .geoServerUrl(new URL("https://data.grandlyon.com/fr/geoserv/grandlyon/ows"))
@@ -64,15 +67,17 @@ public class TilesDownloaderApiIT extends FacadeIT {
                 [ 4.479593950305621, 45.882900828315755 ],
                 [ 4.459648282829194, 45.904988912620688 ] ] ] ] } }""",
                     Feature.class)
-                .zoom(10)
+                .zoom(zoom)
                 .id("feature_1_id"))
         .build();
   }
 
   @Test
-  public void download_tiles_ok() throws MalformedURLException, JsonProcessingException {
-    byte[] result = tilesDownloaderApi.downloadTiles(parcel());
+  public void download_tiles_ok() throws IOException {
+    var zoom = 13;
 
-    assertTrue(result.length > 0);
+    var tilesDir = tilesDownloaderApi.downloadTiles(a_parcel_from_lyon(zoom));
+
+    assertEquals(2, new File(tilesDir.getAbsolutePath() + "/" + zoom).listFiles().length);
   }
 }
