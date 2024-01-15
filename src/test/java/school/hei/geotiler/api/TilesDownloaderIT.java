@@ -17,11 +17,11 @@ import school.hei.geotiler.endpoint.rest.model.Feature;
 import school.hei.geotiler.endpoint.rest.model.GeoServerParameter;
 import school.hei.geotiler.file.BucketComponent;
 import school.hei.geotiler.repository.model.geo.Parcel;
-import school.hei.geotiler.service.api.TilesDownloaderApi;
+import school.hei.geotiler.service.geo.TilesDownloader;
 
-public class TilesDownloaderApiIT extends FacadeIT {
+public class TilesDownloaderIT extends FacadeIT {
   @MockBean BucketComponent bucketComponent;
-  @Autowired TilesDownloaderApi tilesDownloaderApi;
+  @Autowired TilesDownloader tilesDownloader;
   @Autowired ObjectMapper om;
 
   private Parcel a_parcel_from_lyon(int zoom)
@@ -76,7 +76,7 @@ public class TilesDownloaderApiIT extends FacadeIT {
   public void download_tiles_ok() throws IOException {
     var zoom = 13;
 
-    var tilesDir = tilesDownloaderApi.downloadTiles(a_parcel_from_lyon(zoom));
+    var tilesDir = tilesDownloader.apply(a_parcel_from_lyon(zoom));
 
     assertEquals(2, new File(tilesDir.getAbsolutePath() + "/" + zoom).listFiles().length);
   }

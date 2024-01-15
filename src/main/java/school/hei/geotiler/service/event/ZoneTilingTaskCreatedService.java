@@ -21,12 +21,12 @@ import school.hei.geotiler.repository.model.Tile;
 import school.hei.geotiler.repository.model.ZoneTilingTask;
 import school.hei.geotiler.repository.model.geo.Parcel;
 import school.hei.geotiler.service.ZoneTilingTaskStatusService;
-import school.hei.geotiler.service.api.TilesDownloaderApi;
+import school.hei.geotiler.service.geo.TilesDownloader;
 
 @Service
 @AllArgsConstructor
 public class ZoneTilingTaskCreatedService implements Consumer<ZoneTilingTaskCreated> {
-  private final TilesDownloaderApi tilesDownloaderApi;
+  private final TilesDownloader tilesDownloader;
   private final BucketComponent bucketComponent;
   private final ZoneTilingTaskStatusService zoneTilingTaskStatusService;
 
@@ -36,8 +36,7 @@ public class ZoneTilingTaskCreatedService implements Consumer<ZoneTilingTaskCrea
     zoneTilingTaskStatusService.process(task);
 
     try {
-      File downloadedTiles =
-          tilesDownloaderApi.downloadTiles(zoneTilingTaskCreated.getTask().getParcel());
+      File downloadedTiles = tilesDownloader.apply(zoneTilingTaskCreated.getTask().getParcel());
       String bucketKey = downloadedTiles.getName();
       bucketComponent.upload(downloadedTiles, bucketKey);
       setParcelTiles(downloadedTiles, task.getParcel(), bucketKey);

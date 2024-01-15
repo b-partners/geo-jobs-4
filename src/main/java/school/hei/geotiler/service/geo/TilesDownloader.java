@@ -1,4 +1,4 @@
-package school.hei.geotiler.service.api;
+package school.hei.geotiler.service.geo;
 
 import static java.nio.file.Files.createTempFile;
 import static school.hei.geotiler.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.zip.ZipFile;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,13 +28,13 @@ import school.hei.geotiler.model.exception.ApiException;
 import school.hei.geotiler.repository.model.geo.Parcel;
 
 @Component
-public class TilesDownloaderApi {
+public class TilesDownloader implements Function<Parcel, File> {
   private final ObjectMapper om;
   private final String tilesDownloaderApiURl;
   private final FileWriter fileWriter;
   private final FileUnzipper fileUnzipper;
 
-  public TilesDownloaderApi(
+  public TilesDownloader(
       @Value("${tiles.downloader.api.url}") String tilesDownloaderApiURl,
       ObjectMapper om,
       FileWriter fileWriter,
@@ -44,7 +45,8 @@ public class TilesDownloaderApi {
     this.fileUnzipper = fileUnzipper;
   }
 
-  public File downloadTiles(Parcel parcel) {
+  @Override
+  public File apply(Parcel parcel) {
     RestTemplate restTemplate = new RestTemplate();
     MultipartBodyBuilder bodies = new MultipartBodyBuilder();
     bodies.part("server", new FileSystemResource(getServerInfoFile(parcel)));

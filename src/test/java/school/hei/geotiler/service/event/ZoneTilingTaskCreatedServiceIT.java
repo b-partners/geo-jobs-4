@@ -27,7 +27,7 @@ import school.hei.geotiler.repository.model.TaskStatus;
 import school.hei.geotiler.repository.model.ZoneTilingJob;
 import school.hei.geotiler.repository.model.ZoneTilingTask;
 import school.hei.geotiler.repository.model.geo.Parcel;
-import school.hei.geotiler.service.api.TilesDownloaderApi;
+import school.hei.geotiler.service.geo.TilesDownloader;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -53,7 +53,8 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   @Autowired
   ZoneTilingController zoneTilingController;
   @MockBean BucketComponent bucketComponent;
-  @MockBean TilesDownloaderApi tilesDownloaderApi;
+  @MockBean
+  TilesDownloader tilesDownloader;
   @Autowired ZoneTilingTaskRepository repository;
   @Autowired ZoneTilingJobRepository zoneTilingJobRepository;
   @MockBean EventProducer eventProducer;
@@ -61,7 +62,7 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
 
   @BeforeEach
   void setUp() {
-    when(tilesDownloaderApi.downloadTiles(any()))
+    when(tilesDownloader.apply(any()))
         .thenAnswer(
             i -> Paths.get(this.getClass().getClassLoader().getResource("mockData/lyon").toURI()).toFile()
             );
