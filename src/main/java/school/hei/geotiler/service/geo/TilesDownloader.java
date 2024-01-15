@@ -78,7 +78,7 @@ public class TilesDownloader implements Function<Parcel, File> {
   }
 
   @SneakyThrows
-  public File getServerInfoFile(Parcel parcel) {
+  private File getServerInfoFile(Parcel parcel) {
     var geoServerParameter = parcel.getGeoServerParameter();
     String geoServerUrl = String.valueOf(parcel.getGeoServerUrl());
     String service = geoServerParameter.getService();
@@ -118,7 +118,7 @@ public class TilesDownloader implements Function<Parcel, File> {
   }
 
   @SneakyThrows
-  public FileSystemResource getGeojson(Parcel parcel) {
+  private FileSystemResource getGeojson(Parcel parcel) {
     Map<String, Object> feature = new HashMap<>();
     feature.put("type", "Feature");
     feature.put("geometry", parcel.getFeature().getGeometry());
