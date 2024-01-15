@@ -30,7 +30,7 @@ Globals:
         DATABASE_URL: !Sub '{{resolve:ssm:/geo-tiler/${Env}/db/url}}'
         DATABASE_USERNAME: !Sub '{{resolve:ssm:/geo-tiler/${Env}/db/username}}'
         DATABASE_PASSWORD: !Sub '{{resolve:ssm:/geo-tiler/${Env}/db/password}}'
-        
+        TILES_DOWNLOADER_API_URL: https://hds4hpeacrrder7h32qy4lmy4a0wrewx.lambda-url.eu-west-3.on.aws
         
 
 Parameters:
@@ -38,6 +38,13 @@ Parameters:
     Type: String
 
 Resources:
+  FrontalServerlessRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      BinaryMediaTypes:
+        - "*~1*"
+
   FrontalFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -51,6 +58,8 @@ Resources:
           Properties:
             Path: /{proxy+}
             Method: ANY
+            RestApiId:
+              Ref: FrontalServerlessRestApi
 
   WorkerFunction:
     Type: AWS::Serverless::Function
@@ -84,7 +93,7 @@ Resources:
     Properties:
       Name: !Join [ '', [ /geo-tiler/, !Ref Env, /api/url ] ]
       Type: String
-      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+      Value: !Sub "https://${FrontalServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
 
 Outputs:
   ApiUrl:

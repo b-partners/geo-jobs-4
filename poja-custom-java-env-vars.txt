@@ -1,0 +1,1 @@
+TILES_DOWNLOADER_API_URL: https://hds4hpeacrrder7h32qy4lmy4a0wrewx.lambda-url.eu-west-3.on.aws
