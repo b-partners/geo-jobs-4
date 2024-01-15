@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
+import static school.hei.geotiler.endpoint.rest.model.Status.HealthEnum.UNKNOWN;
+import static school.hei.geotiler.endpoint.rest.model.Status.ProgressionEnum.PROCESSING;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -16,6 +18,7 @@ import school.hei.geotiler.endpoint.event.EventProducer;
 import school.hei.geotiler.endpoint.rest.model.CreateZoneTilingJob;
 import school.hei.geotiler.endpoint.rest.model.Feature;
 import school.hei.geotiler.endpoint.rest.model.GeoServerParameter;
+import school.hei.geotiler.endpoint.rest.model.Status;
 import school.hei.geotiler.endpoint.rest.model.ZoneTilingJob;
 import school.hei.geotiler.model.BoundedPageSize;
 import school.hei.geotiler.model.PageFromOne;
@@ -72,13 +75,14 @@ class ZoneTilingJobControllerIT extends FacadeIT {
                       [ 4.479593950305621, 45.882900828315755 ],
                       [ 4.459648282829194, 45.904988912620688 ] ] ] ] } }""",
                             Feature.class)
+                        .zoom(10)
                         .id("feature_1_id")));
 
     var actual = controller.tileZone(creatableJob);
-    var actualList = controller.findAll(new PageFromOne(1), new BoundedPageSize(30));
+    var expected = from(creatableJob);
+    var actualList = controller.getTilingJobs(new PageFromOne(1), new BoundedPageSize(30));
 
-    ZoneTilingJob expected = from(creatableJob);
-    assertEquals(expected, ignoreId(actual));
+    assertEquals(expected, ignoreIdAndCreationDatetime(actual));
     // TODO: coordinates are fine when retrieved by controller::tileZone
     //   but rounded when retrieved by controller::findAll!
     // assertTrue(actualList.stream().map(this::ignoreId).anyMatch(z -> z.equals(expected)));
@@ -86,8 +90,10 @@ class ZoneTilingJobControllerIT extends FacadeIT {
     verify(eventProducer, only()).accept(any());
   }
 
-  private ZoneTilingJob ignoreId(ZoneTilingJob zoneTilingJob) {
-    return zoneTilingJob.id(null);
+  private ZoneTilingJob ignoreIdAndCreationDatetime(ZoneTilingJob zoneTilingJob) {
+    zoneTilingJob.getStatus().setCreationDatetime(null);
+    zoneTilingJob.id(null);
+    return zoneTilingJob;
   }
 
   private ZoneTilingJob from(CreateZoneTilingJob createZoneTilingJob) {
@@ -97,6 +103,7 @@ class ZoneTilingJobControllerIT extends FacadeIT {
         .emailReceiver(createZoneTilingJob.getEmailReceiver())
         .geoServerUrl(createZoneTilingJob.getGeoServerUrl())
         .geoServerParameter(createZoneTilingJob.getGeoServerParameter())
+        .status(new Status().creationDatetime(null).health(UNKNOWN).progression(PROCESSING))
         .features(createZoneTilingJob.getFeatures());
   }
 }

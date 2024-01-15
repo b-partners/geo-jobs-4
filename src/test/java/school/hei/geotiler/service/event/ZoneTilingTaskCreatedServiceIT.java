@@ -6,14 +6,22 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static school.hei.geotiler.endpoint.rest.model.Status.HealthEnum.SUCCEEDED;
+import static school.hei.geotiler.endpoint.rest.model.Status.ProgressionEnum.FINISHED;
 import static school.hei.geotiler.file.FileHashAlgorithm.SHA256;
 import static school.hei.geotiler.repository.model.Status.HealthStatus.UNKNOWN;
-import static school.hei.geotiler.repository.model.Status.ProgressionStatus.FINISHED;
 import static school.hei.geotiler.repository.model.Status.ProgressionStatus.PENDING;
 import static school.hei.geotiler.repository.model.Status.ProgressionStatus.PROCESSING;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -23,7 +31,12 @@ import school.hei.geotiler.conf.FacadeIT;
 import school.hei.geotiler.endpoint.event.EventProducer;
 import school.hei.geotiler.endpoint.event.gen.ZoneTilingJobStatusChanged;
 import school.hei.geotiler.endpoint.event.gen.ZoneTilingTaskCreated;
+import school.hei.geotiler.endpoint.rest.controller.ZoneTilingController;
+import school.hei.geotiler.endpoint.rest.model.Feature;
 import school.hei.geotiler.endpoint.rest.model.GeoServerParameter;
+import school.hei.geotiler.endpoint.rest.model.Status;
+import school.hei.geotiler.endpoint.rest.model.Tile;
+import school.hei.geotiler.endpoint.rest.model.TileCoordinates;
 import school.hei.geotiler.file.BucketComponent;
 import school.hei.geotiler.file.FileHash;
 import school.hei.geotiler.repository.ZoneTilingJobRepository;
@@ -35,25 +48,169 @@ import school.hei.geotiler.repository.model.ZoneTilingTask;
 import school.hei.geotiler.repository.model.geo.Parcel;
 import school.hei.geotiler.service.api.TilesDownloaderApi;
 
+@Slf4j
 class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   @Autowired ZoneTilingTaskCreatedService subject;
+  @Autowired
+  ZoneTilingController zoneTilingController;
   @MockBean BucketComponent bucketComponent;
   @MockBean TilesDownloaderApi api;
   @Autowired ZoneTilingTaskRepository repository;
   @Autowired ZoneTilingJobRepository zoneTilingJobRepository;
   @MockBean EventProducer eventProducer;
+  @Autowired ObjectMapper om;
 
   @BeforeEach
-  void setUp() {
+  void setUp() throws MalformedURLException {
     when(api.downloadTiles(any()))
         .thenAnswer(
             i -> {
               try (InputStream is =
-                  this.getClass().getClassLoader().getResourceAsStream("mockData/data.zip"); ) {
+                  this.getClass().getClassLoader().getResourceAsStream("mockData/test.zip"); ) {
+                assert is != null;
                 return is.readAllBytes();
               }
             });
     when(bucketComponent.upload(any(), any())).thenReturn(new FileHash(SHA256, "mock"));
+  }
+
+
+  @SneakyThrows
+  private school.hei.geotiler.endpoint.rest.model.Parcel expectedParcel(){
+    return new school.hei.geotiler.endpoint.rest.model.Parcel()
+        .creationDatetime(null)
+        .id(null)
+        .tiles(expectedTiles())
+        .feature(
+            om.readValue(
+                    """
+              { "type": "Feature",
+                "properties": {
+                  "code": "69",
+                  "nom": "Rhône",
+                  "id": 30251921,
+                  "CLUSTER_ID": 99520,
+                  "CLUSTER_SIZE": 386884 },
+                "geometry": {
+                  "type": "MultiPolygon",
+                  "coordinates": [[[[4.459648282829194, 45.90498891262069], [4.464709510872551, 45.928950368349426], [4.490816965688656, 45.941784543770964], [4.510354299995861, 45.9336971326646], [4.518386257467152, 45.91288834552105], [4.496344031095243, 45.88343820140181], [4.479593950305621, 45.882900828315755], [4.459648282829194, 45.90498891262069]]]] } }""",
+                    Feature.class)
+                .zoom(10)
+                .id("feature_1_id"))
+        .tilingStatus(new Status().creationDatetime(null)
+            .progression(FINISHED)
+            .health(SUCCEEDED));
+  }
+
+  public List<Tile> expectedTiles(){
+    List<Tile> tiles = new ArrayList<>();
+    tiles.add(tile1());
+    tiles.add(tile2());
+    return tiles;
+  }
+
+  public Tile tile1 (){
+    return new Tile()
+        .creationDatetime(null)
+        .id(null)
+        .coordinates(new TileCoordinates()
+            .x(123132)
+            .y(456)
+            .z(20))
+        .bucketPath(null);
+  }
+
+  public Tile tile2 (){
+    return new Tile()
+        .creationDatetime(null)
+        .id(null)
+        .coordinates(new TileCoordinates()
+            .x(123132)
+            .y(123)
+            .z(20))
+        .bucketPath(null);
+  }
+
+  private school.hei.geotiler.endpoint.rest.model.Parcel ignoreIds(school.hei.geotiler.endpoint.rest.model.Parcel parcel){
+    Status status = parcel.getTilingStatus();
+    parcel.setId(null);
+    assert status != null;
+    parcel.setTilingStatus(new Status()
+        .creationDatetime(null)
+        .health(status.getHealth())
+        .progression(status.getProgression())
+    );
+    return parcel;
+  }
+
+  private List<Tile> ignoreIds(List<Tile> tile){
+    for (Tile tile1 : tile) {
+      tile1.setId(null);
+      tile1.setCreationDatetime(null);
+      tile1.setBucketPath(null);
+    }
+    return tile;
+  }
+
+  private ZoneTilingJob zoneTilingJob (String jobId){
+    return ZoneTilingJob.builder()
+        .id(jobId)
+        .statusHistory(
+            (List.of(
+                JobStatus.builder()
+                    .id(randomUUID().toString())
+                    .jobId(jobId)
+                    .progression(PENDING)
+                    .health(UNKNOWN)
+                    .build())))
+        .zoneName("mock")
+        .emailReceiver("mock@hotmail.com")
+        .build();
+  }
+
+  @SneakyThrows
+  private ZoneTilingTask zoneTilingTask(String jobId, String taskId){
+    return  ZoneTilingTask.builder()
+        .id(taskId)
+        .jobId(jobId)
+        .parcel(
+            Parcel.builder()
+                .id(randomUUID().toString())
+                .geoServerParameter(new GeoServerParameter().layers("grand-lyon"))
+                .feature(
+                    om.readValue(
+                            """
+                { "type": "Feature",
+                  "properties": {
+                    "code": "69",
+                    "nom": "Rhône",
+                    "id": 30251921,
+                    "CLUSTER_ID": 99520,
+                    "CLUSTER_SIZE": 386884 },
+                  "geometry": {
+                    "type": "MultiPolygon",
+                    "coordinates": [ [ [
+                      [ 4.459648282829194, 45.904988912620688 ],
+                      [ 4.464709510872551, 45.928950368349426 ],
+                      [ 4.490816965688656, 45.941784543770964 ],
+                      [ 4.510354299995861, 45.933697132664598 ],
+                      [ 4.518386257467152, 45.912888345521047 ],
+                      [ 4.496344031095243, 45.883438201401809 ],
+                      [ 4.479593950305621, 45.882900828315755 ],
+                      [ 4.459648282829194, 45.904988912620688 ] ] ] ] } }""",
+                            Feature.class)
+                        .zoom(10)
+                        .id("feature_1_id"))
+                .build())
+        .statusHistory(
+            List.of(
+                TaskStatus.builder()
+                    .id(randomUUID().toString())
+                    .taskId(taskId)
+                    .progression(PENDING)
+                    .health(UNKNOWN)
+                    .build()))
+        .build();
   }
 
   @Test
@@ -107,39 +264,9 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   void send_statusChanged_event_on_each_status_change() {
     String jobId = randomUUID().toString();
     ZoneTilingJob job =
-        zoneTilingJobRepository.save(
-            ZoneTilingJob.builder()
-                .id(jobId)
-                .statusHistory(
-                    (List.of(
-                        JobStatus.builder()
-                            .id(randomUUID().toString())
-                            .jobId(jobId)
-                            .progression(PENDING)
-                            .health(UNKNOWN)
-                            .build())))
-                .zoneName("mock")
-                .emailReceiver("mock@hotmail.com")
-                .build());
+        zoneTilingJobRepository.save(zoneTilingJob(jobId));
     String taskId = randomUUID().toString();
-    ZoneTilingTask toCreate =
-        ZoneTilingTask.builder()
-            .id(taskId)
-            .jobId(job.getId())
-            .parcel(
-                Parcel.builder()
-                    .id(randomUUID().toString())
-                    .geoServerParameter(new GeoServerParameter().layers("grand-lyon"))
-                    .build())
-            .statusHistory(
-                List.of(
-                    TaskStatus.builder()
-                        .id(randomUUID().toString())
-                        .taskId(taskId)
-                        .progression(PENDING)
-                        .health(UNKNOWN)
-                        .build()))
-            .build();
+    ZoneTilingTask toCreate = zoneTilingTask(jobId, taskId);
     ZoneTilingTask created = repository.save(toCreate);
     ZoneTilingTaskCreated createdEventPayload =
         ZoneTilingTaskCreated.builder().task(created).build();
@@ -153,6 +280,25 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
     var changedToProcessing = (ZoneTilingJobStatusChanged) sentEvents.get(0);
     assertEquals(PROCESSING, changedToProcessing.getNewJob().getStatus().getProgression());
     var changedToFinished = (ZoneTilingJobStatusChanged) sentEvents.get(1);
-    assertEquals(FINISHED, changedToFinished.getNewJob().getStatus().getProgression());
+    assertEquals(school.hei.geotiler.repository.model.Status.ProgressionStatus.FINISHED, changedToFinished.getNewJob().getStatus().getProgression());
+  }
+
+  @Test
+  void get_ztj_tiles() {
+    String jobId = randomUUID().toString();
+    zoneTilingJobRepository.save(zoneTilingJob(jobId));
+    String taskId = randomUUID().toString();
+    ZoneTilingTask toCreate = zoneTilingTask(jobId, taskId);
+    ZoneTilingTask created = repository.save(toCreate);
+    ZoneTilingTaskCreated createdEventPayload =
+        ZoneTilingTaskCreated.builder().task(created).build();
+
+    subject.accept(createdEventPayload);
+    List<school.hei.geotiler.endpoint.rest.model.Parcel> actual = zoneTilingController.getZTJParcels(jobId);
+    school.hei.geotiler.endpoint.rest.model.Parcel expected = expectedParcel();
+    actual.stream().map(this::ignoreIds).toList();
+    actual.stream().flatMap(parcel -> ignoreIds(Objects.requireNonNull(parcel.getTiles())).stream()).toList();
+
+    assertEquals(List.of(expected), actual);
   }
 }

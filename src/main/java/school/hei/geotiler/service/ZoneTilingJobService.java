@@ -7,6 +7,7 @@ import static school.hei.geotiler.repository.model.Status.ProgressionStatus.PEND
 import static school.hei.geotiler.repository.model.Status.ProgressionStatus.PROCESSING;
 
 import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import school.hei.geotiler.repository.model.Status.HealthStatus;
 import school.hei.geotiler.repository.model.Status.ProgressionStatus;
 import school.hei.geotiler.repository.model.ZoneTilingJob;
 import school.hei.geotiler.repository.model.ZoneTilingTask;
+import school.hei.geotiler.repository.model.geo.Parcel;
 
 @Service
 @AllArgsConstructor
@@ -40,6 +42,16 @@ public class ZoneTilingJobService {
     var saved = repository.save(job);
     eventProducer.accept(List.of(new ZoneTilingJobCreated(job)));
     return saved;
+  }
+
+  public List<Parcel> getAJobParcel(String jobId) {
+    Optional<ZoneTilingJob> zoneTilingJob = repository.findById(jobId);
+
+    if (zoneTilingJob.isPresent()) {
+      return zoneTilingJob.get().getTasks().stream().map(ZoneTilingTask::getParcel).toList();
+    }
+
+    throw new NotFoundException("The job is not found");
   }
 
   private static boolean areAllTasksPending(ZoneTilingJob job) {

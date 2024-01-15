@@ -19,6 +19,7 @@ import school.hei.geotiler.repository.model.JobStatus;
 public class ZoneTilingJobMapper {
   private final ZoneTilingTaskMapper taskMapper;
   private final FeatureMapper featureMapper;
+  private final StatusMapper statusMapper;
 
   public school.hei.geotiler.repository.model.ZoneTilingJob toDomain(CreateZoneTilingJob rest) {
     var generatedId = randomUUID();
@@ -63,6 +64,7 @@ public class ZoneTilingJobMapper {
         .geoServerUrl(parcel0.getGeoServerUrl().toString())
         .geoServerParameter(parcel0.getGeoServerParameter())
         .emailReceiver(domain.getEmailReceiver())
+        .status(statusMapper.statusConverter(domain.getStatus()))
         .features(domain.getTasks().stream().map(featureMapper::fromZoneTilingTask).toList());
   }
 }
