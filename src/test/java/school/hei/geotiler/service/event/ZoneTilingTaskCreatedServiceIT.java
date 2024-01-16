@@ -30,9 +30,7 @@ import school.hei.geotiler.repository.model.geo.Parcel;
 import school.hei.geotiler.service.geo.TilesDownloader;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -70,11 +68,11 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   }
 
   @SneakyThrows
-  private school.hei.geotiler.endpoint.rest.model.Parcel expectedParcel(){
+  private school.hei.geotiler.endpoint.rest.model.Parcel parcel1(){
     return new school.hei.geotiler.endpoint.rest.model.Parcel()
         .creationDatetime(null)
         .id(null)
-        .tiles(expectedTiles())
+        .tiles(List.of(tile1(), tile2()))
         .feature(
             om.readValue(
                     """
@@ -94,13 +92,6 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
         .tilingStatus(new Status().creationDatetime(null)
             .progression(FINISHED)
             .health(SUCCEEDED));
-  }
-
-  public List<Tile> expectedTiles(){
-    List<Tile> tiles = new ArrayList<>();
-    tiles.add(tile1());
-    tiles.add(tile2());
-    return tiles;
   }
 
   public Tile tile1 (){
@@ -146,7 +137,7 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
     return tile;
   }
 
-  private ZoneTilingJob zoneTilingJob (String jobId){
+  private ZoneTilingJob aZTJ(String jobId){
     return ZoneTilingJob.builder()
         .id(jobId)
         .statusHistory(
@@ -163,7 +154,7 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   }
 
   @SneakyThrows
-  private ZoneTilingTask zoneTilingTask(String jobId, String taskId){
+  private ZoneTilingTask aZTT(String jobId, String taskId){
     return  ZoneTilingTask.builder()
         .id(taskId)
         .jobId(jobId)
@@ -257,9 +248,9 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   @Test
   void send_statusChanged_event_on_each_status_change() {
     String jobId = randomUUID().toString();
-    zoneTilingJobRepository.save(zoneTilingJob(jobId));
+    zoneTilingJobRepository.save(aZTJ(jobId));
     String taskId = randomUUID().toString();
-    ZoneTilingTask toCreate = zoneTilingTask(jobId, taskId);
+    ZoneTilingTask toCreate = aZTT(jobId, taskId);
     ZoneTilingTask created = repository.save(toCreate);
     ZoneTilingTaskCreated createdEventPayload =
         ZoneTilingTaskCreated.builder().task(created).build();
@@ -279,19 +270,17 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   @Test
   void get_ztj_tiles() {
     String jobId = randomUUID().toString();
-    zoneTilingJobRepository.save(zoneTilingJob(jobId));
-    String taskId = randomUUID().toString();
-    ZoneTilingTask toCreate = zoneTilingTask(jobId, taskId);
+    zoneTilingJobRepository.save(aZTJ(jobId));
+    ZoneTilingTask toCreate = aZTT(jobId, randomUUID().toString());
     ZoneTilingTask created = repository.save(toCreate);
-    ZoneTilingTaskCreated createdEventPayload =
+    ZoneTilingTaskCreated ztjCreated =
         ZoneTilingTaskCreated.builder().task(created).build();
 
-    subject.accept(createdEventPayload);
+    subject.accept(ztjCreated);
     List<school.hei.geotiler.endpoint.rest.model.Parcel> actual = zoneTilingController.getZTJParcels(jobId);
-    school.hei.geotiler.endpoint.rest.model.Parcel expected = expectedParcel();
-    actual.stream().map(this::ignoreIds).toList();
-    actual.stream().flatMap(parcel -> ignoreIds(Objects.requireNonNull(parcel.getTiles())).stream()).toList();
 
-    assertEquals(List.of(expected), actual);
+    actual.forEach(this::ignoreIds);
+    actual.forEach(parcel -> ignoreIds(parcel.getTiles()));
+    assertEquals(List.of(parcel1()), actual);
   }
 }
