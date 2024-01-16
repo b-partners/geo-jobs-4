@@ -37,11 +37,10 @@ public class TilesDownloaderIT extends FacadeIT {
                 "request": "GetMap",
                 "layers": "grandlyon:ortho_2018",
                 "styles": "",
-                "format": "image/png",
-                "transparent": true,
+                "format": "image/jpeg",
                 "version": "1.3.0",
-                "width": 256,
-                "height": 256,
+                "width": 1024,
+                "height": 1024,
                 "srs": "EPSG:3857"
             }""",
                 GeoServerParameter.class))
@@ -51,21 +50,20 @@ public class TilesDownloaderIT extends FacadeIT {
             { "type": "Feature",
             "properties": {
               "code": "69",
-              "nom": "Rhône",
+              "nom": "Rhône - 1 sur 1000x100",
               "id": 30251921,
               "CLUSTER_ID": 99520,
               "CLUSTER_SIZE": 386884 },
             "geometry": {
               "type": "MultiPolygon",
               "coordinates": [ [ [
-                [ 4.459648282829194, 45.904988912620688 ],
-                [ 4.464709510872551, 45.928950368349426 ],
-                [ 4.490816965688656, 45.941784543770964 ],
-                [ 4.510354299995861, 45.933697132664598 ],
-                [ 4.518386257467152, 45.912888345521047 ],
-                [ 4.496344031095243, 45.883438201401809 ],
-                [ 4.479593950305621, 45.882900828315755 ],
-                [ 4.459648282829194, 45.904988912620688 ] ] ] ] } }""",
+                [ 4.803193184300449, 45.732156868763205 ],
+                [ 4.802538245115325, 45.732990634128193 ],
+                [ 4.80264872650989, 45.733263461411831 ],
+                [ 4.803125193613379, 45.733382317920366 ],
+                [ 4.803576766482497, 45.73258632485657 ],
+                [ 4.803576472461046, 45.73258224786219 ],
+                [ 4.803193184300449, 45.732156868763205 ] ] ] ] } }""",
                     Feature.class)
                 .zoom(zoom)
                 .id("feature_1_id"))
@@ -74,10 +72,10 @@ public class TilesDownloaderIT extends FacadeIT {
 
   @Test
   public void download_tiles_ok() throws IOException {
-    var zoom = 13;
+    var zoom = 20;
 
     var tilesDir = tilesDownloader.apply(a_parcel_from_lyon(zoom));
 
-    assertEquals(2, new File(tilesDir.getAbsolutePath() + "/" + zoom).listFiles().length);
+    assertEquals(4, new File(tilesDir.getAbsolutePath() + "/" + zoom).listFiles().length);
   }
 }
