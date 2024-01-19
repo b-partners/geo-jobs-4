@@ -1,11 +1,11 @@
-app_name: geo-tiler
-cli_version: 10.4.2
+app_name: geo-jobs
+cli_version: 10.5.1
 custom_java_deps: poja-custom-java-deps.txt
 custom_java_env_vars: poja-custom-java-env-vars.txt
 custom_java_repositories: poja-custom-java-repositories.txt
 frontal_memory: 512
 jacoco_min_coverage: '0.7'
-package_full_name: school.hei.geotiler
+package_full_name: school.hei.geojobs
 region: eu-west-3
 ses_source: noreply@nowhere.com
 ssm_sg_id: /geo-tiler/sg/id

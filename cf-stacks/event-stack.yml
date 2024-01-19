@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: geo-tiler - Event
+Description: geo-jobs - Event
 
 Parameters:
   Env:
@@ -9,7 +9,7 @@ Resources:
   MailboxQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Join ['' , [!Ref Env , -geo-tiler]]
+      QueueName: !Join ['' , [!Ref Env , -geo-jobs]]
       VisibilityTimeout: 601
       RedrivePolicy:
         deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
@@ -19,7 +19,7 @@ Resources:
   DeadLetterQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName:  !Join ['' , [!Ref Env , -geo-tiler-dl]]
+      QueueName:  !Join ['' , [!Ref Env , -geo-jobs-dl]]
       SqsManagedSseEnabled: false
 
   MailboxQueuePolicy:
@@ -69,65 +69,65 @@ Resources:
   MailboxQueueSSM:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Join ['' , [/geo-tiler/ , !Ref Env , /sqs/mailbox-queue-url]]
+      Name: !Join ['' , [/geo-jobs/ , !Ref Env , /sqs/mailbox-queue-url]]
       Type: String
       Value: !Ref MailboxQueue
 
   MailboxQueueSSMArn:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Join ['' , [/geo-tiler/ , !Ref Env , /sqs/mailbox-queue-arn]]
+      Name: !Join ['' , [/geo-jobs/ , !Ref Env , /sqs/mailbox-queue-arn]]
       Type: String
       Value: !GetAtt MailboxQueue.Arn
 
   DeadLetterQueueSSM:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Join ['' , [/geo-tiler/ , !Ref Env , /sqs/dead-letter-queue-url]]
+      Name: !Join ['' , [/geo-jobs/ , !Ref Env , /sqs/dead-letter-queue-url]]
       Type: String
       Value: !Ref DeadLetterQueue
 
   DeadLetterQueueArnSSM:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Join [ '' , [ /geo-tiler/ , !Ref Env , /sqs/dead-letter-queue-arn ] ]
+      Name: !Join [ '' , [ /geo-jobs/ , !Ref Env , /sqs/dead-letter-queue-arn ] ]
       Type: String
       Value: !GetAtt DeadLetterQueue.Arn
 
   EventBridgeBus:
     Type: AWS::Events::EventBus
     Properties:
-      Name: !Join ['', [!Ref Env, -geo-tiler]]
+      Name: !Join ['', [!Ref Env, -geo-jobs]]
 
   EventBridgeArchive:
     Type: AWS::Events::Archive
     Properties:
-      ArchiveName: !Join ['', [!Ref Env, -geo-tiler, -archive]]
+      ArchiveName: !Join ['', [!Ref Env, -geo-jobs, -archive]]
       SourceArn: !GetAtt EventBridgeBus.Arn
 
   EventBridgeRule:
     Type: AWS::Events::Rule
     Properties:
-      Name: !Join ['', [!Ref Env, -geo-tiler, -from-api-to-api]]
+      Name: !Join ['', [!Ref Env, -geo-jobs, -from-api-to-api]]
       EventBusName: !GetAtt EventBridgeBus.Name
       EventPattern:
         source:
-          - school.hei.geotiler
+          - school.hei.geojobs
       Targets:
         - Arn: !GetAtt MailboxQueue.Arn
-          Id: !Join ['', [!Ref Env, -geo-tiler, -api-mailbox]]
+          Id: !Join ['', [!Ref Env, -geo-jobs, -api-mailbox]]
 
   EventBridgeBusNameSSM:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Join ['',[/geo-tiler/ , !Ref Env , /eventbridge/bus-name]]
+      Name: !Join ['',[/geo-jobs/ , !Ref Env , /eventbridge/bus-name]]
       Type: String
       Value: !GetAtt EventBridgeBus.Name
 
   EventBridgeBusArnSSM:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Join [ '',[ /geo-tiler/ , !Ref Env , /eventbridge/bus-arn ] ]
+      Name: !Join [ '',[ /geo-jobs/ , !Ref Env , /eventbridge/bus-arn ] ]
       Type: String
       Value: !GetAtt EventBridgeBus.Arn
 

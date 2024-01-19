@@ -22,7 +22,7 @@ repositories {
 }
 
 java {
-    group = 'school.hei.geotiler'
+    group = 'school.hei.geojobs'
     sourceCompatibility = '17'
     targetCompatibility = '17'
 }
@@ -42,9 +42,9 @@ task generateJavaClient(type: GenerateTask) {
     generatorName = "java"
     inputSpec = "$rootDir/doc/api.yml".toString()
     outputDir = "$buildDir/gen".toString()
-    apiPackage = "school.hei.geotiler.endpoint.rest.api"
-    invokerPackage = "school.hei.geotiler.endpoint.rest.client"
-    modelPackage = "school.hei.geotiler.endpoint.rest.model"
+    apiPackage = "school.hei.geojobs.endpoint.rest.api"
+    invokerPackage = "school.hei.geojobs.endpoint.rest.client"
+    modelPackage = "school.hei.geojobs.endpoint.rest.model"
 
     configOptions = [
             serializationLibrary: "jackson",
@@ -58,7 +58,7 @@ task generateJavaClient(type: GenerateTask) {
     library = "native"
 
     groupId = 'school.hei'
-    id = 'geo-tiler-gen'
+    id = 'geo-jobs-gen'
     skipValidateSpec = false
     logToStderr = true
     generateAliasAsModel = false
@@ -74,7 +74,7 @@ task generateTsClient(type: org.openapitools.generator.gradle.plugin.tasks.Gener
     ]
     additionalProperties = [
             enumPropertyNaming: "original",
-            npmName           : "@geo-tiler/typescript-client",
+            npmName           : "@geo-jobs/typescript-client",
             npmVersion        : project.properties["args"] ?: "latest"
     ]
 }
@@ -95,12 +95,40 @@ test {
 }
 
 jacocoTestCoverageVerification {
+    dependsOn test
     violationRules {
         rule {
             limit {
                 counter = "LINE"
                 minimum = 0.7
             }
+        }
+    }
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    doLast {
+        def coverageReportFile = file("$buildDir/reports/jacoco/test/jacocoTestReport.xml")
+
+        if (coverageReportFile.exists()) {
+            def xmlParser = new XmlParser()
+            xmlParser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+            xmlParser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
+
+            def xml = xmlParser.parse(coverageReportFile)
+
+            def totalLines = xml.'counter'.find { it.@type == 'LINE' }.@missed.toInteger() + xml.'counter'.find { it.@type == 'LINE' }.@covered.toInteger()
+            def coveredLines = xml.'counter'.find { it.@type == 'LINE' }.@covered.toInteger()
+            def coverageRate = coveredLines / totalLines.toDouble() * 100
+
+            println "Total Line Coverage Rate: ${coverageRate.round(2)}%"
+        } else {
+            println "No JaCoCo coverage report found. Make sure you run 'gradle test jacocoTestReport' first."
         }
     }
 }
@@ -151,7 +179,7 @@ dependencies {
 
 implementation 'com.vladmihalcea:hibernate-types-52:1.0.0'
 implementation 'io.hypersistence:hypersistence-utils-hibernate-55:3.5.1'
-implementation 'school.hei:geo-tiler-gen:latest'
+implementation 'school.hei:geo-jobs-gen:latest'
 implementation 'org.thymeleaf:thymeleaf:3.1.1.RELEASE'
 
 }

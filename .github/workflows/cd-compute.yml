@@ -35,10 +35,10 @@ jobs:
       - run: sam build
 
       - name: Deploy application
-        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name ${{ github.ref_name }}-compute-geo-tiler --capabilities CAPABILITY_IAM --parameter-overrides Env=${{ github.ref_name }} --resolve-s3
+        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name ${{ github.ref_name }}-compute-geo-jobs --capabilities CAPABILITY_IAM --parameter-overrides Env=${{ github.ref_name }} --resolve-s3
 
   health-check-infra:
     needs: [deploy-api]
-    if: ${{ needs.deploy-api.result == 'success' && github.ref_name == 'prod' }}
+    if: ${{ needs.deploy-api.result == 'success' && (github.ref_name == 'prod' || github.ref_name == 'preprod') }}
     uses: ./.github/workflows/health-check-infra.yml
     secrets: inherit

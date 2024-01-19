@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: geo-tiler - Computation and API
+Description: geo-jobs - Computation and API
 
 Globals:
   Function:
@@ -22,14 +22,14 @@ Globals:
     Environment:
       Variables:
         ENV: !Ref Env
-        AWS_SQS_QUEUE_URL: !Sub '{{resolve:ssm:/geo-tiler/${Env}/sqs/mailbox-queue-url}}'
-        AWS_EVENTBRIDGE_BUS: !Sub '{{resolve:ssm:/geo-tiler/${Env}/eventbridge/bus-name}}'
-        AWS_S3_BUCKET: !Sub '{{resolve:ssm:/geo-tiler/${Env}/s3/bucket-name}}'
+        AWS_SQS_QUEUE_URL: !Sub '{{resolve:ssm:/geo-jobs/${Env}/sqs/mailbox-queue-url}}'
+        AWS_EVENTBRIDGE_BUS: !Sub '{{resolve:ssm:/geo-jobs/${Env}/eventbridge/bus-name}}'
+        AWS_S3_BUCKET: !Sub '{{resolve:ssm:/geo-jobs/${Env}/s3/bucket-name}}'
         AWS_SES_SOURCE: noreply@nowhere.com
         
-        DATABASE_URL: !Sub '{{resolve:ssm:/geo-tiler/${Env}/db/url}}'
-        DATABASE_USERNAME: !Sub '{{resolve:ssm:/geo-tiler/${Env}/db/username}}'
-        DATABASE_PASSWORD: !Sub '{{resolve:ssm:/geo-tiler/${Env}/db/password}}'
+        DATABASE_URL: !Sub '{{resolve:ssm:/geo-jobs/${Env}/db/url}}'
+        DATABASE_USERNAME: !Sub '{{resolve:ssm:/geo-jobs/${Env}/db/username}}'
+        DATABASE_PASSWORD: !Sub '{{resolve:ssm:/geo-jobs/${Env}/db/password}}'
         TILES_DOWNLOADER_API_URL: https://hds4hpeacrrder7h32qy4lmy4a0wrewx.lambda-url.eu-west-3.on.aws
         TILE_DETECTION_API_URL: https://parjrau5niz7tsnr5v6mqayjty0avzco.lambda-url.eu-west-3.on.aws
 
@@ -50,9 +50,9 @@ Resources:
   FrontalFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: school.hei.geotiler.ApiEventHandler::handleRequest
+      Handler: school.hei.geojobs.ApiEventHandler::handleRequest
       MemorySize: 512
-      Role: !Sub '{{resolve:ssm:/geo-tiler/${Env}/execution/role-arn}}'
+      Role: !Sub '{{resolve:ssm:/geo-jobs/${Env}/execution/role-arn}}'
       
       Events:
         ApiCall:
@@ -66,15 +66,15 @@ Resources:
   WorkerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: school.hei.geotiler.MailboxEventHandler::handleRequest
+      Handler: school.hei.geojobs.MailboxEventHandler::handleRequest
       MemorySize: 1024
-      Role: !Sub '{{resolve:ssm:/geo-tiler/${Env}/execution/role-arn}}'
+      Role: !Sub '{{resolve:ssm:/geo-jobs/${Env}/execution/role-arn}}'
       
       Events:
         AllEvents:
           Type: SQS
           Properties:
-            Queue: !Sub '{{resolve:ssm:/geo-tiler/${Env}/sqs/mailbox-queue-arn}}'
+            Queue: !Sub '{{resolve:ssm:/geo-jobs/${Env}/sqs/mailbox-queue-arn}}'
             BatchSize: 5
 
   ApplicationResourceGroup:
@@ -93,7 +93,7 @@ Resources:
   ApiUrlSSM:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Join [ '', [ /geo-tiler/, !Ref Env, /api/url ] ]
+      Name: !Join [ '', [ /geo-jobs/, !Ref Env, /api/url ] ]
       Type: String
       Value: !Sub "https://${FrontalServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
 
