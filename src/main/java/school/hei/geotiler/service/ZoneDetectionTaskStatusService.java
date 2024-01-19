@@ -11,34 +11,34 @@ import static school.hei.geotiler.repository.model.Status.ProgressionStatus.PROC
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.hei.geotiler.model.exception.NotFoundException;
-import school.hei.geotiler.repository.ZoneTilingTaskRepository;
+import school.hei.geotiler.repository.ZoneDetectionTaskRepository;
+import school.hei.geotiler.repository.model.DetectionTaskStatus;
 import school.hei.geotiler.repository.model.Status.HealthStatus;
 import school.hei.geotiler.repository.model.Status.ProgressionStatus;
-import school.hei.geotiler.repository.model.TilingTaskStatus;
-import school.hei.geotiler.repository.model.ZoneTilingTask;
+import school.hei.geotiler.repository.model.ZoneDetectionTask;
 
 @Service
 @AllArgsConstructor
-public class ZoneTilingTaskStatusService {
-  private final ZoneTilingTaskRepository repository;
-  private final ZoneTilingJobService zoneTilingJobService;
+public class ZoneDetectionTaskStatusService {
+  private final ZoneDetectionTaskRepository repository;
+  private final ZoneDetectionJobService zoneDetectionJobService;
 
-  public ZoneTilingTask process(ZoneTilingTask task) {
+  public ZoneDetectionTask process(ZoneDetectionTask task) {
     return updateStatus(task, PROCESSING, UNKNOWN);
   }
 
-  public ZoneTilingTask succeed(ZoneTilingTask task) {
+  public ZoneDetectionTask succeed(ZoneDetectionTask task) {
     return updateStatus(task, FINISHED, SUCCEEDED);
   }
 
-  public ZoneTilingTask fail(ZoneTilingTask task) {
+  public ZoneDetectionTask fail(ZoneDetectionTask task) {
     return updateStatus(task, FINISHED, FAILED);
   }
 
-  private ZoneTilingTask updateStatus(
-      ZoneTilingTask task, ProgressionStatus progression, HealthStatus health) {
+  private ZoneDetectionTask updateStatus(
+      ZoneDetectionTask task, ProgressionStatus progression, HealthStatus health) {
     task.addStatus(
-        TilingTaskStatus.builder()
+        DetectionTaskStatus.builder()
             .id(randomUUID().toString())
             .creationDatetime(now())
             .progression(progression)
@@ -48,13 +48,13 @@ public class ZoneTilingTaskStatusService {
     return update(task);
   }
 
-  private ZoneTilingTask update(ZoneTilingTask zoneTilingTask) {
-    if (!repository.existsById(zoneTilingTask.getId())) {
-      throw new NotFoundException("ZoneTilingTask.Id = " + zoneTilingTask.getId() + " not found");
+  private ZoneDetectionTask update(ZoneDetectionTask zoneDetectionTask) {
+    if (!repository.existsById(zoneDetectionTask.getId())) {
+      throw new NotFoundException("ZoneDetection.Id = " + zoneDetectionTask.getId() + " not found");
     }
 
-    var updated = repository.save(zoneTilingTask);
-    zoneTilingJobService.refreshStatus(zoneTilingTask.getJobId());
+    var updated = repository.save(zoneDetectionTask);
+    zoneDetectionJobService.refreshStatus(zoneDetectionTask.getJobId());
 
     return updated;
   }

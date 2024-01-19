@@ -20,12 +20,12 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @Table(name = "zone_tiling_job_status")
-public class JobStatus extends Status {
+public class TilingJobStatus extends Status {
   @JoinColumn(referencedColumnName = "id")
   private String jobId;
 
-  public static JobStatus from(String id, Status status) {
-    return JobStatus.builder()
+  public static TilingJobStatus from(String id, Status status) {
+    return TilingJobStatus.builder()
         .jobId(id)
         .id(randomUUID().toString())
         .progression(status.getProgression())

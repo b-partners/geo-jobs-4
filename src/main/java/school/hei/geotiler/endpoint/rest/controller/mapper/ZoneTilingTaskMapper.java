@@ -20,7 +20,7 @@ import school.hei.geotiler.endpoint.rest.model.Parcel;
 import school.hei.geotiler.endpoint.rest.model.Status;
 import school.hei.geotiler.endpoint.rest.model.Tile;
 import school.hei.geotiler.repository.ZoneTilingJobRepository;
-import school.hei.geotiler.repository.model.TaskStatus;
+import school.hei.geotiler.repository.model.TilingTaskStatus;
 import school.hei.geotiler.repository.model.ZoneTilingJob;
 import school.hei.geotiler.repository.model.ZoneTilingTask;
 
@@ -38,7 +38,7 @@ public class ZoneTilingTaskMapper {
         .jobId(jobId.toString())
         .statusHistory(
             List.of(
-                TaskStatus.builder()
+                TilingTaskStatus.builder()
                     .health(UNKNOWN)
                     .progression(PENDING)
                     .creationDatetime(now())

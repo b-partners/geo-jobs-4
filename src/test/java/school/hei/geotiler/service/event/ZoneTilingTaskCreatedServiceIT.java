@@ -22,8 +22,8 @@ import school.hei.geotiler.file.BucketComponent;
 import school.hei.geotiler.file.FileHash;
 import school.hei.geotiler.repository.ZoneTilingJobRepository;
 import school.hei.geotiler.repository.ZoneTilingTaskRepository;
-import school.hei.geotiler.repository.model.JobStatus;
-import school.hei.geotiler.repository.model.TaskStatus;
+import school.hei.geotiler.repository.model.TilingJobStatus;
+import school.hei.geotiler.repository.model.TilingTaskStatus;
 import school.hei.geotiler.repository.model.ZoneTilingJob;
 import school.hei.geotiler.repository.model.ZoneTilingTask;
 import school.hei.geotiler.repository.model.geo.Parcel;
@@ -142,7 +142,7 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
         .id(jobId)
         .statusHistory(
             (List.of(
-                JobStatus.builder()
+                TilingJobStatus.builder()
                     .id(randomUUID().toString())
                     .jobId(jobId)
                     .progression(PENDING)
@@ -189,7 +189,7 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
                 .build())
         .statusHistory(
             List.of(
-                TaskStatus.builder()
+                TilingTaskStatus.builder()
                     .id(randomUUID().toString())
                     .taskId(taskId)
                     .progression(PENDING)
@@ -207,7 +207,7 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
                 .id(jobId)
                 .statusHistory(
                     (List.of(
-                        JobStatus.builder()
+                        TilingJobStatus.builder()
                             .id(randomUUID().toString())
                             .jobId(jobId)
                             .progression(PENDING)
@@ -228,7 +228,7 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
                     .build())
             .statusHistory(
                 List.of(
-                    TaskStatus.builder()
+                    TilingTaskStatus.builder()
                         .id(randomUUID().toString())
                         .taskId(taskId)
                         .progression(PENDING)

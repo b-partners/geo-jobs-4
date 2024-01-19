@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 import static school.hei.geotiler.endpoint.rest.model.Status.HealthEnum.UNKNOWN;
-import static school.hei.geotiler.endpoint.rest.model.Status.ProgressionEnum.PROCESSING;
+import static school.hei.geotiler.endpoint.rest.model.Status.ProgressionEnum.PENDING;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -39,41 +39,41 @@ class ZoneTilingJobControllerIT extends FacadeIT {
             .geoServerParameter(
                 om.readValue(
                     """
-                {
-                    "service": "WMS",
-                    "request": "GetMap",
-                    "layers": "grandlyon:ortho_2018",
-                    "styles": "",
-                    "format": "image/png",
-                    "transparent": true,
-                    "version": "1.3.0",
-                    "width": 256,
-                    "height": 256,
-                    "srs": "EPSG:3857"
-                  }""",
+                        {
+                            "service": "WMS",
+                            "request": "GetMap",
+                            "layers": "grandlyon:ortho_2018",
+                            "styles": "",
+                            "format": "image/png",
+                            "transparent": true,
+                            "version": "1.3.0",
+                            "width": 256,
+                            "height": 256,
+                            "srs": "EPSG:3857"
+                          }""",
                     GeoServerParameter.class))
             .features(
                 List.of(
                     om.readValue(
                             """
-                { "type": "Feature",
-                  "properties": {
-                    "code": "69",
-                    "nom": "Rhône",
-                    "id": 30251921,
-                    "CLUSTER_ID": 99520,
-                    "CLUSTER_SIZE": 386884 },
-                  "geometry": {
-                    "type": "MultiPolygon",
-                    "coordinates": [ [ [
-                      [ 4.459648282829194, 45.904988912620688 ],
-                      [ 4.464709510872551, 45.928950368349426 ],
-                      [ 4.490816965688656, 45.941784543770964 ],
-                      [ 4.510354299995861, 45.933697132664598 ],
-                      [ 4.518386257467152, 45.912888345521047 ],
-                      [ 4.496344031095243, 45.883438201401809 ],
-                      [ 4.479593950305621, 45.882900828315755 ],
-                      [ 4.459648282829194, 45.904988912620688 ] ] ] ] } }""",
+                                { "type": "Feature",
+                                  "properties": {
+                                    "code": "69",
+                                    "nom": "Rhône",
+                                    "id": 30251921,
+                                    "CLUSTER_ID": 99520,
+                                    "CLUSTER_SIZE": 386884 },
+                                  "geometry": {
+                                    "type": "MultiPolygon",
+                                    "coordinates": [ [ [
+                                      [ 4.459648282829194, 45.904988912620688 ],
+                                      [ 4.464709510872551, 45.928950368349426 ],
+                                      [ 4.490816965688656, 45.941784543770964 ],
+                                      [ 4.510354299995861, 45.933697132664598 ],
+                                      [ 4.518386257467152, 45.912888345521047 ],
+                                      [ 4.496344031095243, 45.883438201401809 ],
+                                      [ 4.479593950305621, 45.882900828315755 ],
+                                      [ 4.459648282829194, 45.904988912620688 ] ] ] ] } }""",
                             Feature.class)
                         .zoom(10)
                         .id("feature_1_id")));
@@ -103,7 +103,7 @@ class ZoneTilingJobControllerIT extends FacadeIT {
         .emailReceiver(createZoneTilingJob.getEmailReceiver())
         .geoServerUrl(createZoneTilingJob.getGeoServerUrl())
         .geoServerParameter(createZoneTilingJob.getGeoServerParameter())
-        .status(new Status().creationDatetime(null).health(UNKNOWN).progression(PROCESSING))
+        .status(new Status().creationDatetime(null).health(UNKNOWN).progression(PENDING))
         .features(createZoneTilingJob.getFeatures());
   }
 }

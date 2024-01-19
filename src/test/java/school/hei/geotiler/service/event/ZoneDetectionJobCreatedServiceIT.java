@@ -16,40 +16,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import school.hei.geotiler.conf.FacadeIT;
 import school.hei.geotiler.endpoint.event.EventProducer;
-import school.hei.geotiler.endpoint.event.gen.ZoneTilingJobCreated;
-import school.hei.geotiler.repository.ZoneTilingJobRepository;
-import school.hei.geotiler.repository.model.TilingJobStatus;
-import school.hei.geotiler.repository.model.TilingTaskStatus;
-import school.hei.geotiler.repository.model.ZoneTilingJob;
-import school.hei.geotiler.repository.model.ZoneTilingTask;
-import school.hei.geotiler.repository.model.geo.Parcel;
-import school.hei.geotiler.service.ZoneTilingJobService;
+import school.hei.geotiler.endpoint.event.gen.ZoneDetectionJobCreated;
+import school.hei.geotiler.repository.ZoneDetectionJobRepository;
+import school.hei.geotiler.repository.model.DetectionJobStatus;
+import school.hei.geotiler.repository.model.DetectionTaskStatus;
+import school.hei.geotiler.repository.model.ZoneDetectionJob;
+import school.hei.geotiler.repository.model.ZoneDetectionTask;
+import school.hei.geotiler.service.ZoneDetectionJobService;
 
-class ZoneTilingJobCreatedServiceIT extends FacadeIT {
-  @Autowired ZoneTilingJobCreatedService subject;
-  @Autowired ZoneTilingJobService zoneTilingJobService;
+class ZoneDetectionJobCreatedServiceIT extends FacadeIT {
+  @Autowired ZoneDetectionJobCreatedService subject;
+  @Autowired ZoneDetectionJobService zoneDetectionJobService;
   @MockBean EventProducer eventProducer;
-  @Autowired ZoneTilingJobRepository repository;
+  @Autowired ZoneDetectionJobRepository repository;
 
   @Test
   void accept() {
     String jobId = randomUUID().toString();
     String taskId = randomUUID().toString();
-    ZoneTilingJob toCreate =
-        ZoneTilingJob.builder()
+    ZoneDetectionJob toCreate =
+        ZoneDetectionJob.builder()
             .id(jobId)
             .zoneName("mock")
             .emailReceiver("mock@gmail.com")
             .tasks(
                 List.of(
-                    ZoneTilingTask.builder()
+                    ZoneDetectionTask.builder()
                         .id(taskId)
                         .jobId(jobId)
                         .submissionInstant(now())
-                        .parcel(Parcel.builder().id(randomUUID().toString()).build())
                         .statusHistory(
                             List.of(
-                                TilingTaskStatus.builder()
+                                DetectionTaskStatus.builder()
                                     .id(randomUUID().toString())
                                     .progression(PENDING)
                                     .health(UNKNOWN)
@@ -59,19 +57,19 @@ class ZoneTilingJobCreatedServiceIT extends FacadeIT {
                         .build()))
             .statusHistory(
                 List.of(
-                    TilingJobStatus.builder()
+                    DetectionJobStatus.builder()
                         .id(randomUUID().toString())
                         .jobId(jobId)
                         .progression(PENDING)
                         .health(UNKNOWN)
                         .build()))
             .build();
-    ZoneTilingJob created = repository.save(toCreate);
-    ZoneTilingJobCreated createdEventPayload =
-        ZoneTilingJobCreated.builder().zoneTilingJob(created).build();
+    ZoneDetectionJob created = repository.save(toCreate);
+    ZoneDetectionJobCreated createdEventPayload =
+        ZoneDetectionJobCreated.builder().zoneDetectionJob(created).build();
 
     subject.accept(createdEventPayload);
-    ZoneTilingJob actualAfterAccept = zoneTilingJobService.findById(created.getId());
+    ZoneDetectionJob actualAfterAccept = zoneDetectionJobService.findById(created.getId());
 
     int numberOfFeaturesInJob = 1;
     verify(eventProducer, times(numberOfFeaturesInJob)).accept(anyList());

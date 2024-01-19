@@ -12,14 +12,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.geotiler.endpoint.rest.model.CreateZoneTilingJob;
 import school.hei.geotiler.endpoint.rest.model.ZoneTilingJob;
-import school.hei.geotiler.repository.model.JobStatus;
+import school.hei.geotiler.repository.model.TilingJobStatus;
 
 @Component
 @AllArgsConstructor
 public class ZoneTilingJobMapper {
   private final ZoneTilingTaskMapper taskMapper;
   private final FeatureMapper featureMapper;
-  private final StatusMapper statusMapper;
+  private final StatusMapper<TilingJobStatus> statusMapper;
 
   public school.hei.geotiler.repository.model.ZoneTilingJob toDomain(CreateZoneTilingJob rest) {
     var generatedId = randomUUID();
@@ -27,7 +27,7 @@ public class ZoneTilingJobMapper {
         .id(generatedId.toString())
         .statusHistory(
             List.of(
-                JobStatus.builder()
+                TilingJobStatus.builder()
                     .health(UNKNOWN)
                     .progression(PENDING)
                     .creationDatetime(now())

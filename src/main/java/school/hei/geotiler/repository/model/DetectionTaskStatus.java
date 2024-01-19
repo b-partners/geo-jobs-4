@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @PrimaryKeyJoinColumn(name = "id")
@@ -17,12 +18,14 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-@Table(name = "zone_tiling_task_status")
-public class TaskStatus extends Status {
-  @JoinColumn private String taskId;
+@Table(name = "zone_detection_task_status")
+@ToString
+public class DetectionTaskStatus extends Status {
+  @JoinColumn(referencedColumnName = "id")
+  private String taskId;
 
-  public static TaskStatus from(String id, Status status) {
-    return TaskStatus.builder()
+  public static DetectionTaskStatus from(String id, Status status) {
+    return DetectionTaskStatus.builder()
         .taskId(id)
         .id(randomUUID().toString())
         .progression(status.getProgression())

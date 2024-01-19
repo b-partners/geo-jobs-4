@@ -8,5 +8,8 @@ public class EnvConf {
     registry.add(
         "tiles.downloader.api.url",
         () -> "https://hds4hpeacrrder7h32qy4lmy4a0wrewx.lambda-url.eu-west-3.on.aws");
+    registry.add(
+        "tile.detection.api.url",
+        () -> "https://parjrau5niz7tsnr5v6mqayjty0avzco.lambda-url.eu-west-3.on.aws");
   }
 }

@@ -14,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import school.hei.geotiler.conf.FacadeIT;
 import school.hei.geotiler.endpoint.event.gen.ZoneTilingJobStatusChanged;
-import school.hei.geotiler.repository.model.JobStatus;
-import school.hei.geotiler.repository.model.TaskStatus;
+import school.hei.geotiler.repository.model.TilingJobStatus;
+import school.hei.geotiler.repository.model.TilingTaskStatus;
 import school.hei.geotiler.repository.model.ZoneTilingJob;
 import school.hei.geotiler.repository.model.ZoneTilingTask;
 import school.hei.geotiler.repository.model.geo.Parcel;
@@ -43,7 +43,7 @@ public class ZoneTilingJobStatusChangedIT extends FacadeIT {
                         .parcel(Parcel.builder().id(randomUUID().toString()).build())
                         .statusHistory(
                             List.of(
-                                TaskStatus.builder()
+                                TilingTaskStatus.builder()
                                     .id(randomUUID().toString())
                                     .progression(FINISHED)
                                     .health(SUCCEEDED)
@@ -53,7 +53,7 @@ public class ZoneTilingJobStatusChangedIT extends FacadeIT {
                         .build()))
             .statusHistory(
                 List.of(
-                    JobStatus.builder()
+                    TilingJobStatus.builder()
                         .id(randomUUID().toString())
                         .jobId(jobId)
                         .progression(FINISHED)

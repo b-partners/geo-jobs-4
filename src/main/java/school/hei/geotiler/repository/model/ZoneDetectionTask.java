@@ -1,6 +1,7 @@
 package school.hei.geotiler.repository.model;
 
 import static java.util.stream.Collectors.toList;
+import static javax.persistence.CascadeType.ALL;
 import static school.hei.geotiler.repository.model.types.PostgresTypes.JSONB;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -9,10 +10,8 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -24,7 +23,6 @@ import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import school.hei.geotiler.repository.model.geo.Parcel;
 
 @TypeDef(name = JSONB, typeClass = JsonBinaryType.class)
 @Entity
@@ -35,25 +33,25 @@ import school.hei.geotiler.repository.model.geo.Parcel;
 @Setter
 @ToString
 @JsonIgnoreProperties({"status"})
-public class ZoneTilingTask implements Serializable {
+public class ZoneDetectionTask implements Serializable {
   @Id private String id;
 
   private String jobId;
   @Getter @CreationTimestamp private Instant submissionInstant;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "taskId", fetch = FetchType.EAGER)
-  private List<TilingTaskStatus> statusHistory = new ArrayList<>();
+  @OneToMany(cascade = ALL, mappedBy = "taskId")
+  private List<DetectionTaskStatus> statusHistory = new ArrayList<>();
 
   @Type(type = JSONB)
   @Column(columnDefinition = JSONB)
-  private Parcel parcel;
+  private Tile tile;
 
-  public TilingTaskStatus getStatus() {
-    return TilingTaskStatus.from(
-        id, Status.reduce(statusHistory.stream().map(status -> (Status) status).collect(toList())));
+  public void addStatus(DetectionTaskStatus status) {
+    statusHistory.add(status);
   }
 
-  public void addStatus(TilingTaskStatus status) {
-    statusHistory.add(status);
+  public DetectionTaskStatus getStatus() {
+    return DetectionTaskStatus.from(
+        id, Status.reduce(statusHistory.stream().map(status -> (Status) status).collect(toList())));
   }
 }
