@@ -17,6 +17,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -31,6 +32,7 @@ import school.hei.geotiler.repository.model.types.PostgresEnumType;
 @NoArgsConstructor
 @EqualsAndHashCode
 @TypeDef(name = PGSQL_ENUM_NAME, typeClass = PostgresEnumType.class)
+@ToString
 public class Status {
   @Id
   @GeneratedValue(strategy = IDENTITY)

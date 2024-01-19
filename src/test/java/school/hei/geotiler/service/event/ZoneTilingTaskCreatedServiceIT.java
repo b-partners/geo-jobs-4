@@ -1,6 +1,7 @@
 package school.hei.geotiler.service.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,7 @@ import java.util.List;
 
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -265,6 +267,25 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
     assertEquals(PROCESSING, changedToProcessing.getNewJob().getStatus().getProgression());
     var changedToFinished = (ZoneTilingJobStatusChanged) sentEvents.get(1);
     assertEquals(school.hei.geotiler.repository.model.Status.ProgressionStatus.FINISHED, changedToFinished.getNewJob().getStatus().getProgression());
+  }
+
+  @Test
+  void task_finished_to_processing_ko(){
+    String jobId = randomUUID().toString();
+    zoneTilingJobRepository.save(aZTJ(jobId));
+    String taskId = randomUUID().toString();
+    ZoneTilingTask toCreate = aZTT(jobId, taskId);
+    ZoneTilingTask created = repository.save(toCreate);
+    ZoneTilingTaskCreated createdEventPayload =
+        ZoneTilingTaskCreated.builder().task(created).build();
+
+    subject.accept(createdEventPayload);
+    toCreate.setSubmissionInstant(Instant.now());
+    ZoneTilingTask taskCreated = repository.save(toCreate);
+    ZoneTilingTaskCreated taskEvent =
+        ZoneTilingTaskCreated.builder().task(taskCreated).build();
+
+    assertThrows(IllegalArgumentException.class , () -> subject.accept(taskEvent));
   }
 
   @Test
