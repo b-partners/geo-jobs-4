@@ -8,9 +8,9 @@ jacoco_min_coverage: '0.7'
 package_full_name: school.hei.geojobs
 region: eu-west-3
 ses_source: noreply@nowhere.com
-ssm_sg_id: /geo-tiler/sg/id
-ssm_subnet1_id: /geo-tiler/private/subnet1/id
-ssm_subnet2_id: /geo-tiler/private/subnet2/id
+ssm_sg_id: /bpartners-imagery/sg/id
+ssm_subnet1_id: /bpartners-imagery/private/subnet1/id
+ssm_subnet2_id: /bpartners-imagery/private/subnet2/id
 ts_client_api_url_env_var_name: ''
 ts_client_default_openapi_server_url: ''
 with_database: postgres
