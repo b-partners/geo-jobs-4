@@ -9,10 +9,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import school.hei.geojobs.repository.model.Tile;
 import school.hei.geojobs.endpoint.rest.model.Feature;
 import school.hei.geojobs.endpoint.rest.model.GeoServerParameter;
 import school.hei.geojobs.repository.model.Status;
+import school.hei.geojobs.repository.model.Tile;
 
 @Builder
 @ToString
@@ -27,4 +27,5 @@ public class Parcel implements Serializable {
   private GeoServerParameter geoServerParameter;
   private List<Tile> tiles;
   private Status tilingStatus;
+  private String creationDatetime;
 }

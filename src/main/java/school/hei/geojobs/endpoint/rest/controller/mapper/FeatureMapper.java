@@ -1,5 +1,7 @@
 package school.hei.geojobs.endpoint.rest.controller.mapper;
 
+import static java.time.Instant.now;
+
 import java.net.URL;
 import org.springframework.stereotype.Component;
 import school.hei.geojobs.endpoint.rest.model.Feature;
@@ -15,6 +17,7 @@ public class FeatureMapper {
         .feature(rest)
         .geoServerUrl(geoServerUrl)
         .geoServerParameter(GeoServerParameter)
+        .creationDatetime(String.valueOf(now()))
         .build();
   }
 
