@@ -22,7 +22,7 @@ repositories {
 }
 
 java {
-    group = 'school.hei.geojobs'
+    group = 'app.bpartners.geojobs'
     sourceCompatibility = '17'
     targetCompatibility = '17'
 }
@@ -42,9 +42,9 @@ task generateJavaClient(type: GenerateTask) {
     generatorName = "java"
     inputSpec = "$rootDir/doc/api.yml".toString()
     outputDir = "$buildDir/gen".toString()
-    apiPackage = "school.hei.geojobs.endpoint.rest.api"
-    invokerPackage = "school.hei.geojobs.endpoint.rest.client"
-    modelPackage = "school.hei.geojobs.endpoint.rest.model"
+    apiPackage = "app.bpartners.geojobs.endpoint.rest.api"
+    invokerPackage = "app.bpartners.geojobs.endpoint.rest.client"
+    modelPackage = "app.bpartners.geojobs.endpoint.rest.model"
 
     configOptions = [
             serializationLibrary: "jackson",
@@ -57,7 +57,7 @@ task generateJavaClient(type: GenerateTask) {
     ]
     library = "native"
 
-    groupId = 'school.hei'
+    groupId = 'app.bpartners'
     id = 'geo-jobs-gen'
     skipValidateSpec = false
     logToStderr = true
@@ -179,7 +179,7 @@ dependencies {
 
 implementation 'com.vladmihalcea:hibernate-types-52:1.0.0'
 implementation 'io.hypersistence:hypersistence-utils-hibernate-55:3.5.1'
-implementation 'school.hei:geo-jobs-gen:latest'
+implementation 'app.bpartners:geo-jobs-gen:latest'
 implementation 'org.thymeleaf:thymeleaf:3.1.1.RELEASE'
 
 }
