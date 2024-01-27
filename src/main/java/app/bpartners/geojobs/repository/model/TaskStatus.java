@@ -30,9 +30,9 @@ public class TaskStatus extends Status {
 
   @Enumerated(EnumType.STRING)
   @Type(type = PGSQL_ENUM_NAME)
-  private JobStatus.JobType jobType;
+  private JobType jobType;
 
-  public static TaskStatus from(String id, Status status, JobStatus.JobType jobType) {
+  public static TaskStatus from(String id, Status status, JobType jobType) {
     return TaskStatus.builder()
         .taskId(id)
         .id(randomUUID().toString())

@@ -1,6 +1,6 @@
 package app.bpartners.geojobs.service;
 
-import static app.bpartners.geojobs.repository.model.JobStatus.JobType.DETECTION;
+import static app.bpartners.geojobs.repository.model.JobType.DETECTION;
 
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionJobStatusChanged;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionTaskCreated;

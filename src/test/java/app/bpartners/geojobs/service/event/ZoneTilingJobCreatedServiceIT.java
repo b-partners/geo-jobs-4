@@ -1,6 +1,6 @@
 package app.bpartners.geojobs.service.event;
 
-import static app.bpartners.geojobs.repository.model.JobStatus.JobType.TILING;
+import static app.bpartners.geojobs.repository.model.JobType.TILING;
 import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;

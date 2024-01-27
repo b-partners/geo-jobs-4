@@ -45,9 +45,4 @@ public class JobStatus extends Status {
         .creationDatetime(status.getCreationDatetime())
         .build();
   }
-
-  public enum JobType {
-    TILING,
-    DETECTION
-  }
 }

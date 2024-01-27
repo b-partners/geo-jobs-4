@@ -1,6 +1,6 @@
 package app.bpartners.geojobs.service.event;
 
-import static app.bpartners.geojobs.repository.model.JobStatus.JobType.DETECTION;
+import static app.bpartners.geojobs.repository.model.JobType.DETECTION;
 import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
 import static java.time.Instant.now;

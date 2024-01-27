@@ -1,6 +1,6 @@
 package app.bpartners.geojobs.service;
 
-import static app.bpartners.geojobs.repository.model.JobStatus.JobType.TILING;
+import static app.bpartners.geojobs.repository.model.JobType.TILING;
 
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobCreated;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobStatusChanged;

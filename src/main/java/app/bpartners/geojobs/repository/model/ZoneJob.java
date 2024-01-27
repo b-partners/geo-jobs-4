@@ -35,7 +35,7 @@ public class ZoneJob<T extends ZoneTask> implements Serializable {
   protected String zoneName;
   protected String emailReceiver;
   @CreationTimestamp protected Instant submissionInstant;
-  protected JobStatus.JobType jobType; // TODO: why in Status...
+  protected JobType jobType;
 
   // note(LazyInitializationException): thrown when fetch type is LAZY, hence using EAGER
   @OneToMany(cascade = ALL, mappedBy = "jobId", fetch = EAGER)

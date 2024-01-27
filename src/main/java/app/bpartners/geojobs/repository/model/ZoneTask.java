@@ -1,6 +1,6 @@
 package app.bpartners.geojobs.repository.model;
 
-import static app.bpartners.geojobs.repository.model.JobStatus.JobType.TILING;
+import static app.bpartners.geojobs.repository.model.JobType.TILING;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

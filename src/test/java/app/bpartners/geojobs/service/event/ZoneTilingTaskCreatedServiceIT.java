@@ -37,7 +37,7 @@ import java.util.List;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
-import static app.bpartners.geojobs.repository.model.JobStatus.JobType.TILING;
+import static app.bpartners.geojobs.repository.model.JobType.TILING;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

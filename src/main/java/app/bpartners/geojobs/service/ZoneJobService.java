@@ -11,6 +11,7 @@ import app.bpartners.geojobs.model.BoundedPageSize;
 import app.bpartners.geojobs.model.PageFromOne;
 import app.bpartners.geojobs.model.exception.NotFoundException;
 import app.bpartners.geojobs.repository.model.JobStatus;
+import app.bpartners.geojobs.repository.model.JobType;
 import app.bpartners.geojobs.repository.model.ZoneJob;
 import app.bpartners.geojobs.repository.model.ZoneTask;
 import java.util.List;
@@ -53,7 +54,7 @@ public class ZoneJobService<T extends ZoneTask, J extends ZoneJob> {
     return repository.save(job);
   }
 
-  public J process(J job, JobStatus.JobType jobType, JpaRepository<J, String> repository) {
+  public J process(J job, JobType jobType, JpaRepository<J, String> repository) {
     var jobStatus =
         JobStatus.builder()
             .id(randomUUID().toString())
