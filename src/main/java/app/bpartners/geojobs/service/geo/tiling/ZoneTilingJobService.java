@@ -6,13 +6,13 @@ import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobCreated;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobStatusChanged;
 import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
 import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
-import app.bpartners.geojobs.service.ZoneJobService;
+import app.bpartners.geojobs.service.JobService;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ZoneTilingJobService extends ZoneJobService<TilingTask, ZoneTilingJob> {
+public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> {
 
   public ZoneTilingJobService(
       JpaRepository<ZoneTilingJob, String> repository, EventProducer eventProducer) {

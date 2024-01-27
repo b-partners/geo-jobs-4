@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TaskStatusService<T extends Task, J extends Job<T>> {
 
   protected final JpaRepository<T, String> repository;
-  protected final ZoneJobService<T, J> zoneJobService;
+  protected final JobService<T, J> jobService;
 
   @Transactional
   public T process(T task) {
@@ -57,8 +57,8 @@ public class TaskStatusService<T extends Task, J extends Job<T>> {
     }
 
     var updated = repository.save(task);
-    var job = zoneJobService.findById(task.getJobId());
-    zoneJobService.refreshStatus(job);
+    var job = jobService.findById(task.getJobId());
+    jobService.refreshStatus(job);
     return updated;
   }
 }

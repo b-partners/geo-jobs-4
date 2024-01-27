@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @AllArgsConstructor
-public class ZoneJobService<T extends Task, J extends Job<T>> {
+public class JobService<T extends Task, J extends Job<T>> {
   protected final JpaRepository<J, String> repository;
   protected final EventProducer eventProducer;
 
@@ -23,7 +23,7 @@ public class ZoneJobService<T extends Task, J extends Job<T>> {
   }
 
   public J findById(String id) {
-    return repository.findById(id).orElseThrow(() -> new NotFoundException("zoneJob.id=" + id));
+    return repository.findById(id).orElseThrow(() -> new NotFoundException("job.id=" + id));
   }
 
   public J refreshStatus(J job) {
