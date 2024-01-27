@@ -14,8 +14,8 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingTaskCreated;
-import app.bpartners.geojobs.repository.model.TilingJobStatus;
-import app.bpartners.geojobs.repository.model.TilingTaskStatus;
+import app.bpartners.geojobs.repository.model.JobStatus;
+import app.bpartners.geojobs.repository.model.TaskStatus;
 import app.bpartners.geojobs.service.geo.TilesDownloader;
 import app.bpartners.geojobs.conf.FacadeIT;
 import app.bpartners.geojobs.endpoint.event.EventProducer;
@@ -37,6 +37,7 @@ import java.util.List;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
+import static app.bpartners.geojobs.repository.model.JobStatus.JobType.TILING;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -150,9 +151,10 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
         .id(jobId)
         .statusHistory(
             (List.of(
-                TilingJobStatus.builder()
+                JobStatus.builder()
                     .id(randomUUID().toString())
                     .jobId(jobId)
+                    .jobType(TILING)
                     .progression(PENDING)
                     .health(UNKNOWN)
                     .build())))
@@ -198,7 +200,7 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
                 .build())
         .statusHistory(
             List.of(
-                TilingTaskStatus.builder()
+                TaskStatus.builder()
                     .id(randomUUID().toString())
                     .taskId(taskId)
                     .progression(PENDING)
@@ -243,7 +245,7 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
                 .build())
         .statusHistory(
             List.of(
-                TilingTaskStatus.builder()
+                TaskStatus.builder()
                     .id(randomUUID().toString())
                     .taskId(taskId)
                     .progression(PROCESSING)
@@ -261,10 +263,11 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
                 .id(jobId)
                 .statusHistory(
                     (List.of(
-                        TilingJobStatus.builder()
+                        JobStatus.builder()
                             .id(randomUUID().toString())
                             .jobId(jobId)
                             .progression(PENDING)
+                            .jobType(TILING)
                             .health(UNKNOWN)
                             .build())))
                 .zoneName("mock")
@@ -282,7 +285,7 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
                     .build())
             .statusHistory(
                 List.of(
-                    TilingTaskStatus.builder()
+                    TaskStatus.builder()
                         .id(randomUUID().toString())
                         .taskId(taskId)
                         .progression(PENDING)
@@ -351,10 +354,10 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
     String taskId = randomUUID().toString();
     ZoneTilingTask toCreate = aZTT_processing(jobId, taskId);
     ZoneTilingTask created = repository.save(toCreate);
-    List<TilingTaskStatus> statuses = repository.findById(created.getId()).orElseThrow().getStatusHistory().stream().toList();
+    List<TaskStatus> statuses = repository.findById(created.getId()).orElseThrow().getStatusHistory().stream().toList();
 
     assertThrows(IllegalArgumentException.class, () -> zoneTilingTaskStatusService.pending(created));
-    List<TilingTaskStatus> statusesAfterFailedStatusTransition = repository.findById(created.getId()).orElseThrow().getStatusHistory().stream().toList();
+    List<TaskStatus> statusesAfterFailedStatusTransition = repository.findById(created.getId()).orElseThrow().getStatusHistory().stream().toList();
 
     assertEquals(statusesAfterFailedStatusTransition, statuses);
     assertFalse(statuses.isEmpty());

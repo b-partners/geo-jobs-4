@@ -1,75 +1,63 @@
 package app.bpartners.geojobs.service;
 
-import static java.time.Instant.now;
-import static java.util.UUID.randomUUID;
+import static app.bpartners.geojobs.repository.model.JobStatus.JobType.TILING;
 
-import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobCreated;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobStatusChanged;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingTaskCreated;
+import app.bpartners.geojobs.model.BoundedPageSize;
+import app.bpartners.geojobs.model.PageFromOne;
 import app.bpartners.geojobs.model.exception.NotFoundException;
 import app.bpartners.geojobs.repository.ZoneTilingJobRepository;
+import app.bpartners.geojobs.repository.model.JobStatus;
 import app.bpartners.geojobs.repository.model.Status;
-import app.bpartners.geojobs.repository.model.TilingJobStatus;
 import app.bpartners.geojobs.repository.model.ZoneTilingJob;
 import app.bpartners.geojobs.repository.model.ZoneTilingTask;
 import app.bpartners.geojobs.repository.model.geo.Parcel;
 import java.util.List;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ZoneTilingJobService
-    extends AbstractZoneJobService<
-        TilingJobStatus, ZoneTilingTask, ZoneTilingJob, ZoneTilingJobRepository> {
-
-  public ZoneTilingJobService(EventProducer eventProducer, ZoneTilingJobRepository repository) {
-    super(eventProducer, repository);
-  }
+@AllArgsConstructor
+public class ZoneTilingJobService {
+  private final ZoneTilingJobRepository repository;
+  private final ZoneJobService<ZoneTilingTask, ZoneTilingJob> zoneJobService;
 
   public ZoneTilingJob create(ZoneTilingJob job) {
-    if (!areAllTasksPending(job)) {
-      throw new IllegalArgumentException("Tasks on job creation must all have status PENDING");
-    }
-
-    var saved = getRepository().save(job);
-    getEventProducer().accept(List.of(new ZoneTilingJobCreated(job)));
+    var saved = zoneJobService.create(job, repository);
+    zoneJobService.getEventProducer().accept(List.of(new ZoneTilingJobCreated(saved)));
     return saved;
   }
 
-  public List<Parcel> getAJobParcel(String jobId) {
-    Optional<ZoneTilingJob> zoneTilingJob = getRepository().findById(jobId);
+  public List<ZoneTilingJob> findAll(PageFromOne page, BoundedPageSize pageSize) {
+    return zoneJobService.findAll(page, pageSize, repository);
+  }
 
+  public ZoneTilingJob findById(String id) {
+    return zoneJobService.findById(id, repository);
+  }
+
+  public List<Parcel> getAJobParcel(String jobId) {
+    Optional<ZoneTilingJob> zoneTilingJob = repository.findById(jobId);
     if (zoneTilingJob.isPresent()) {
       return zoneTilingJob.get().getTasks().stream().map(ZoneTilingTask::getParcel).toList();
     }
-
     throw new NotFoundException("The job is not found");
   }
 
-  private static boolean areAllTasksPending(ZoneTilingJob job) {
-    return job.getTasks().stream()
-        .map(ZoneTilingTask::getStatus)
-        .allMatch(status -> Status.ProgressionStatus.PENDING.equals(status.getProgression()));
-  }
-
   public ZoneTilingJob process(ZoneTilingJob job) {
-    var status =
-        TilingJobStatus.builder()
-            .id(randomUUID().toString())
-            .jobId(job.getId())
-            .progression(Status.ProgressionStatus.PROCESSING)
-            .health(Status.HealthStatus.UNKNOWN)
-            .creationDatetime(now())
-            .build();
-    var processed = updateStatus(job, status);
+    var processed = zoneJobService.process(job, TILING, repository);
     job.getTasks()
-        .forEach(task -> getEventProducer().accept(List.of(new ZoneTilingTaskCreated(task))));
+        .forEach(
+            task ->
+                zoneJobService.getEventProducer().accept(List.of(new ZoneTilingTaskCreated(task))));
     return processed;
   }
 
   public ZoneTilingJob refreshStatus(String jobId) {
-    var oldJob = findById(jobId);
+    var oldJob = zoneJobService.findById(jobId, repository);
     Status oldStatus = oldJob.getStatus();
     Status newStatus =
         Status.reduce(
@@ -80,10 +68,11 @@ public class ZoneTilingJobService
     if (oldStatus.equals(newStatus)) {
       return oldJob;
     }
-    var jobStatus = TilingJobStatus.from(oldJob.getId(), newStatus);
-    var refreshed = updateStatus(oldJob, jobStatus);
+    var jobStatus = JobStatus.from(oldJob.getId(), newStatus, TILING);
+    var refreshed = zoneJobService.updateStatus(oldJob, jobStatus, repository);
 
-    getEventProducer()
+    zoneJobService
+        .getEventProducer()
         .accept(
             List.of(ZoneTilingJobStatusChanged.builder().oldJob(oldJob).newJob(refreshed).build()));
     return refreshed;

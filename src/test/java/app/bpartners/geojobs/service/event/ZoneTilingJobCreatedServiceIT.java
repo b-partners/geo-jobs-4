@@ -1,5 +1,6 @@
 package app.bpartners.geojobs.service.event;
 
+import static app.bpartners.geojobs.repository.model.JobStatus.JobType.TILING;
 import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;
@@ -14,8 +15,8 @@ import app.bpartners.geojobs.conf.FacadeIT;
 import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobCreated;
 import app.bpartners.geojobs.repository.ZoneTilingJobRepository;
-import app.bpartners.geojobs.repository.model.TilingJobStatus;
-import app.bpartners.geojobs.repository.model.TilingTaskStatus;
+import app.bpartners.geojobs.repository.model.JobStatus;
+import app.bpartners.geojobs.repository.model.TaskStatus;
 import app.bpartners.geojobs.repository.model.ZoneTilingJob;
 import app.bpartners.geojobs.repository.model.ZoneTilingTask;
 import app.bpartners.geojobs.repository.model.geo.Parcel;
@@ -49,7 +50,7 @@ class ZoneTilingJobCreatedServiceIT extends FacadeIT {
                         .parcel(Parcel.builder().id(randomUUID().toString()).build())
                         .statusHistory(
                             List.of(
-                                TilingTaskStatus.builder()
+                                TaskStatus.builder()
                                     .id(randomUUID().toString())
                                     .progression(PENDING)
                                     .health(UNKNOWN)
@@ -59,9 +60,10 @@ class ZoneTilingJobCreatedServiceIT extends FacadeIT {
                         .build()))
             .statusHistory(
                 List.of(
-                    TilingJobStatus.builder()
+                    JobStatus.builder()
                         .id(randomUUID().toString())
                         .jobId(jobId)
+                        .jobType(TILING)
                         .progression(PENDING)
                         .health(UNKNOWN)
                         .build()))
