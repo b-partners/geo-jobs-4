@@ -6,7 +6,7 @@ import app.bpartners.geojobs.repository.DetectedTileRepository;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectedTile;
 import app.bpartners.geojobs.service.geo.detection.DetectionResponse;
 import app.bpartners.geojobs.service.geo.detection.DetectionTaskStatusService;
-import app.bpartners.geojobs.service.geo.detection.TilesDetectionApi;
+import app.bpartners.geojobs.service.geo.detection.ObjectsDetector;
 import app.bpartners.geojobs.service.mapper.DetectionMapper;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class DetectionTaskCreatedService implements Consumer<DetectionTaskCreated> {
-  private final TilesDetectionApi tilesDetectionApi;
+  private final ObjectsDetector objectsDetector;
   private final DetectionTaskStatusService detectionTaskStatusService;
   private final DetectedTileRepository detectedTileRepository;
 
@@ -24,7 +24,7 @@ public class DetectionTaskCreatedService implements Consumer<DetectionTaskCreate
     var task = detectionTaskCreated.getTask();
     detectionTaskStatusService.process(task);
     try {
-      DetectionResponse response = tilesDetectionApi.detect(task);
+      DetectionResponse response = objectsDetector.apply(task);
       DetectedTile detectedTile = DetectionMapper.toDetectedTile(response, task.getTile());
       detectedTileRepository.save(detectedTile);
       detectionTaskStatusService.succeed(task);

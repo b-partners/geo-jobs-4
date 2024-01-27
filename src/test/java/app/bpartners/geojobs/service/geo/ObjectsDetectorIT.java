@@ -1,4 +1,4 @@
-package app.bpartners.geojobs.api;
+package app.bpartners.geojobs.service.geo;
 
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,15 +9,14 @@ import app.bpartners.geojobs.conf.FacadeIT;
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
-import app.bpartners.geojobs.service.geo.detection.DetectionResponse;
-import app.bpartners.geojobs.service.geo.detection.TilesDetectionApi;
+import app.bpartners.geojobs.service.geo.detection.ObjectsDetector;
 import java.io.File;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-public class TilesDetectionApiIT extends FacadeIT {
+public class ObjectsDetectorIT extends FacadeIT {
   private static final String FILE_NAME =
       "src"
           + File.separator
@@ -29,11 +28,11 @@ public class TilesDetectionApiIT extends FacadeIT {
           + File.separator
           + "image-to-detect.jpg";
   @MockBean BucketComponent bucketComponent;
-  @Autowired TilesDetectionApi tilesDetectionApi;
+  @Autowired ObjectsDetector objectsDetector;
 
   @Test
   public void process_detection_ok() {
-    DetectionResponse actual = tilesDetectionApi.detect(detectionTask());
+    var actual = objectsDetector.apply(detectionTask());
 
     assertNotNull(actual);
     assertNotNull(actual.getRstImageUrl());

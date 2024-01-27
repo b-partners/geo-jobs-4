@@ -24,7 +24,7 @@ import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
 import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
 import app.bpartners.geojobs.service.geo.detection.DetectionResponse;
-import app.bpartners.geojobs.service.geo.detection.TilesDetectionApi;
+import app.bpartners.geojobs.service.geo.detection.ObjectsDetector;
 import app.bpartners.geojobs.service.geo.detection.ZoneDetectionJobService;
 import java.io.File;
 import java.math.BigDecimal;
@@ -53,7 +53,7 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
 
   @Autowired DetectionTaskCreatedService subject;
 
-  @MockBean TilesDetectionApi tilesDetectionApi;
+  @MockBean ObjectsDetector objectsDetector;
 
   @MockBean BucketComponent bucketComponent;
 
@@ -171,7 +171,7 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
   @Test
   void process_detection() {
     when(bucketComponent.download(any())).thenReturn(new File(FILE_NAME));
-    when(tilesDetectionApi.detect(any())).thenReturn(detectionResponse());
+    when(objectsDetector.apply(any())).thenReturn(detectionResponse());
     when(detectionTaskRepository.existsById(any())).thenReturn(true);
     when(zoneDetectionJobService.findById(any())).thenReturn(zoneDetectionJob());
 

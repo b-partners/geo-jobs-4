@@ -1,5 +1,7 @@
 package app.bpartners.geojobs.service.geo.detection;
 
+import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
+
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.model.exception.ApiException;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
@@ -7,6 +9,7 @@ import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.util.Base64;
+import java.util.function.Function;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -21,12 +24,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 @Slf4j
-public class TilesDetectionApi {
+public class ObjectsDetector implements Function<DetectionTask, DetectionResponse> {
   private final String tileDetectionBaseUrl;
   private final ObjectMapper om;
   private final BucketComponent bucketComponent;
 
-  public TilesDetectionApi(
+  public ObjectsDetector(
       @Value("${tile.detection.api.url}") String apiUrl,
       ObjectMapper objectMapper,
       BucketComponent bucket) {
@@ -36,7 +39,8 @@ public class TilesDetectionApi {
   }
 
   @SneakyThrows
-  public DetectionResponse detect(DetectionTask task) {
+  @Override
+  public DetectionResponse apply(DetectionTask task) {
     RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -64,6 +68,6 @@ public class TilesDetectionApi {
       log.info("Response data {}", responseEntity.getBody());
       return responseEntity.getBody();
     }
-    throw new ApiException(ApiException.ExceptionType.SERVER_EXCEPTION, "Server error");
+    throw new ApiException(SERVER_EXCEPTION, "Server error");
   }
 }

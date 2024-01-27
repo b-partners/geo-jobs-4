@@ -1,4 +1,4 @@
-package app.bpartners.geojobs.api;
+package app.bpartners.geojobs.service.geo;
 
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
