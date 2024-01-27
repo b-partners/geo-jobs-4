@@ -16,7 +16,7 @@ import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionTaskCreated;
 import app.bpartners.geojobs.endpoint.rest.model.TileCoordinates;
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.repository.DetectedTileRepository;
-import app.bpartners.geojobs.repository.ZoneDetectionTaskRepository;
+import app.bpartners.geojobs.repository.DetectionTaskRepository;
 import app.bpartners.geojobs.repository.model.DetectedTile;
 import app.bpartners.geojobs.repository.model.JobStatus;
 import app.bpartners.geojobs.repository.model.TaskStatus;
@@ -59,7 +59,8 @@ class ZoneDetectionTaskCreatedServiceIT extends FacadeIT {
 
   @MockBean DetectedTileRepository detectedTileRepository;
 
-  @MockBean ZoneDetectionTaskRepository zoneDetectionTaskRepository;
+  @MockBean
+  DetectionTaskRepository detectionTaskRepository;
 
   @MockBean ZoneDetectionJobService zoneDetectionJobService;
 
@@ -172,7 +173,7 @@ class ZoneDetectionTaskCreatedServiceIT extends FacadeIT {
   void process_detection() {
     when(bucketComponent.download(any())).thenReturn(new File(FILE_NAME));
     when(tilesDetectionApi.detect(any())).thenReturn(detectionResponse());
-    when(zoneDetectionTaskRepository.existsById(any())).thenReturn(true);
+    when(detectionTaskRepository.existsById(any())).thenReturn(true);
     when(zoneDetectionJobService.findById(any())).thenReturn(zoneDetectionJob());
 
     subject.accept(zoneDetectionTaskCreated());

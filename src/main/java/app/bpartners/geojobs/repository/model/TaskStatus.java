@@ -2,10 +2,10 @@ package app.bpartners.geojobs.repository.model;
 
 import static app.bpartners.geojobs.repository.model.types.PostgresEnumType.PGSQL_ENUM_NAME;
 import static java.util.UUID.randomUUID;
+import static javax.persistence.EnumType.STRING;
 
 import app.bpartners.geojobs.repository.model.types.PostgresEnumType;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.PrimaryKeyJoinColumn;
@@ -28,7 +28,7 @@ import org.hibernate.annotations.TypeDef;
 public class TaskStatus extends Status {
   @JoinColumn private String taskId;
 
-  @Enumerated(EnumType.STRING)
+  @Enumerated(STRING)
   @Type(type = PGSQL_ENUM_NAME)
   private JobType jobType;
 

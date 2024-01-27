@@ -3,7 +3,7 @@ package app.bpartners.geojobs.service.event;
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.file.FileHash;
 import app.bpartners.geojobs.file.FileHashAlgorithm;
-import app.bpartners.geojobs.service.ZoneTilingTaskStatusService;
+import app.bpartners.geojobs.service.TilingTaskStatusService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import lombok.SneakyThrows;
@@ -27,7 +27,7 @@ import app.bpartners.geojobs.endpoint.rest.model.Status;
 import app.bpartners.geojobs.endpoint.rest.model.Tile;
 import app.bpartners.geojobs.endpoint.rest.model.TileCoordinates;
 import app.bpartners.geojobs.repository.ZoneTilingJobRepository;
-import app.bpartners.geojobs.repository.ZoneTilingTaskRepository;
+import app.bpartners.geojobs.repository.TilingTaskRepository;
 import app.bpartners.geojobs.repository.model.ZoneTilingJob;
 import app.bpartners.geojobs.repository.model.ZoneTilingTask;
 import app.bpartners.geojobs.repository.model.geo.Parcel;
@@ -61,12 +61,13 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   BucketComponent bucketComponent;
   @MockBean
   TilesDownloader tilesDownloader;
-  @Autowired ZoneTilingTaskRepository repository;
+  @Autowired
+  TilingTaskRepository repository;
   @Autowired ZoneTilingJobRepository zoneTilingJobRepository;
   @MockBean EventProducer eventProducer;
   @Autowired ObjectMapper om;
   @Autowired
-  ZoneTilingTaskStatusService zoneTilingTaskStatusService;
+  TilingTaskStatusService tilingTaskStatusService;
 
   @BeforeEach
   void setUp() {
@@ -356,7 +357,7 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
     ZoneTilingTask created = repository.save(toCreate);
     List<TaskStatus> statuses = repository.findById(created.getId()).orElseThrow().getStatusHistory().stream().toList();
 
-    assertThrows(IllegalArgumentException.class, () -> zoneTilingTaskStatusService.pending(created));
+    assertThrows(IllegalArgumentException.class, () -> tilingTaskStatusService.pending(created));
     List<TaskStatus> statusesAfterFailedStatusTransition = repository.findById(created.getId()).orElseThrow().getStatusHistory().stream().toList();
 
     assertEquals(statusesAfterFailedStatusTransition, statuses);

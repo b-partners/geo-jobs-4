@@ -11,7 +11,7 @@ import app.bpartners.geojobs.model.exception.ApiException;
 import app.bpartners.geojobs.repository.model.Tile;
 import app.bpartners.geojobs.repository.model.ZoneTilingTask;
 import app.bpartners.geojobs.repository.model.geo.Parcel;
-import app.bpartners.geojobs.service.ZoneTilingTaskStatusService;
+import app.bpartners.geojobs.service.TilingTaskStatusService;
 import app.bpartners.geojobs.service.geo.TilesDownloader;
 import java.io.File;
 import java.time.Instant;
@@ -29,12 +29,12 @@ public class ZoneTilingTaskCreatedService implements Consumer<ZoneTilingTaskCrea
   private final TilesDownloader tilesDownloader;
   private final BucketComponent bucketComponent;
   private final BucketConf bucketConf;
-  private final ZoneTilingTaskStatusService zoneTilingTaskStatusService;
+  private final TilingTaskStatusService tilingTaskStatusService;
 
   @Override
   public void accept(ZoneTilingTaskCreated zoneTilingTaskCreated) {
     ZoneTilingTask task = zoneTilingTaskCreated.getTask();
-    zoneTilingTaskStatusService.process(task);
+    tilingTaskStatusService.process(task);
 
     try {
       File downloadedTiles = tilesDownloader.apply(zoneTilingTaskCreated.getTask().getParcel());
@@ -42,11 +42,11 @@ public class ZoneTilingTaskCreatedService implements Consumer<ZoneTilingTaskCrea
       bucketComponent.upload(downloadedTiles, bucketKey);
       setParcelTiles(downloadedTiles, task.getParcel(), bucketKey);
     } catch (Exception e) {
-      zoneTilingTaskStatusService.fail(task);
+      tilingTaskStatusService.fail(task);
       throw new ApiException(ApiException.ExceptionType.SERVER_EXCEPTION, e);
     }
 
-    zoneTilingTaskStatusService.succeed(task);
+    tilingTaskStatusService.succeed(task);
   }
 
   private void setParcelTiles(File tilesDir, Parcel parcel, String bucketKey) {

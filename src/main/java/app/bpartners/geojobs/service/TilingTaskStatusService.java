@@ -1,7 +1,7 @@
 package app.bpartners.geojobs.service;
 
 import app.bpartners.geojobs.model.exception.NotFoundException;
-import app.bpartners.geojobs.repository.ZoneTilingTaskRepository;
+import app.bpartners.geojobs.repository.TilingTaskRepository;
 import app.bpartners.geojobs.repository.model.ZoneTilingTask;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,30 +9,30 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
-public class ZoneTilingTaskStatusService {
+public class TilingTaskStatusService {
 
-  private final ZoneTilingTaskRepository repository;
+  private final TilingTaskRepository repository;
   private final ZoneTilingJobService zoneTilingJobService;
-  private final ZoneTaskStatusService<ZoneTilingTask> zoneTaskStatusService;
+  private final TaskStatusService<ZoneTilingTask> taskStatusService;
 
   @Transactional(rollbackFor = IllegalArgumentException.class)
   public ZoneTilingTask pending(ZoneTilingTask task) {
-    return zoneTaskStatusService.pending(task, this::update);
+    return taskStatusService.pending(task, this::update);
   }
 
   @Transactional(rollbackFor = IllegalArgumentException.class)
   public ZoneTilingTask process(ZoneTilingTask task) {
-    return zoneTaskStatusService.process(task, this::update);
+    return taskStatusService.process(task, this::update);
   }
 
   @Transactional(rollbackFor = IllegalArgumentException.class)
   public ZoneTilingTask succeed(ZoneTilingTask task) {
-    return zoneTaskStatusService.succeed(task, this::update);
+    return taskStatusService.succeed(task, this::update);
   }
 
   @Transactional(rollbackFor = IllegalArgumentException.class)
   public ZoneTilingTask fail(ZoneTilingTask task) {
-    return zoneTaskStatusService.fail(task, this::update);
+    return taskStatusService.fail(task, this::update);
   }
 
   private ZoneTilingTask update(ZoneTilingTask zoneTilingTask) {

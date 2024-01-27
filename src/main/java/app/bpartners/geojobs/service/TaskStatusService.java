@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class ZoneTaskStatusService<T extends ZoneTask> {
+public class TaskStatusService<T extends ZoneTask> {
 
   public T pending(T task, Function<T, T> update) {
     return updateStatus(task, PENDING, UNKNOWN, update);
