@@ -1,6 +1,7 @@
 package app.bpartners.geojobs.repository.model;
 
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
+import static app.bpartners.geojobs.repository.model.types.PostgresEnumType.PGSQL_ENUM_NAME;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 import static org.hibernate.annotations.FetchMode.SELECT;
@@ -30,13 +31,12 @@ import org.hibernate.annotations.TypeDef;
 @Setter
 @ToString
 @MappedSuperclass
-@TypeDef(name = PostgresEnumType.PGSQL_ENUM_NAME, typeClass = PostgresEnumType.class)
-public class ZoneJob<T extends ZoneTask> implements Serializable {
+@TypeDef(name = PGSQL_ENUM_NAME, typeClass = PostgresEnumType.class)
+public abstract class ZoneJob<T extends ZoneTask> implements Serializable {
   @Id protected String id;
   protected String zoneName;
   protected String emailReceiver;
   @CreationTimestamp protected Instant submissionInstant;
-  protected JobType jobType;
 
   // note(LazyInitializationException): thrown when fetch type is LAZY, hence using EAGER
   @OneToMany(cascade = ALL, mappedBy = "jobId", fetch = EAGER)
@@ -57,10 +57,12 @@ public class ZoneJob<T extends ZoneTask> implements Serializable {
         id,
         Status.reduce(
             tasks.stream().map(ZoneTask::getStatus).map(status -> (Status) status).toList()),
-        jobType);
+        getJobType());
   }
 
   public boolean isPending() {
     return PENDING.equals(getStatus().getProgression());
   }
+
+  public abstract JobType getJobType();
 }

@@ -1,5 +1,6 @@
 package app.bpartners.geojobs.repository.model;
 
+import static app.bpartners.geojobs.repository.model.JobType.DETECTION;
 import static javax.persistence.CascadeType.ALL;
 
 import java.io.Serializable;
@@ -20,4 +21,9 @@ import lombok.experimental.SuperBuilder;
 public class ZoneDetectionJob extends ZoneJob<ZoneDetectionTask> implements Serializable {
   @OneToOne(cascade = ALL)
   private ZoneTilingJob zoneTilingJob;
+
+  @Override
+  public JobType getJobType() {
+    return DETECTION;
+  }
 }

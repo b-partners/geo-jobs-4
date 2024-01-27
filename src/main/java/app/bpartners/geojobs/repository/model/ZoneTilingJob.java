@@ -1,5 +1,7 @@
 package app.bpartners.geojobs.repository.model;
 
+import static app.bpartners.geojobs.repository.model.JobType.TILING;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import javax.persistence.Entity;
@@ -14,4 +16,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @ToString
 @JsonIgnoreProperties({"status", "done"})
-public class ZoneTilingJob extends ZoneJob<ZoneTilingTask> implements Serializable {}
+public class ZoneTilingJob extends ZoneJob<ZoneTilingTask> implements Serializable {
+  @Override
+  public JobType getJobType() {
+    return TILING;
+  }
+}
