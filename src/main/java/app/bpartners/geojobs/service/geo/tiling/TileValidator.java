@@ -1,4 +1,4 @@
-package app.bpartners.geojobs.service.validator;
+package app.bpartners.geojobs.service.geo.tiling;
 
 import app.bpartners.geojobs.model.exception.BadRequestException;
 import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
