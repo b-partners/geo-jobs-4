@@ -18,7 +18,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode
 @ToString
-public class ZoneTilingTaskCreated implements Serializable {
-  @JsonProperty("zoneTilingTask")
+public class TilingTaskCreated implements Serializable {
+  @JsonProperty("tilingTask")
   private TilingTask task;
 }

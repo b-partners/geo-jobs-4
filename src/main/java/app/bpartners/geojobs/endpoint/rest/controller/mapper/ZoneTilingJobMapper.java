@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class ZoneTilingJobMapper {
-  private final ZoneTilingTaskMapper taskMapper;
+  private final TilingTaskMapper taskMapper;
   private final FeatureMapper featureMapper;
   private final StatusMapper<JobStatus> statusMapper;
 
@@ -65,6 +65,6 @@ public class ZoneTilingJobMapper {
         .geoServerParameter(parcel0.getGeoServerParameter())
         .emailReceiver(domain.getEmailReceiver())
         .status(statusMapper.statusConverter(domain.getStatus()))
-        .features(domain.getTasks().stream().map(featureMapper::fromZoneTilingTask).toList());
+        .features(domain.getTasks().stream().map(featureMapper::from).toList());
   }
 }

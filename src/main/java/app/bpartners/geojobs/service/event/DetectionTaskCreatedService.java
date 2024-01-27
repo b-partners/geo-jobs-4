@@ -1,6 +1,6 @@
 package app.bpartners.geojobs.service.event;
 
-import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionTaskCreated;
+import app.bpartners.geojobs.endpoint.event.gen.DetectionTaskCreated;
 import app.bpartners.geojobs.model.exception.ApiException;
 import app.bpartners.geojobs.repository.DetectedTileRepository;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectedTile;
@@ -14,14 +14,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class ZoneDetectionTaskCreatedService implements Consumer<ZoneDetectionTaskCreated> {
+public class DetectionTaskCreatedService implements Consumer<DetectionTaskCreated> {
   private final TilesDetectionApi tilesDetectionApi;
   private final DetectionTaskStatusService detectionTaskStatusService;
   private final DetectedTileRepository detectedTileRepository;
 
   @Override
-  public void accept(ZoneDetectionTaskCreated zoneDetectionTaskCreated) {
-    var task = zoneDetectionTaskCreated.getTask();
+  public void accept(DetectionTaskCreated detectionTaskCreated) {
+    var task = detectionTaskCreated.getTask();
     detectionTaskStatusService.process(task);
     try {
       DetectionResponse response = tilesDetectionApi.detect(task);

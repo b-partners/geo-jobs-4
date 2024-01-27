@@ -1,9 +1,9 @@
 package app.bpartners.geojobs.service.geo.tiling;
 
 import app.bpartners.geojobs.endpoint.event.EventProducer;
+import app.bpartners.geojobs.endpoint.event.gen.TilingTaskCreated;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobCreated;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobStatusChanged;
-import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingTaskCreated;
 import app.bpartners.geojobs.model.exception.NotFoundException;
 import app.bpartners.geojobs.repository.model.geo.Parcel;
 import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
@@ -38,7 +38,7 @@ public class ZoneTilingJobService extends ZoneJobService<TilingTask, ZoneTilingJ
   }
 
   public void fireTasks(ZoneTilingJob job) {
-    job.getTasks().forEach(task -> eventProducer.accept(List.of(new ZoneTilingTaskCreated(task))));
+    job.getTasks().forEach(task -> eventProducer.accept(List.of(new TilingTaskCreated(task))));
   }
 
   public ZoneTilingJob refreshStatus(String jobId) {

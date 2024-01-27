@@ -12,7 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import app.bpartners.geojobs.conf.FacadeIT;
-import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionTaskCreated;
+import app.bpartners.geojobs.endpoint.event.gen.DetectionTaskCreated;
 import app.bpartners.geojobs.endpoint.rest.model.TileCoordinates;
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.repository.DetectedTileRepository;
@@ -51,7 +51,7 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
           + File.separator
           + "image-to-detect.jpg";
 
-  @Autowired ZoneDetectionTaskCreatedService subject;
+  @Autowired DetectionTaskCreatedService subject;
 
   @MockBean TilesDetectionApi tilesDetectionApi;
 
@@ -113,11 +113,11 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
         .build();
   }
 
-  ZoneDetectionTaskCreated zoneDetectionTaskCreated() {
+  DetectionTaskCreated detectionTaskCreated() {
     String taskId = randomUUID().toString();
     String jobId = randomUUID().toString();
 
-    return ZoneDetectionTaskCreated.builder()
+    return DetectionTaskCreated.builder()
         .task(
             DetectionTask.builder()
                 .id(taskId)
@@ -146,7 +146,7 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
   }
 
   ZoneDetectionJob zoneDetectionJob() {
-    var task = zoneDetectionTaskCreated().getTask();
+    var task = detectionTaskCreated().getTask();
     String jobId = task.getJobId();
     return ZoneDetectionJob.builder()
         .id(jobId)
@@ -175,7 +175,7 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
     when(detectionTaskRepository.existsById(any())).thenReturn(true);
     when(zoneDetectionJobService.findById(any())).thenReturn(zoneDetectionJob());
 
-    subject.accept(zoneDetectionTaskCreated());
+    subject.accept(detectionTaskCreated());
 
     verify(detectedTileRepository).save(detectedTileCaptor.capture());
 

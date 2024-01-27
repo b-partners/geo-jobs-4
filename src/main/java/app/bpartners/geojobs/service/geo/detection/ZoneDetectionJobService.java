@@ -1,8 +1,8 @@
 package app.bpartners.geojobs.service.geo.detection;
 
 import app.bpartners.geojobs.endpoint.event.EventProducer;
+import app.bpartners.geojobs.endpoint.event.gen.DetectionTaskCreated;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionJobStatusChanged;
-import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionTaskCreated;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
 import app.bpartners.geojobs.service.ZoneJobService;
@@ -20,8 +20,7 @@ public class ZoneDetectionJobService extends ZoneJobService<DetectionTask, ZoneD
 
   public List<ZoneDetectionJob> fireTasks(String jobId) {
     var job = findById(jobId);
-    job.getTasks()
-        .forEach(task -> eventProducer.accept(List.of(new ZoneDetectionTaskCreated(task))));
+    job.getTasks().forEach(task -> eventProducer.accept(List.of(new DetectionTaskCreated(task))));
     return List.of(job);
   }
 

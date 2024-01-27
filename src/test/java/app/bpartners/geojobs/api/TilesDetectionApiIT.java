@@ -33,7 +33,7 @@ public class TilesDetectionApiIT extends FacadeIT {
 
   @Test
   public void process_detection_ok() {
-    DetectionResponse actual = tilesDetectionApi.detect(zoneDetectionTask());
+    DetectionResponse actual = tilesDetectionApi.detect(detectionTask());
 
     assertNotNull(actual);
     assertNotNull(actual.getRstImageUrl());
@@ -41,7 +41,7 @@ public class TilesDetectionApiIT extends FacadeIT {
     assertNotNull(actual.getRstRaw());
   }
 
-  public DetectionTask zoneDetectionTask() {
+  public DetectionTask detectionTask() {
     when(bucketComponent.download(any())).thenReturn(new File(FILE_NAME));
 
     return DetectionTask.builder()

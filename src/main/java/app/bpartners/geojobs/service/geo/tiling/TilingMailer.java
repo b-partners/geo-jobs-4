@@ -7,7 +7,6 @@ import app.bpartners.geojobs.template.HTMLTemplateParser;
 import jakarta.mail.internet.InternetAddress;
 import java.util.List;
 import java.util.function.Consumer;
-
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;

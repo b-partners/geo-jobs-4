@@ -21,7 +21,7 @@ public class FeatureMapper {
         .build();
   }
 
-  public Feature fromZoneTilingTask(TilingTask domainTask) {
+  public Feature from(TilingTask domainTask) {
     return domainTask.getParcel().getFeature();
   }
 }

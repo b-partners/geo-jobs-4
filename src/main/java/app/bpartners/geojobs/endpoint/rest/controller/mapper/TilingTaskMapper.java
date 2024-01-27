@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public class ZoneTilingTaskMapper {
+public class TilingTaskMapper {
   private final FeatureMapper featureMapper;
   private final ZoneTilingJobRepository zoneTilingJobRepository;
 

@@ -2,7 +2,7 @@ package app.bpartners.geojobs.service.event;
 
 import static java.util.UUID.randomUUID;
 
-import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingTaskCreated;
+import app.bpartners.geojobs.endpoint.event.gen.TilingTaskCreated;
 import app.bpartners.geojobs.endpoint.rest.model.TileCoordinates;
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.file.BucketConf;
@@ -25,19 +25,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class ZoneTilingTaskCreatedService implements Consumer<ZoneTilingTaskCreated> {
+public class TilingTaskCreatedService implements Consumer<TilingTaskCreated> {
   private final TilesDownloader tilesDownloader;
   private final BucketComponent bucketComponent;
   private final BucketConf bucketConf;
   private final TilingTaskStatusService tilingTaskStatusService;
 
   @Override
-  public void accept(ZoneTilingTaskCreated zoneTilingTaskCreated) {
-    TilingTask task = zoneTilingTaskCreated.getTask();
+  public void accept(TilingTaskCreated tilingTaskCreated) {
+    TilingTask task = tilingTaskCreated.getTask();
     tilingTaskStatusService.process(task);
 
     try {
-      File downloadedTiles = tilesDownloader.apply(zoneTilingTaskCreated.getTask().getParcel());
+      File downloadedTiles = tilesDownloader.apply(tilingTaskCreated.getTask().getParcel());
       String bucketKey = downloadedTiles.getName();
       bucketComponent.upload(downloadedTiles, bucketKey);
       setParcelTiles(downloadedTiles, task.getParcel(), bucketKey);

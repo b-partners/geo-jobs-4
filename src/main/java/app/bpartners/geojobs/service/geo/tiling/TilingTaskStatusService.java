@@ -36,12 +36,12 @@ public class TilingTaskStatusService {
     return taskStatusService.fail(task, this::update);
   }
 
-  private TilingTask update(TilingTask zoneTilingTask) {
-    if (!repository.existsById(zoneTilingTask.getId())) {
-      throw new NotFoundException("ZoneTilingTask.Id = " + zoneTilingTask.getId() + " not found");
+  private TilingTask update(TilingTask tilingTask) {
+    if (!repository.existsById(tilingTask.getId())) {
+      throw new NotFoundException("tilingTask.Id = " + tilingTask.getId() + " not found");
     }
-    var updated = repository.save(zoneTilingTask);
-    zoneTilingJobService.refreshStatus(zoneTilingTask.getJobId());
+    var updated = repository.save(tilingTask);
+    zoneTilingJobService.refreshStatus(tilingTask.getJobId());
 
     return updated;
   }

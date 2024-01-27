@@ -26,13 +26,13 @@ public class DetectionTaskStatusService {
     return taskStatusService.fail(task, this::update);
   }
 
-  private DetectionTask update(DetectionTask zoneDetectionTask) {
-    if (!repository.existsById(zoneDetectionTask.getId())) {
-      throw new NotFoundException("ZoneDetection.Id = " + zoneDetectionTask.getId() + " not found");
+  private DetectionTask update(DetectionTask detectionTask) {
+    if (!repository.existsById(detectionTask.getId())) {
+      throw new NotFoundException("detection.Id = " + detectionTask.getId() + " not found");
     }
 
-    var updated = repository.save(zoneDetectionTask);
-    zoneDetectionJobService.refreshStatus(zoneDetectionTask.getJobId());
+    var updated = repository.save(detectionTask);
+    zoneDetectionJobService.refreshStatus(detectionTask.getJobId());
     return updated;
   }
 }

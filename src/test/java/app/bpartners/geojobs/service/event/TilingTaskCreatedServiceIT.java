@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingTaskCreated;
+import app.bpartners.geojobs.endpoint.event.gen.TilingTaskCreated;
 import app.bpartners.geojobs.repository.model.JobStatus;
 import app.bpartners.geojobs.repository.model.TaskStatus;
 import app.bpartners.geojobs.service.geo.tiling.TilesDownloader;
@@ -54,7 +54,8 @@ import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PR
 
 @Slf4j
 class TilingTaskCreatedServiceIT extends FacadeIT {
-  @Autowired ZoneTilingTaskCreatedService subject;
+  @Autowired
+  TilingTaskCreatedService subject;
   @Autowired
   ZoneTilingController zoneTilingController;
   @MockBean
@@ -294,8 +295,8 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
                         .build()))
             .build();
     TilingTask created = repository.save(toCreate);
-    ZoneTilingTaskCreated createdEventPayload =
-        ZoneTilingTaskCreated.builder().task(created).build();
+    TilingTaskCreated createdEventPayload =
+        TilingTaskCreated.builder().task(created).build();
 
     subject.accept(createdEventPayload);
 
@@ -310,8 +311,8 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
     String taskId = randomUUID().toString();
     TilingTask toCreate = aZTT(jobId, taskId);
     TilingTask created = repository.save(toCreate);
-    ZoneTilingTaskCreated createdEventPayload =
-        ZoneTilingTaskCreated.builder().task(created).build();
+    TilingTaskCreated createdEventPayload =
+        TilingTaskCreated.builder().task(created).build();
 
     subject.accept(createdEventPayload);
 
@@ -332,8 +333,8 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
     String taskId = randomUUID().toString();
     TilingTask toCreate = aZTT(jobId, taskId);
     TilingTask created = repository.save(toCreate);
-    ZoneTilingTaskCreated createdEventPayload =
-        ZoneTilingTaskCreated.builder().task(created).build();
+    TilingTaskCreated createdEventPayload =
+        TilingTaskCreated.builder().task(created).build();
 
     subject.accept(createdEventPayload);
     toCreate.setSubmissionInstant(Instant.now());
@@ -371,8 +372,8 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
     zoneTilingJobRepository.save(aZTJ(jobId));
     TilingTask toCreate = aZTT(jobId, randomUUID().toString());
     TilingTask created = repository.save(toCreate);
-    ZoneTilingTaskCreated ztjCreated =
-        ZoneTilingTaskCreated.builder().task(created).build();
+    TilingTaskCreated ztjCreated =
+        TilingTaskCreated.builder().task(created).build();
 
     subject.accept(ztjCreated);
     List<app.bpartners.geojobs.endpoint.rest.model.Parcel> actual = zoneTilingController.getZTJParcels(jobId);

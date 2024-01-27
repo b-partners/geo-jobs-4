@@ -1,7 +1,7 @@
 package app.bpartners.geojobs.endpoint.rest.controller;
 
+import app.bpartners.geojobs.endpoint.rest.controller.mapper.TilingTaskMapper;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.ZoneTilingJobMapper;
-import app.bpartners.geojobs.endpoint.rest.controller.mapper.ZoneTilingTaskMapper;
 import app.bpartners.geojobs.endpoint.rest.model.CreateZoneTilingJob;
 import app.bpartners.geojobs.endpoint.rest.model.Parcel;
 import app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ZoneTilingController {
   private final ZoneTilingJobMapper mapper;
   private final ZoneTilingJobService service;
-  private final ZoneTilingTaskMapper zoneTilingTaskMapper;
+  private final TilingTaskMapper tilingTaskMapper;
 
   @PostMapping("/tilingJobs")
   public ZoneTilingJob tileZone(@RequestBody CreateZoneTilingJob job) {
@@ -41,7 +41,7 @@ public class ZoneTilingController {
   @GetMapping("/tilingJobs/{id}/parcels")
   public List<Parcel> getZTJParcels(@PathVariable("id") String jobId) {
     return service.getAJobParcel(jobId).stream()
-        .map(parcel -> zoneTilingTaskMapper.toRest(parcel, jobId))
+        .map(parcel -> tilingTaskMapper.toRest(parcel, jobId))
         .toList();
   }
 }
