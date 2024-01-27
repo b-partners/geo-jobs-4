@@ -80,7 +80,7 @@ class ZoneDetectionJobServiceIT extends FacadeIT {
     when(repository.findById(any())).thenReturn(Optional.of(zoneDetectionJob()));
     when(repository.save(any())).thenReturn(zoneDetectionJob());
 
-    List<ZoneDetectionJob> actual = service.process(zoneDetectionJob().getId());
+    List<ZoneDetectionJob> actual = service.fireTasks(zoneDetectionJob().getId());
     var actualJob = actual.get(0);
 
     assertEquals(1, actual.size());

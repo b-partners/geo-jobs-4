@@ -25,7 +25,7 @@ public class ZoneDetectionController {
       @RequestBody List<DetectableObjectType> objectTypesToDetect) {
 
     List<app.bpartners.geojobs.repository.model.ZoneDetectionJob> processedZDJ =
-        service.process(jobId);
+        service.fireTasks(jobId);
 
     return processedZDJ.stream().map(job -> mapper.toRest(job, objectTypesToDetect)).toList();
   }

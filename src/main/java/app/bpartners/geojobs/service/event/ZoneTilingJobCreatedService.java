@@ -13,6 +13,6 @@ public class ZoneTilingJobCreatedService implements Consumer<ZoneTilingJobCreate
 
   @Override
   public void accept(ZoneTilingJobCreated zoneTilingJobCreated) {
-    zoneTilingJobService.process(zoneTilingJobCreated.getZoneTilingJob());
+    zoneTilingJobService.fireTasks(zoneTilingJobCreated.getZoneTilingJob());
   }
 }

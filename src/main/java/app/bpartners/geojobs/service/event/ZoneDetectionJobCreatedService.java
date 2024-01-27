@@ -14,6 +14,6 @@ public class ZoneDetectionJobCreatedService implements Consumer<ZoneDetectionJob
   @Override
   public void accept(ZoneDetectionJobCreated zoneDetectionJobCreated) {
     var zoneDetectionJob = zoneDetectionJobCreated.getZoneDetectionJob();
-    zoneDetectionJobService.process(zoneDetectionJob.getId());
+    zoneDetectionJobService.fireTasks(zoneDetectionJob.getId());
   }
 }

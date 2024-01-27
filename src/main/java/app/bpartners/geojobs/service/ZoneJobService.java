@@ -1,73 +1,44 @@
 package app.bpartners.geojobs.service;
 
-import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;
-import static java.time.Instant.now;
-import static java.util.UUID.randomUUID;
-
 import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.model.BoundedPageSize;
 import app.bpartners.geojobs.model.PageFromOne;
 import app.bpartners.geojobs.model.exception.NotFoundException;
-import app.bpartners.geojobs.repository.model.JobStatus;
-import app.bpartners.geojobs.repository.model.JobType;
 import app.bpartners.geojobs.repository.model.ZoneJob;
 import app.bpartners.geojobs.repository.model.ZoneTask;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Service;
 
-// TODO: Consider refactoring for better abstraction - warrants discussion
 @AllArgsConstructor
-@Data
-@Service
-public class ZoneJobService<T extends ZoneTask, J extends ZoneJob> {
-  private final EventProducer eventProducer;
+public class ZoneJobService<T extends ZoneTask, J extends ZoneJob<T>> {
+  protected final JpaRepository<J, String> repository;
+  protected final EventProducer eventProducer;
 
-  public List<J> findAll(
-      PageFromOne page, BoundedPageSize pageSize, JpaRepository<J, String> repository) {
+  public List<J> findAll(PageFromOne page, BoundedPageSize pageSize) {
     Pageable pageable = PageRequest.of(page.getValue() - 1, pageSize.getValue());
     return repository.findAll(pageable).toList();
   }
 
-  public J findById(String id, JpaRepository<J, String> repository) {
+  public J findById(String id) {
     return repository
         .findById(id)
         .orElseThrow(() -> new NotFoundException("ZoneJob.Id " + id + " not found"));
   }
 
-  public J updateStatus(J job, JobStatus status, JpaRepository<J, String> repository) {
-    job.addStatus(status);
+  public J refreshStatus(J job) {
+    job.refreshStatusHistory();
     return repository.save(job);
   }
 
-  public J create(J job, JpaRepository<J, String> repository) {
-    if (!isPending(job)) {
-      throw new IllegalArgumentException("Tasks on job creation must all have status PENDING");
+  public J create(J job) {
+    if (!job.isPending()) {
+      throw new IllegalArgumentException(
+          "Only PENDING job can be created. " + "You sure that tasks are all PENDING?");
     }
 
     return repository.save(job);
-  }
-
-  public J process(J job, JobType jobType, JpaRepository<J, String> repository) {
-    var jobStatus =
-        JobStatus.builder()
-            .id(randomUUID().toString())
-            .jobId(job.getId())
-            .jobType(jobType)
-            .progression(PROCESSING)
-            .health(UNKNOWN)
-            .creationDatetime(now())
-            .build();
-    return updateStatus(job, jobStatus, repository);
-  }
-
-  private boolean isPending(J job) {
-    return PENDING.equals(job.getStatus().getProgression());
   }
 }

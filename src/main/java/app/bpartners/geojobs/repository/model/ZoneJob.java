@@ -1,5 +1,6 @@
 package app.bpartners.geojobs.repository.model;
 
+import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 import static org.hibernate.annotations.FetchMode.SELECT;
@@ -47,8 +48,8 @@ public class ZoneJob<T extends ZoneTask> implements Serializable {
   @Fetch(SELECT)
   protected List<T> tasks = new ArrayList<>();
 
-  public void addStatus(JobStatus status) {
-    statusHistory.add(status);
+  public void refreshStatusHistory() {
+    statusHistory.add(getStatus());
   }
 
   public JobStatus getStatus() {
@@ -57,5 +58,9 @@ public class ZoneJob<T extends ZoneTask> implements Serializable {
         Status.reduce(
             tasks.stream().map(ZoneTask::getStatus).map(status -> (Status) status).toList()),
         jobType);
+  }
+
+  public boolean isPending() {
+    return PENDING.equals(getStatus().getProgression());
   }
 }
