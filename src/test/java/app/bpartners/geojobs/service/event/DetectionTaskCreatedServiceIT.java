@@ -23,9 +23,9 @@ import app.bpartners.geojobs.repository.model.geo.detection.DetectedTile;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
 import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
-import app.bpartners.geojobs.service.ZoneDetectionJobService;
-import app.bpartners.geojobs.service.geo.TilesDetectionApi;
-import app.bpartners.geojobs.service.geo.response.DetectionResponse;
+import app.bpartners.geojobs.service.geo.detection.DetectionResponse;
+import app.bpartners.geojobs.service.geo.detection.TilesDetectionApi;
+import app.bpartners.geojobs.service.geo.detection.ZoneDetectionJobService;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 @Slf4j
-class ZoneDetectionTaskCreatedServiceIT extends FacadeIT {
+class DetectionTaskCreatedServiceIT extends FacadeIT {
   private static final String FILE_NAME =
       "src"
           + File.separator

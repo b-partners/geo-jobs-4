@@ -1,4 +1,4 @@
-package app.bpartners.geojobs.service.geo.response;
+package app.bpartners.geojobs.service.geo.detection;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

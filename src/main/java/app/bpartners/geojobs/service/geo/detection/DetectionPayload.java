@@ -1,4 +1,4 @@
-package app.bpartners.geojobs.service.geo.payload;
+package app.bpartners.geojobs.service.geo.detection;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

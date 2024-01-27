@@ -1,10 +1,11 @@
-package app.bpartners.geojobs.service;
+package app.bpartners.geojobs.service.geo.detection;
 
 import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionJobStatusChanged;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionTaskCreated;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
+import app.bpartners.geojobs.service.ZoneJobService;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;

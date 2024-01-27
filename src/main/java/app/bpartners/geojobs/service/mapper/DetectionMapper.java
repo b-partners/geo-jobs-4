@@ -8,7 +8,7 @@ import app.bpartners.geojobs.repository.model.geo.detection.DetectableObjectType
 import app.bpartners.geojobs.repository.model.geo.detection.DetectedObject;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectedTile;
 import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
-import app.bpartners.geojobs.service.geo.response.DetectionResponse;
+import app.bpartners.geojobs.service.geo.detection.DetectionResponse;
 import app.bpartners.geojobs.service.validator.TileValidator;
 import java.math.BigDecimal;
 import java.time.Instant;

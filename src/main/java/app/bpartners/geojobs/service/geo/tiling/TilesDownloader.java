@@ -1,4 +1,4 @@
-package app.bpartners.geojobs.service.geo;
+package app.bpartners.geojobs.service.geo.tiling;
 
 import static java.nio.file.Files.createTempFile;
 

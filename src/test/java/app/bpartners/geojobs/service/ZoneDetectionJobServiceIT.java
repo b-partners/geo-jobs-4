@@ -19,6 +19,7 @@ import app.bpartners.geojobs.repository.model.TaskStatus;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
 import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
+import app.bpartners.geojobs.service.geo.detection.ZoneDetectionJobService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-class ZoneZoneDetectionJobServiceIT extends FacadeIT {
+class ZoneDetectionJobServiceIT extends FacadeIT {
   @Autowired ZoneDetectionJobService service;
   @MockBean ZoneDetectionJobRepository repository;
   @MockBean EventProducer eventProducer;

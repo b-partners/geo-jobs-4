@@ -1,11 +1,9 @@
-package app.bpartners.geojobs.service.geo;
+package app.bpartners.geojobs.service.geo.detection;
 
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.model.exception.ApiException;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
-import app.bpartners.geojobs.service.geo.payload.DetectionPayload;
-import app.bpartners.geojobs.service.geo.response.DetectionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.util.Base64;

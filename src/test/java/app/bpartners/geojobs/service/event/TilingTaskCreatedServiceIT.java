@@ -3,7 +3,7 @@ package app.bpartners.geojobs.service.event;
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.file.FileHash;
 import app.bpartners.geojobs.file.FileHashAlgorithm;
-import app.bpartners.geojobs.service.TilingTaskStatusService;
+import app.bpartners.geojobs.service.geo.tiling.TilingTaskStatusService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import lombok.SneakyThrows;
@@ -16,7 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingTaskCreated;
 import app.bpartners.geojobs.repository.model.JobStatus;
 import app.bpartners.geojobs.repository.model.TaskStatus;
-import app.bpartners.geojobs.service.geo.TilesDownloader;
+import app.bpartners.geojobs.service.geo.tiling.TilesDownloader;
 import app.bpartners.geojobs.conf.FacadeIT;
 import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobStatusChanged;
@@ -53,7 +53,7 @@ import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PE
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;
 
 @Slf4j
-class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
+class TilingTaskCreatedServiceIT extends FacadeIT {
   @Autowired ZoneTilingTaskCreatedService subject;
   @Autowired
   ZoneTilingController zoneTilingController;
