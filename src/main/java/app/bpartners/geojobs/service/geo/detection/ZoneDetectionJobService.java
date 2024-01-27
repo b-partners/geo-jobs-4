@@ -24,12 +24,14 @@ public class ZoneDetectionJobService extends ZoneJobService<DetectionTask, ZoneD
     return List.of(job);
   }
 
-  public ZoneDetectionJob refreshStatus(String jobId) {
-    var oldJob = findById(jobId);
-    var refreshed = super.refreshStatus(oldJob);
+  @Override
+  public ZoneDetectionJob refreshStatus(ZoneDetectionJob job) {
+    var refreshed = super.refreshStatus(job);
 
-    eventProducer.accept(
-        List.of(ZoneDetectionJobStatusChanged.builder().oldJob(oldJob).newJob(refreshed).build()));
+    if (!refreshed.getStatus().equals(job.getStatus())) {
+      eventProducer.accept(
+          List.of(ZoneDetectionJobStatusChanged.builder().oldJob(job).newJob(refreshed).build()));
+    }
     return refreshed;
   }
 }

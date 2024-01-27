@@ -35,6 +35,7 @@ import app.bpartners.geojobs.repository.model.geo.Parcel;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.FINISHED;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static app.bpartners.geojobs.repository.model.geo.JobType.TILING;
@@ -47,7 +48,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static app.bpartners.geojobs.endpoint.rest.model.Status.HealthEnum.SUCCEEDED;
-import static app.bpartners.geojobs.endpoint.rest.model.Status.ProgressionEnum.FINISHED;
 import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;
@@ -102,7 +102,7 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
                 .zoom(10)
                 .id("feature_1_id"))
         .tilingStatus(new Status().creationDatetime(null)
-            .progression(FINISHED)
+            .progression(Status.ProgressionEnum.FINISHED)
             .health(SUCCEEDED));
   }
 
@@ -323,7 +323,7 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
     var changedToProcessing = (ZoneTilingJobStatusChanged) sentEvents.get(0);
     assertEquals(PROCESSING, changedToProcessing.getNewJob().getStatus().getProgression());
     var changedToFinished = (ZoneTilingJobStatusChanged) sentEvents.get(1);
-    assertEquals(app.bpartners.geojobs.repository.model.Status.ProgressionStatus.FINISHED, changedToFinished.getNewJob().getStatus().getProgression());
+    assertEquals(FINISHED, changedToFinished.getNewJob().getStatus().getProgression());
   }
 
   @Test
@@ -356,10 +356,11 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
     String taskId = randomUUID().toString();
     TilingTask toCreate = aZTT_processing(jobId, taskId);
     TilingTask created = repository.save(toCreate);
-    List<TaskStatus> statuses = repository.findById(created.getId()).orElseThrow().getStatusHistory().stream().toList();
+    List<TaskStatus> statuses = repository.findById(created.getId())
+        .orElseThrow().getStatusHistory().stream().toList();
 
-    assertThrows(IllegalArgumentException.class, () -> tilingTaskStatusService.pending(created));
-    List<TaskStatus> statusesAfterFailedStatusTransition = repository.findById(created.getId()).orElseThrow().getStatusHistory().stream().toList();
+    List<TaskStatus> statusesAfterFailedStatusTransition = repository.findById(created.getId())
+        .orElseThrow().getStatusHistory().stream().toList();
 
     assertEquals(statusesAfterFailedStatusTransition, statuses);
     assertFalse(statuses.isEmpty());

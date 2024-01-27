@@ -1,5 +1,6 @@
 package app.bpartners.geojobs.service.event;
 
+import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.endpoint.event.gen.TilingTaskCreated;
@@ -43,7 +44,7 @@ public class TilingTaskCreatedService implements Consumer<TilingTaskCreated> {
       setParcelTiles(downloadedTiles, task.getParcel(), bucketKey);
     } catch (Exception e) {
       tilingTaskStatusService.fail(task);
-      throw new ApiException(ApiException.ExceptionType.SERVER_EXCEPTION, e);
+      throw new ApiException(SERVER_EXCEPTION, e);
     }
 
     tilingTaskStatusService.succeed(task);

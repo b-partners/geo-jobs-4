@@ -4,43 +4,41 @@ import static app.bpartners.geojobs.repository.model.Status.HealthStatus.FAILED;
 import static app.bpartners.geojobs.repository.model.Status.HealthStatus.SUCCEEDED;
 import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.FINISHED;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;
 import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 
+import app.bpartners.geojobs.model.exception.NotFoundException;
+import app.bpartners.geojobs.repository.model.Job;
 import app.bpartners.geojobs.repository.model.Status;
 import app.bpartners.geojobs.repository.model.Task;
 import app.bpartners.geojobs.repository.model.TaskStatus;
-import java.util.function.Function;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @AllArgsConstructor
-public class TaskStatusService<T extends Task> {
+public class TaskStatusService<T extends Task, J extends Job<T>> {
 
-  public T pending(T task, Function<T, T> update) {
-    return updateStatus(task, PENDING, UNKNOWN, update);
+  protected final JpaRepository<T, String> repository;
+  protected final ZoneJobService<T, J> zoneJobService;
+
+  @Transactional
+  public T process(T task) {
+    return updateStatus(task, PROCESSING, UNKNOWN);
   }
 
-  public T process(T task, Function<T, T> update) {
-    return updateStatus(task, PROCESSING, UNKNOWN, update);
+  @Transactional
+  public T succeed(T task) {
+    return updateStatus(task, FINISHED, SUCCEEDED);
   }
 
-  public T succeed(T task, Function<T, T> update) {
-    return updateStatus(task, FINISHED, SUCCEEDED, update);
+  @Transactional
+  public T fail(T task) {
+    return updateStatus(task, FINISHED, FAILED);
   }
 
-  public T fail(T task, Function<T, T> update) {
-    return updateStatus(task, FINISHED, FAILED, update);
-  }
-
-  private T updateStatus(
-      T task,
-      Status.ProgressionStatus progression,
-      Status.HealthStatus health,
-      Function<T, T> update) {
+  private T updateStatus(T task, Status.ProgressionStatus progression, Status.HealthStatus health) {
     task.addStatus(
         TaskStatus.builder()
             .id(randomUUID().toString())
@@ -49,6 +47,18 @@ public class TaskStatusService<T extends Task> {
             .health(health)
             .taskId(task.getId())
             .build());
-    return update.apply(task);
+    return update(task);
+  }
+
+  private T update(T task) {
+    var taskId = task.getId();
+    if (!repository.existsById(taskId)) {
+      throw new NotFoundException("task.id=" + taskId);
+    }
+
+    var updated = repository.save(task);
+    var job = zoneJobService.findById(task.getJobId());
+    zoneJobService.refreshStatus(job);
+    return updated;
   }
 }
