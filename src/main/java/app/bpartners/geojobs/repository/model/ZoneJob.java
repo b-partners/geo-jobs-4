@@ -30,25 +30,30 @@ import org.hibernate.annotations.TypeDef;
 @ToString
 @MappedSuperclass
 @TypeDef(name = PostgresEnumType.PGSQL_ENUM_NAME, typeClass = PostgresEnumType.class)
-public class ZoneJob<T> implements Serializable {
-  @Id private String id;
-  private String zoneName;
-  private String emailReceiver;
-  @CreationTimestamp private Instant submissionInstant;
+public class ZoneJob<T extends ZoneTask> implements Serializable {
+  @Id protected String id;
+  protected String zoneName;
+  protected String emailReceiver;
+  @CreationTimestamp protected Instant submissionInstant;
+  protected JobStatus.JobType jobType; // TODO: why in Status...
 
   // note(LazyInitializationException): thrown when fetch type is LAZY, hence using EAGER
   @OneToMany(cascade = ALL, mappedBy = "jobId", fetch = EAGER)
   @Fetch(SELECT)
-  private List<JobStatus> statusHistory;
+  protected List<JobStatus> statusHistory;
 
   // note(LazyInitializationException)
   @OneToMany(mappedBy = "jobId", cascade = ALL, fetch = EAGER)
   @Fetch(SELECT)
-  private List<T> tasks = new ArrayList<>();
-
-  public JobStatus getStatus() {
-    return null;
-  }
+  protected List<T> tasks = new ArrayList<>();
 
   public void addStatus(JobStatus status) {}
+
+  public JobStatus getStatus() {
+    return JobStatus.from(
+        id,
+        Status.reduce(
+            tasks.stream().map(ZoneTask::getStatus).map(status -> (Status) status).toList()),
+        jobType);
+  }
 }

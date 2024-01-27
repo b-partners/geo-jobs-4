@@ -1,5 +1,8 @@
 package app.bpartners.geojobs.service;
 
+import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
+import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
+import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;
 import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 
@@ -8,7 +11,6 @@ import app.bpartners.geojobs.model.BoundedPageSize;
 import app.bpartners.geojobs.model.PageFromOne;
 import app.bpartners.geojobs.model.exception.NotFoundException;
 import app.bpartners.geojobs.repository.model.JobStatus;
-import app.bpartners.geojobs.repository.model.Status;
 import app.bpartners.geojobs.repository.model.ZoneJob;
 import app.bpartners.geojobs.repository.model.ZoneTask;
 import java.util.List;
@@ -23,7 +25,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Data
 @Service
-public class ZoneJobService<T extends ZoneTask, J extends ZoneJob<T>> {
+public class ZoneJobService<T extends ZoneTask, J extends ZoneJob> {
   private final EventProducer eventProducer;
 
   public List<J> findAll(
@@ -44,7 +46,7 @@ public class ZoneJobService<T extends ZoneTask, J extends ZoneJob<T>> {
   }
 
   public J create(J job, JpaRepository<J, String> repository) {
-    if (!areAllTasksPending(job)) {
+    if (!isPending(job)) {
       throw new IllegalArgumentException("Tasks on job creation must all have status PENDING");
     }
 
@@ -57,16 +59,14 @@ public class ZoneJobService<T extends ZoneTask, J extends ZoneJob<T>> {
             .id(randomUUID().toString())
             .jobId(job.getId())
             .jobType(jobType)
-            .progression(Status.ProgressionStatus.PROCESSING)
-            .health(Status.HealthStatus.UNKNOWN)
+            .progression(PROCESSING)
+            .health(UNKNOWN)
             .creationDatetime(now())
             .build();
     return updateStatus(job, jobStatus, repository);
   }
 
-  private boolean areAllTasksPending(J job) {
-    return job.getTasks().stream()
-        .map(T::getStatus)
-        .allMatch(status -> Status.ProgressionStatus.PENDING.equals(status.getProgression()));
+  private boolean isPending(J job) {
+    return PENDING.equals(job.getStatus().getProgression());
   }
 }
