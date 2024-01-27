@@ -6,6 +6,7 @@ import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 import static org.hibernate.annotations.FetchMode.SELECT;
 
+import app.bpartners.geojobs.repository.model.geo.JobType;
 import app.bpartners.geojobs.repository.model.types.PostgresEnumType;
 import java.io.Serializable;
 import java.time.Instant;
@@ -32,7 +33,7 @@ import org.hibernate.annotations.TypeDef;
 @ToString
 @MappedSuperclass
 @TypeDef(name = PGSQL_ENUM_NAME, typeClass = PostgresEnumType.class)
-public abstract class ZoneJob<T extends ZoneTask> implements Serializable {
+public abstract class Job<T extends Task> implements Serializable {
   @Id protected String id;
   protected String zoneName;
   protected String emailReceiver;
@@ -55,8 +56,7 @@ public abstract class ZoneJob<T extends ZoneTask> implements Serializable {
   public JobStatus getStatus() {
     return JobStatus.from(
         id,
-        Status.reduce(
-            tasks.stream().map(ZoneTask::getStatus).map(status -> (Status) status).toList()),
+        Status.reduce(tasks.stream().map(Task::getStatus).map(status -> (Status) status).toList()),
         getJobType());
   }
 

@@ -1,6 +1,6 @@
 package app.bpartners.geojobs.repository;
 
-import app.bpartners.geojobs.repository.model.ZoneDetectionJob;
+import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

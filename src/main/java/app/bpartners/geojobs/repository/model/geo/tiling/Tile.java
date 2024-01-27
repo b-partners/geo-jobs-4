@@ -1,4 +1,4 @@
-package app.bpartners.geojobs.repository.model;
+package app.bpartners.geojobs.repository.model.geo.tiling;
 
 import app.bpartners.geojobs.endpoint.rest.model.TileCoordinates;
 import java.io.Serializable;

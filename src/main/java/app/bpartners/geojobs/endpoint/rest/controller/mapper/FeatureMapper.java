@@ -4,8 +4,8 @@ import static java.time.Instant.now;
 
 import app.bpartners.geojobs.endpoint.rest.model.Feature;
 import app.bpartners.geojobs.endpoint.rest.model.GeoServerParameter;
-import app.bpartners.geojobs.repository.model.ZoneTilingTask;
 import app.bpartners.geojobs.repository.model.geo.Parcel;
+import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
 import java.net.URL;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +21,7 @@ public class FeatureMapper {
         .build();
   }
 
-  public Feature fromZoneTilingTask(ZoneTilingTask domainTask) {
+  public Feature fromZoneTilingTask(TilingTask domainTask) {
     return domainTask.getParcel().getFeature();
   }
 }

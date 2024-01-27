@@ -10,15 +10,15 @@ import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.repository.model.Status;
+import app.bpartners.geojobs.repository.model.Task;
 import app.bpartners.geojobs.repository.model.TaskStatus;
-import app.bpartners.geojobs.repository.model.ZoneTask;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class TaskStatusService<T extends ZoneTask> {
+public class TaskStatusService<T extends Task> {
 
   public T pending(T task, Function<T, T> update) {
     return updateStatus(task, PENDING, UNKNOWN, update);

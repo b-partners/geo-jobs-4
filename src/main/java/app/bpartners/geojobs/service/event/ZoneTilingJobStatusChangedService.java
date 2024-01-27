@@ -3,7 +3,7 @@ package app.bpartners.geojobs.service.event;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobStatusChanged;
 import app.bpartners.geojobs.repository.model.JobStatus;
 import app.bpartners.geojobs.repository.model.Status;
-import app.bpartners.geojobs.repository.model.ZoneTilingJob;
+import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
 import app.bpartners.geojobs.service.EmailService;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;

@@ -1,8 +1,11 @@
-package app.bpartners.geojobs.repository.model;
+package app.bpartners.geojobs.repository.model.geo.tiling;
 
-import static app.bpartners.geojobs.repository.model.JobType.DETECTION;
+import static app.bpartners.geojobs.repository.model.geo.JobType.TILING;
 import static app.bpartners.geojobs.repository.model.types.PostgresTypes.JSONB;
 
+import app.bpartners.geojobs.repository.model.Task;
+import app.bpartners.geojobs.repository.model.geo.JobType;
+import app.bpartners.geojobs.repository.model.geo.Parcel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import java.io.Serializable;
@@ -26,13 +29,13 @@ import org.hibernate.annotations.TypeDef;
 @Setter
 @ToString
 @JsonIgnoreProperties({"status"})
-public class ZoneDetectionTask extends ZoneTask implements Serializable {
+public class TilingTask extends Task implements Serializable {
   @Type(type = JSONB)
   @Column(columnDefinition = JSONB)
-  private Tile tile;
+  private Parcel parcel;
 
   @Override
   public JobType getJobType() {
-    return DETECTION;
+    return TILING;
   }
 }

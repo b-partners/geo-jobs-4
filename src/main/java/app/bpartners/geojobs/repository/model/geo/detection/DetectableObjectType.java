@@ -1,4 +1,4 @@
-package app.bpartners.geojobs.repository.model;
+package app.bpartners.geojobs.repository.model.geo.detection;
 
 import app.bpartners.geojobs.repository.model.types.PostgresEnumType;
 import java.io.Serializable;

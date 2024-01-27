@@ -7,8 +7,8 @@ import static org.mockito.Mockito.when;
 
 import app.bpartners.geojobs.conf.FacadeIT;
 import app.bpartners.geojobs.file.BucketComponent;
-import app.bpartners.geojobs.repository.model.Tile;
-import app.bpartners.geojobs.repository.model.ZoneDetectionTask;
+import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
+import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
 import app.bpartners.geojobs.service.geo.TilesDetectionApi;
 import app.bpartners.geojobs.service.geo.response.DetectionResponse;
 import java.io.File;
@@ -41,10 +41,10 @@ public class TilesDetectionApiIT extends FacadeIT {
     assertNotNull(actual.getRstRaw());
   }
 
-  public ZoneDetectionTask zoneDetectionTask() {
+  public DetectionTask zoneDetectionTask() {
     when(bucketComponent.download(any())).thenReturn(new File(FILE_NAME));
 
-    return ZoneDetectionTask.builder()
+    return DetectionTask.builder()
         .id(String.valueOf(randomUUID()))
         .jobId(String.valueOf(randomUUID()))
         .submissionInstant(Instant.now())

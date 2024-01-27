@@ -5,16 +5,16 @@ import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobCreated;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobStatusChanged;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingTaskCreated;
 import app.bpartners.geojobs.model.exception.NotFoundException;
-import app.bpartners.geojobs.repository.model.ZoneTilingJob;
-import app.bpartners.geojobs.repository.model.ZoneTilingTask;
 import app.bpartners.geojobs.repository.model.geo.Parcel;
+import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
+import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ZoneTilingJobService extends ZoneJobService<ZoneTilingTask, ZoneTilingJob> {
+public class ZoneTilingJobService extends ZoneJobService<TilingTask, ZoneTilingJob> {
 
   public ZoneTilingJobService(
       JpaRepository<ZoneTilingJob, String> repository, EventProducer eventProducer) {
@@ -31,7 +31,7 @@ public class ZoneTilingJobService extends ZoneJobService<ZoneTilingTask, ZoneTil
   public List<Parcel> getAJobParcel(String jobId) {
     Optional<ZoneTilingJob> zoneTilingJob = repository.findById(jobId);
     if (zoneTilingJob.isPresent()) {
-      return zoneTilingJob.get().getTasks().stream().map(ZoneTilingTask::getParcel).toList();
+      return zoneTilingJob.get().getTasks().stream().map(TilingTask::getParcel).toList();
     }
     throw new NotFoundException("The job is not found");
   }

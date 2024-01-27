@@ -4,10 +4,10 @@ import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.endpoint.rest.model.Feature;
 import app.bpartners.geojobs.endpoint.rest.model.MultiPolygon;
-import app.bpartners.geojobs.repository.model.DetectableObjectType;
-import app.bpartners.geojobs.repository.model.DetectedObject;
-import app.bpartners.geojobs.repository.model.DetectedTile;
-import app.bpartners.geojobs.repository.model.Tile;
+import app.bpartners.geojobs.repository.model.geo.detection.DetectableObjectType;
+import app.bpartners.geojobs.repository.model.geo.detection.DetectedObject;
+import app.bpartners.geojobs.repository.model.geo.detection.DetectedTile;
+import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
 import app.bpartners.geojobs.service.geo.response.DetectionResponse;
 import app.bpartners.geojobs.service.validator.TileValidator;
 import java.math.BigDecimal;

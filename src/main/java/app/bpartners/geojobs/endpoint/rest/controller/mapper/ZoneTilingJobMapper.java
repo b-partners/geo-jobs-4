@@ -4,9 +4,9 @@ import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.endpoint.rest.model.CreateZoneTilingJob;
-import app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob;
 import app.bpartners.geojobs.repository.model.JobStatus;
 import app.bpartners.geojobs.repository.model.Status;
+import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -20,9 +20,9 @@ public class ZoneTilingJobMapper {
   private final FeatureMapper featureMapper;
   private final StatusMapper<JobStatus> statusMapper;
 
-  public app.bpartners.geojobs.repository.model.ZoneTilingJob toDomain(CreateZoneTilingJob rest) {
+  public ZoneTilingJob toDomain(CreateZoneTilingJob rest) {
     var generatedId = randomUUID();
-    return app.bpartners.geojobs.repository.model.ZoneTilingJob.builder()
+    return ZoneTilingJob.builder()
         .id(generatedId.toString())
         .statusHistory(
             List.of(
@@ -53,9 +53,9 @@ public class ZoneTilingJobMapper {
         .build();
   }
 
-  public ZoneTilingJob toRest(app.bpartners.geojobs.repository.model.ZoneTilingJob domain) {
+  public app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob toRest(ZoneTilingJob domain) {
     var parcel0 = domain.getTasks().get(0).getParcel();
-    return new ZoneTilingJob()
+    return new app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob()
         .id(domain.getId())
         .zoneName(domain.getZoneName())
         .creationDatetime(domain.getSubmissionInstant())

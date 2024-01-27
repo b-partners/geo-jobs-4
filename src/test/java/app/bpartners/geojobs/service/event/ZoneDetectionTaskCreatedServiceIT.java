@@ -1,8 +1,8 @@
 package app.bpartners.geojobs.service.event;
 
-import static app.bpartners.geojobs.repository.model.JobType.DETECTION;
 import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
+import static app.bpartners.geojobs.repository.model.geo.JobType.DETECTION;
 import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -17,12 +17,12 @@ import app.bpartners.geojobs.endpoint.rest.model.TileCoordinates;
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.repository.DetectedTileRepository;
 import app.bpartners.geojobs.repository.DetectionTaskRepository;
-import app.bpartners.geojobs.repository.model.DetectedTile;
 import app.bpartners.geojobs.repository.model.JobStatus;
 import app.bpartners.geojobs.repository.model.TaskStatus;
-import app.bpartners.geojobs.repository.model.Tile;
-import app.bpartners.geojobs.repository.model.ZoneDetectionJob;
-import app.bpartners.geojobs.repository.model.ZoneDetectionTask;
+import app.bpartners.geojobs.repository.model.geo.detection.DetectedTile;
+import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
+import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
+import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
 import app.bpartners.geojobs.service.ZoneDetectionJobService;
 import app.bpartners.geojobs.service.geo.TilesDetectionApi;
 import app.bpartners.geojobs.service.geo.response.DetectionResponse;
@@ -59,8 +59,7 @@ class ZoneDetectionTaskCreatedServiceIT extends FacadeIT {
 
   @MockBean DetectedTileRepository detectedTileRepository;
 
-  @MockBean
-  DetectionTaskRepository detectionTaskRepository;
+  @MockBean DetectionTaskRepository detectionTaskRepository;
 
   @MockBean ZoneDetectionJobService zoneDetectionJobService;
 
@@ -120,7 +119,7 @@ class ZoneDetectionTaskCreatedServiceIT extends FacadeIT {
 
     return ZoneDetectionTaskCreated.builder()
         .task(
-            ZoneDetectionTask.builder()
+            DetectionTask.builder()
                 .id(taskId)
                 .jobId(jobId)
                 .tile(

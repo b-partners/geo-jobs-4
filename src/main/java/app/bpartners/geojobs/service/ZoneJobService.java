@@ -4,8 +4,8 @@ import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.model.BoundedPageSize;
 import app.bpartners.geojobs.model.PageFromOne;
 import app.bpartners.geojobs.model.exception.NotFoundException;
-import app.bpartners.geojobs.repository.model.ZoneJob;
-import app.bpartners.geojobs.repository.model.ZoneTask;
+import app.bpartners.geojobs.repository.model.Job;
+import app.bpartners.geojobs.repository.model.Task;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @AllArgsConstructor
-public class ZoneJobService<T extends ZoneTask, J extends ZoneJob<T>> {
+public class ZoneJobService<T extends Task, J extends Job<T>> {
   protected final JpaRepository<J, String> repository;
   protected final EventProducer eventProducer;
 

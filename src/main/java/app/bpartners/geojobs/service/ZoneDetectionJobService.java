@@ -3,14 +3,14 @@ package app.bpartners.geojobs.service;
 import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionJobStatusChanged;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionTaskCreated;
-import app.bpartners.geojobs.repository.model.ZoneDetectionJob;
-import app.bpartners.geojobs.repository.model.ZoneDetectionTask;
+import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
+import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ZoneDetectionJobService extends ZoneJobService<ZoneDetectionTask, ZoneDetectionJob> {
+public class ZoneDetectionJobService extends ZoneJobService<DetectionTask, ZoneDetectionJob> {
 
   public ZoneDetectionJobService(
       JpaRepository<ZoneDetectionJob, String> repository, EventProducer eventProducer) {

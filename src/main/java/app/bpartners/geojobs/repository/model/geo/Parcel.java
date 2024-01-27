@@ -3,7 +3,7 @@ package app.bpartners.geojobs.repository.model.geo;
 import app.bpartners.geojobs.endpoint.rest.model.Feature;
 import app.bpartners.geojobs.endpoint.rest.model.GeoServerParameter;
 import app.bpartners.geojobs.repository.model.Status;
-import app.bpartners.geojobs.repository.model.Tile;
+import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.List;

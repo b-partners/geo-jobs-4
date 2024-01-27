@@ -28,8 +28,8 @@ import app.bpartners.geojobs.endpoint.rest.model.Tile;
 import app.bpartners.geojobs.endpoint.rest.model.TileCoordinates;
 import app.bpartners.geojobs.repository.ZoneTilingJobRepository;
 import app.bpartners.geojobs.repository.TilingTaskRepository;
-import app.bpartners.geojobs.repository.model.ZoneTilingJob;
-import app.bpartners.geojobs.repository.model.ZoneTilingTask;
+import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
+import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
 import app.bpartners.geojobs.repository.model.geo.Parcel;
 
 import java.nio.file.Paths;
@@ -37,7 +37,7 @@ import java.util.List;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
-import static app.bpartners.geojobs.repository.model.JobType.TILING;
+import static app.bpartners.geojobs.repository.model.geo.JobType.TILING;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -165,8 +165,8 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   }
 
   @SneakyThrows
-  private ZoneTilingTask aZTT(String jobId, String taskId){
-    return  ZoneTilingTask.builder()
+  private TilingTask aZTT(String jobId, String taskId){
+    return  TilingTask.builder()
         .id(taskId)
         .jobId(jobId)
         .parcel(
@@ -211,8 +211,8 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   }
 
   @SneakyThrows
-  private ZoneTilingTask aZTT_processing(String jobId, String taskId){
-    return  ZoneTilingTask.builder()
+  private TilingTask aZTT_processing(String jobId, String taskId){
+    return  TilingTask.builder()
         .id(taskId)
         .jobId(jobId)
         .parcel(
@@ -275,8 +275,8 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
                 .emailReceiver("mock@hotmail.com")
                 .build());
     String taskId = randomUUID().toString();
-    ZoneTilingTask toCreate =
-        ZoneTilingTask.builder()
+    TilingTask toCreate =
+        TilingTask.builder()
             .id(taskId)
             .jobId(job.getId())
             .parcel(
@@ -293,7 +293,7 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
                         .health(UNKNOWN)
                         .build()))
             .build();
-    ZoneTilingTask created = repository.save(toCreate);
+    TilingTask created = repository.save(toCreate);
     ZoneTilingTaskCreated createdEventPayload =
         ZoneTilingTaskCreated.builder().task(created).build();
 
@@ -308,8 +308,8 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
     String jobId = randomUUID().toString();
     zoneTilingJobRepository.save(aZTJ(jobId));
     String taskId = randomUUID().toString();
-    ZoneTilingTask toCreate = aZTT(jobId, taskId);
-    ZoneTilingTask created = repository.save(toCreate);
+    TilingTask toCreate = aZTT(jobId, taskId);
+    TilingTask created = repository.save(toCreate);
     ZoneTilingTaskCreated createdEventPayload =
         ZoneTilingTaskCreated.builder().task(created).build();
 
@@ -330,18 +330,18 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
     String jobId = randomUUID().toString();
     zoneTilingJobRepository.save(aZTJ(jobId));
     String taskId = randomUUID().toString();
-    ZoneTilingTask toCreate = aZTT(jobId, taskId);
-    ZoneTilingTask created = repository.save(toCreate);
+    TilingTask toCreate = aZTT(jobId, taskId);
+    TilingTask created = repository.save(toCreate);
     ZoneTilingTaskCreated createdEventPayload =
         ZoneTilingTaskCreated.builder().task(created).build();
 
     subject.accept(createdEventPayload);
     toCreate.setSubmissionInstant(Instant.now());
-    ZoneTilingTask task1 = repository.findById(taskId).get();
+    TilingTask task1 = repository.findById(taskId).get();
     var sortedStatuses =
         task1.getStatusHistory().stream().sorted(comparing(app.bpartners.geojobs.repository.model.Status::getCreationDatetime, naturalOrder())).toList();
     assertThrows(IllegalArgumentException.class , () -> subject.accept(createdEventPayload));
-    ZoneTilingTask task2 = repository.findById(taskId).get();
+    TilingTask task2 = repository.findById(taskId).get();
     var expectedStatuses =
         task2.getStatusHistory().stream().sorted(comparing(app.bpartners.geojobs.repository.model.Status::getCreationDatetime, naturalOrder())).toList();
 
@@ -353,8 +353,8 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
     String jobId = randomUUID().toString();
     zoneTilingJobRepository.save(aZTJ(jobId));
     String taskId = randomUUID().toString();
-    ZoneTilingTask toCreate = aZTT_processing(jobId, taskId);
-    ZoneTilingTask created = repository.save(toCreate);
+    TilingTask toCreate = aZTT_processing(jobId, taskId);
+    TilingTask created = repository.save(toCreate);
     List<TaskStatus> statuses = repository.findById(created.getId()).orElseThrow().getStatusHistory().stream().toList();
 
     assertThrows(IllegalArgumentException.class, () -> tilingTaskStatusService.pending(created));
@@ -369,8 +369,8 @@ class ZoneTilingTaskCreatedServiceIT extends FacadeIT {
   void get_ztj_tiles() {
     String jobId = randomUUID().toString();
     zoneTilingJobRepository.save(aZTJ(jobId));
-    ZoneTilingTask toCreate = aZTT(jobId, randomUUID().toString());
-    ZoneTilingTask created = repository.save(toCreate);
+    TilingTask toCreate = aZTT(jobId, randomUUID().toString());
+    TilingTask created = repository.save(toCreate);
     ZoneTilingTaskCreated ztjCreated =
         ZoneTilingTaskCreated.builder().task(created).build();
 

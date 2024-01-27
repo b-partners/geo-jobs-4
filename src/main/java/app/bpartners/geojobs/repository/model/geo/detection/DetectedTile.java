@@ -1,17 +1,16 @@
-package app.bpartners.geojobs.repository.model;
+package app.bpartners.geojobs.repository.model.geo.detection;
 
 import static javax.persistence.CascadeType.ALL;
-import static org.hibernate.annotations.FetchMode.SELECT;
 
-import app.bpartners.geojobs.endpoint.rest.model.Feature;
+import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
 import app.bpartners.geojobs.repository.model.types.PostgresTypes;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -33,17 +32,17 @@ import org.hibernate.annotations.TypeDef;
 @EqualsAndHashCode
 @ToString
 @TypeDef(name = PostgresTypes.JSONB, typeClass = JsonBinaryType.class)
-public class DetectedObject implements Serializable {
+public class DetectedTile implements Serializable {
   @Id private String id;
 
   @Type(type = PostgresTypes.JSONB)
   @Column(columnDefinition = PostgresTypes.JSONB)
-  private Feature feature;
+  private Tile tile;
 
-  @JoinColumn(referencedColumnName = "id")
-  private String detectedTileId;
+  @CreationTimestamp private Instant creationDatetime;
 
-  @OneToMany(cascade = ALL, mappedBy = "objectId")
-  @Fetch(SELECT)
-  private List<DetectableObjectType> detectedObjectTypes;
+  @OneToMany(cascade = ALL, mappedBy = "detectedTileId")
+  private List<DetectedObject> detectedObjects;
+
+  private String bucketPath;
 }

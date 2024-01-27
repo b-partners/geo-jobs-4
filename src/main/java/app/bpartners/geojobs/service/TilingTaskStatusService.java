@@ -2,7 +2,7 @@ package app.bpartners.geojobs.service;
 
 import app.bpartners.geojobs.model.exception.NotFoundException;
 import app.bpartners.geojobs.repository.TilingTaskRepository;
-import app.bpartners.geojobs.repository.model.ZoneTilingTask;
+import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,29 +13,29 @@ public class TilingTaskStatusService {
 
   private final TilingTaskRepository repository;
   private final ZoneTilingJobService zoneTilingJobService;
-  private final TaskStatusService<ZoneTilingTask> taskStatusService;
+  private final TaskStatusService<TilingTask> taskStatusService;
 
   @Transactional(rollbackFor = IllegalArgumentException.class)
-  public ZoneTilingTask pending(ZoneTilingTask task) {
+  public TilingTask pending(TilingTask task) {
     return taskStatusService.pending(task, this::update);
   }
 
   @Transactional(rollbackFor = IllegalArgumentException.class)
-  public ZoneTilingTask process(ZoneTilingTask task) {
+  public TilingTask process(TilingTask task) {
     return taskStatusService.process(task, this::update);
   }
 
   @Transactional(rollbackFor = IllegalArgumentException.class)
-  public ZoneTilingTask succeed(ZoneTilingTask task) {
+  public TilingTask succeed(TilingTask task) {
     return taskStatusService.succeed(task, this::update);
   }
 
   @Transactional(rollbackFor = IllegalArgumentException.class)
-  public ZoneTilingTask fail(ZoneTilingTask task) {
+  public TilingTask fail(TilingTask task) {
     return taskStatusService.fail(task, this::update);
   }
 
-  private ZoneTilingTask update(ZoneTilingTask zoneTilingTask) {
+  private TilingTask update(TilingTask zoneTilingTask) {
     if (!repository.existsById(zoneTilingTask.getId())) {
       throw new NotFoundException("ZoneTilingTask.Id = " + zoneTilingTask.getId() + " not found");
     }

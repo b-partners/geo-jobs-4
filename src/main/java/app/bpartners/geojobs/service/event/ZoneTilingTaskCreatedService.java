@@ -8,9 +8,9 @@ import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.file.BucketConf;
 import app.bpartners.geojobs.file.FileUnzipper;
 import app.bpartners.geojobs.model.exception.ApiException;
-import app.bpartners.geojobs.repository.model.Tile;
-import app.bpartners.geojobs.repository.model.ZoneTilingTask;
 import app.bpartners.geojobs.repository.model.geo.Parcel;
+import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
+import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
 import app.bpartners.geojobs.service.TilingTaskStatusService;
 import app.bpartners.geojobs.service.geo.TilesDownloader;
 import java.io.File;
@@ -33,7 +33,7 @@ public class ZoneTilingTaskCreatedService implements Consumer<ZoneTilingTaskCrea
 
   @Override
   public void accept(ZoneTilingTaskCreated zoneTilingTaskCreated) {
-    ZoneTilingTask task = zoneTilingTaskCreated.getTask();
+    TilingTask task = zoneTilingTaskCreated.getTask();
     tilingTaskStatusService.process(task);
 
     try {

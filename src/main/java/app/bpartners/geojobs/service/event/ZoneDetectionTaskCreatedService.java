@@ -3,7 +3,7 @@ package app.bpartners.geojobs.service.event;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionTaskCreated;
 import app.bpartners.geojobs.model.exception.ApiException;
 import app.bpartners.geojobs.repository.DetectedTileRepository;
-import app.bpartners.geojobs.repository.model.DetectedTile;
+import app.bpartners.geojobs.repository.model.geo.detection.DetectedTile;
 import app.bpartners.geojobs.service.DetectionTaskStatusService;
 import app.bpartners.geojobs.service.geo.TilesDetectionApi;
 import app.bpartners.geojobs.service.geo.response.DetectionResponse;

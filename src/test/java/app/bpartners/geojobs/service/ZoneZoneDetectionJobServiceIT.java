@@ -1,8 +1,8 @@
 package app.bpartners.geojobs.service;
 
-import static app.bpartners.geojobs.repository.model.JobType.DETECTION;
 import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
+import static app.bpartners.geojobs.repository.model.geo.JobType.DETECTION;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,9 +16,9 @@ import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.repository.ZoneDetectionJobRepository;
 import app.bpartners.geojobs.repository.model.JobStatus;
 import app.bpartners.geojobs.repository.model.TaskStatus;
-import app.bpartners.geojobs.repository.model.Tile;
-import app.bpartners.geojobs.repository.model.ZoneDetectionJob;
-import app.bpartners.geojobs.repository.model.ZoneDetectionTask;
+import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
+import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
+import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-class ZoneDetectionJobServiceIT extends FacadeIT {
+class ZoneZoneDetectionJobServiceIT extends FacadeIT {
   @Autowired ZoneDetectionJobService service;
   @MockBean ZoneDetectionJobRepository repository;
   @MockBean EventProducer eventProducer;
@@ -50,7 +50,7 @@ class ZoneDetectionJobServiceIT extends FacadeIT {
             })
         .tasks(
             List.of(
-                ZoneDetectionTask.builder()
+                DetectionTask.builder()
                     .id(String.valueOf(randomUUID()))
                     .jobId(String.valueOf(randomUUID()))
                     .submissionInstant(Instant.now())

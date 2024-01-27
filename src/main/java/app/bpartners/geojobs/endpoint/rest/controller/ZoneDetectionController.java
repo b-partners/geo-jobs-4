@@ -2,7 +2,7 @@ package app.bpartners.geojobs.endpoint.rest.controller;
 
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.ZoneDetectionJobMapper;
 import app.bpartners.geojobs.endpoint.rest.model.DetectableObjectType;
-import app.bpartners.geojobs.endpoint.rest.model.ZoneDetectionJob;
+import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
 import app.bpartners.geojobs.service.ZoneDetectionJobService;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -20,12 +20,11 @@ public class ZoneDetectionController {
   private final ZoneDetectionJobMapper mapper;
 
   @PostMapping("/detectionJobs/{id}/process")
-  public List<ZoneDetectionJob> processZDJ(
+  public List<app.bpartners.geojobs.endpoint.rest.model.ZoneDetectionJob> processZDJ(
       @PathVariable("id") String jobId,
       @RequestBody List<DetectableObjectType> objectTypesToDetect) {
 
-    List<app.bpartners.geojobs.repository.model.ZoneDetectionJob> processedZDJ =
-        service.fireTasks(jobId);
+    List<ZoneDetectionJob> processedZDJ = service.fireTasks(jobId);
 
     return processedZDJ.stream().map(job -> mapper.toRest(job, objectTypesToDetect)).toList();
   }

@@ -2,8 +2,8 @@ package app.bpartners.geojobs.service.geo;
 
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.model.exception.ApiException;
-import app.bpartners.geojobs.repository.model.Tile;
-import app.bpartners.geojobs.repository.model.ZoneDetectionTask;
+import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
+import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
 import app.bpartners.geojobs.service.geo.payload.DetectionPayload;
 import app.bpartners.geojobs.service.geo.response.DetectionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +38,7 @@ public class TilesDetectionApi {
   }
 
   @SneakyThrows
-  public DetectionResponse detect(ZoneDetectionTask task) {
+  public DetectionResponse detect(DetectionTask task) {
     RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);

@@ -12,16 +12,16 @@ import app.bpartners.geojobs.conf.FacadeIT;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobStatusChanged;
 import app.bpartners.geojobs.repository.model.JobStatus;
 import app.bpartners.geojobs.repository.model.TaskStatus;
-import app.bpartners.geojobs.repository.model.ZoneTilingJob;
-import app.bpartners.geojobs.repository.model.ZoneTilingTask;
 import app.bpartners.geojobs.repository.model.geo.Parcel;
+import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
+import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
 import app.bpartners.geojobs.service.EmailService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-public class ZoneJobStatusChangedIT extends FacadeIT {
+public class JobStatusChangedIT extends FacadeIT {
   @Autowired private ZoneTilingJobStatusChangedService subject;
   @MockBean private EmailService emailService;
 
@@ -36,7 +36,7 @@ public class ZoneJobStatusChangedIT extends FacadeIT {
             .emailReceiver("mock@gmail.com")
             .tasks(
                 List.of(
-                    ZoneTilingTask.builder()
+                    TilingTask.builder()
                         .id(taskId)
                         .jobId(jobId)
                         .submissionInstant(now())

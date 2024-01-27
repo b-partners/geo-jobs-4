@@ -2,7 +2,7 @@ package app.bpartners.geojobs.service;
 
 import app.bpartners.geojobs.model.exception.NotFoundException;
 import app.bpartners.geojobs.repository.DetectionTaskRepository;
-import app.bpartners.geojobs.repository.model.ZoneDetectionTask;
+import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,21 +11,21 @@ import org.springframework.stereotype.Service;
 public class DetectionTaskStatusService {
   private final DetectionTaskRepository repository;
   private final ZoneDetectionJobService zoneDetectionJobService;
-  private final TaskStatusService<ZoneDetectionTask> taskStatusService;
+  private final TaskStatusService<DetectionTask> taskStatusService;
 
-  public ZoneDetectionTask process(ZoneDetectionTask task) {
+  public DetectionTask process(DetectionTask task) {
     return taskStatusService.process(task, this::update);
   }
 
-  public ZoneDetectionTask succeed(ZoneDetectionTask task) {
+  public DetectionTask succeed(DetectionTask task) {
     return taskStatusService.succeed(task, this::update);
   }
 
-  public ZoneDetectionTask fail(ZoneDetectionTask task) {
+  public DetectionTask fail(DetectionTask task) {
     return taskStatusService.fail(task, this::update);
   }
 
-  private ZoneDetectionTask update(ZoneDetectionTask zoneDetectionTask) {
+  private DetectionTask update(DetectionTask zoneDetectionTask) {
     if (!repository.existsById(zoneDetectionTask.getId())) {
       throw new NotFoundException("ZoneDetection.Id = " + zoneDetectionTask.getId() + " not found");
     }

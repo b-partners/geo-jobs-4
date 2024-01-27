@@ -1,8 +1,11 @@
-package app.bpartners.geojobs.repository.model;
+package app.bpartners.geojobs.repository.model.geo.detection;
 
-import static app.bpartners.geojobs.repository.model.JobType.DETECTION;
+import static app.bpartners.geojobs.repository.model.geo.JobType.DETECTION;
 import static javax.persistence.CascadeType.ALL;
 
+import app.bpartners.geojobs.repository.model.Job;
+import app.bpartners.geojobs.repository.model.geo.JobType;
+import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
@@ -18,7 +21,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ZoneDetectionJob extends ZoneJob<ZoneDetectionTask> implements Serializable {
+public class ZoneDetectionJob extends Job<DetectionTask> implements Serializable {
   @OneToOne(cascade = ALL)
   private ZoneTilingJob zoneTilingJob;
 

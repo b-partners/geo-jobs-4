@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
+import app.bpartners.geojobs.repository.model.geo.JobType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.Instant;
@@ -28,7 +29,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @ToString
 @MappedSuperclass
 @JsonIgnoreProperties({"status"})
-public abstract class ZoneTask implements Serializable {
+public abstract class Task implements Serializable {
   @Id private String id;
 
   private String jobId;

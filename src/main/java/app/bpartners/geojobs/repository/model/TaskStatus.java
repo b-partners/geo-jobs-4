@@ -4,6 +4,7 @@ import static app.bpartners.geojobs.repository.model.types.PostgresEnumType.PGSQ
 import static java.util.UUID.randomUUID;
 import static javax.persistence.EnumType.STRING;
 
+import app.bpartners.geojobs.repository.model.geo.JobType;
 import app.bpartners.geojobs.repository.model.types.PostgresEnumType;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -23,7 +24,7 @@ import org.hibernate.annotations.TypeDef;
 @Getter
 @Setter
 @SuperBuilder
-@Table(name = "zone_task_status")
+@Table(name = "task_status")
 @TypeDef(name = PGSQL_ENUM_NAME, typeClass = PostgresEnumType.class)
 public class TaskStatus extends Status {
   @JoinColumn private String taskId;

@@ -11,8 +11,8 @@ import app.bpartners.geojobs.endpoint.rest.model.Status;
 import app.bpartners.geojobs.endpoint.rest.model.Tile;
 import app.bpartners.geojobs.repository.ZoneTilingJobRepository;
 import app.bpartners.geojobs.repository.model.TaskStatus;
-import app.bpartners.geojobs.repository.model.ZoneTilingJob;
-import app.bpartners.geojobs.repository.model.ZoneTilingTask;
+import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
+import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
@@ -26,10 +26,10 @@ public class ZoneTilingTaskMapper {
   private final FeatureMapper featureMapper;
   private final ZoneTilingJobRepository zoneTilingJobRepository;
 
-  public ZoneTilingTask from(
+  public TilingTask from(
       Feature createFeature, URL geoServerUrl, GeoServerParameter geoServerParameter, UUID jobId) {
     String generatedId = randomUUID().toString();
-    return ZoneTilingTask.builder()
+    return TilingTask.builder()
         .id(generatedId)
         .jobId(jobId.toString())
         .statusHistory(
@@ -67,7 +67,7 @@ public class ZoneTilingTaskMapper {
         .feature(model.getFeature());
   }
 
-  public Tile toRest(app.bpartners.geojobs.repository.model.Tile model) {
+  public Tile toRest(app.bpartners.geojobs.repository.model.geo.tiling.Tile model) {
     return new Tile()
         .id(model.getId())
         .coordinates(model.getCoordinates())
