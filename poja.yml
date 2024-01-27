@@ -21,4 +21,4 @@ with_publish_to_npm_registry: 'false'
 with_snapstart: 'true'
 with_swagger_ui: 'false'
 worker_batch: 5
-worker_memory: 1024
+worker_memory: 512
