@@ -20,8 +20,4 @@ import lombok.experimental.SuperBuilder;
 public class ZoneDetectionJob extends ZoneJob<ZoneDetectionTask> implements Serializable {
   @OneToOne(cascade = ALL)
   private ZoneTilingJob zoneTilingJob;
-
-  public void addStatus(JobStatus status) {
-    getStatusHistory().add(status);
-  }
 }

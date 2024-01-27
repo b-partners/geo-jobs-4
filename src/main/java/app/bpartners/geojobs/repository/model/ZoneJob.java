@@ -47,7 +47,9 @@ public class ZoneJob<T extends ZoneTask> implements Serializable {
   @Fetch(SELECT)
   protected List<T> tasks = new ArrayList<>();
 
-  public void addStatus(JobStatus status) {}
+  public void addStatus(JobStatus status) {
+    statusHistory.add(status);
+  }
 
   public JobStatus getStatus() {
     return JobStatus.from(
