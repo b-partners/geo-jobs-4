@@ -1,6 +1,5 @@
 package app.bpartners.geojobs.repository.model;
 
-import static app.bpartners.geojobs.repository.model.JobType.TILING;
 import static java.util.stream.Collectors.toList;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
@@ -29,7 +28,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @ToString
 @MappedSuperclass
 @JsonIgnoreProperties({"status"})
-public class ZoneTask implements Serializable {
+public abstract class ZoneTask implements Serializable {
   @Id private String id;
 
   private String jobId;
@@ -42,8 +41,10 @@ public class ZoneTask implements Serializable {
     return TaskStatus.from(
         id,
         Status.reduce(statusHistory.stream().map(status -> (Status) status).collect(toList())),
-        TILING);
+        getJobType());
   }
+
+  public abstract JobType getJobType();
 
   public void addStatus(TaskStatus status) {
     statusHistory.add(status);

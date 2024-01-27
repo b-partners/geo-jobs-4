@@ -1,7 +1,9 @@
 package app.bpartners.geojobs.repository.model;
 
+import static app.bpartners.geojobs.repository.model.JobType.TILING;
+import static app.bpartners.geojobs.repository.model.types.PostgresTypes.JSONB;
+
 import app.bpartners.geojobs.repository.model.geo.Parcel;
-import app.bpartners.geojobs.repository.model.types.PostgresTypes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import java.io.Serializable;
@@ -16,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-@TypeDef(name = PostgresTypes.JSONB, typeClass = JsonBinaryType.class)
+@TypeDef(name = JSONB, typeClass = JsonBinaryType.class)
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,7 +28,12 @@ import org.hibernate.annotations.TypeDef;
 @ToString
 @JsonIgnoreProperties({"status"})
 public class ZoneTilingTask extends ZoneTask implements Serializable {
-  @Type(type = PostgresTypes.JSONB)
-  @Column(columnDefinition = PostgresTypes.JSONB)
+  @Type(type = JSONB)
+  @Column(columnDefinition = JSONB)
   private Parcel parcel;
+
+  @Override
+  public JobType getJobType() {
+    return TILING;
+  }
 }
