@@ -30,8 +30,14 @@ public class ZoneJobService<T extends Task, J extends Job<T>> {
 
   public J refreshStatus(J job) {
     job.refreshStatusHistory();
-    return repository.save(job);
+    var refreshed = repository.save(job);
+    if (!refreshed.getStatus().equals(job.getStatus())) {
+      onStatusChanged(job, refreshed);
+    }
+    return refreshed;
   }
+
+  protected void onStatusChanged(J oldJob, J newJob) {}
 
   public J create(J job) {
     if (!job.isPending()) {

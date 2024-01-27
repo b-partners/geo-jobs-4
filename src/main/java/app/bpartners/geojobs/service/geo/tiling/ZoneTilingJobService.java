@@ -42,13 +42,8 @@ public class ZoneTilingJobService extends ZoneJobService<TilingTask, ZoneTilingJ
   }
 
   @Override
-  public ZoneTilingJob refreshStatus(ZoneTilingJob job) {
-    var refreshed = super.refreshStatus(job);
-
-    if (!refreshed.getStatus().equals(job.getStatus())) {
-      eventProducer.accept(
-          List.of(ZoneTilingJobStatusChanged.builder().oldJob(job).newJob(refreshed).build()));
-    }
-    return refreshed;
+  protected void onStatusChanged(ZoneTilingJob oldJob, ZoneTilingJob newJob) {
+    eventProducer.accept(
+        List.of(ZoneTilingJobStatusChanged.builder().oldJob(oldJob).newJob(newJob).build()));
   }
 }

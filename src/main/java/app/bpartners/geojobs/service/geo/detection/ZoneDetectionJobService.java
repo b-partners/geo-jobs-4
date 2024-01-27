@@ -25,13 +25,8 @@ public class ZoneDetectionJobService extends ZoneJobService<DetectionTask, ZoneD
   }
 
   @Override
-  public ZoneDetectionJob refreshStatus(ZoneDetectionJob job) {
-    var refreshed = super.refreshStatus(job);
-
-    if (!refreshed.getStatus().equals(job.getStatus())) {
-      eventProducer.accept(
-          List.of(ZoneDetectionJobStatusChanged.builder().oldJob(job).newJob(refreshed).build()));
-    }
-    return refreshed;
+  protected void onStatusChanged(ZoneDetectionJob oldJob, ZoneDetectionJob newJob) {
+    eventProducer.accept(
+        List.of(ZoneDetectionJobStatusChanged.builder().oldJob(oldJob).newJob(newJob).build()));
   }
 }
