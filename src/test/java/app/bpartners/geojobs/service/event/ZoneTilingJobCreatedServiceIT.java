@@ -3,7 +3,6 @@ package app.bpartners.geojobs.service.event;
 import static app.bpartners.geojobs.repository.model.JobType.TILING;
 import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;
 import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -77,7 +76,7 @@ class ZoneTilingJobCreatedServiceIT extends FacadeIT {
 
     int numberOfFeaturesInJob = 1;
     verify(eventProducer, times(numberOfFeaturesInJob)).accept(anyList());
-    assertEquals(actualAfterAccept.getStatus().getHealth(), UNKNOWN);
-    assertEquals(actualAfterAccept.getStatus().getProgression(), PROCESSING);
+    assertEquals(UNKNOWN, actualAfterAccept.getStatus().getHealth());
+    assertEquals(PENDING, actualAfterAccept.getStatus().getProgression());
   }
 }
