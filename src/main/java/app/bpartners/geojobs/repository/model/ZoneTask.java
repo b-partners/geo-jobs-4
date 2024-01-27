@@ -2,6 +2,8 @@ package app.bpartners.geojobs.repository.model;
 
 import static app.bpartners.geojobs.repository.model.JobType.TILING;
 import static java.util.stream.Collectors.toList;
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.FetchType.EAGER;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
@@ -35,7 +37,7 @@ public class ZoneTask implements Serializable {
   private String jobId;
   @Getter @CreationTimestamp private Instant submissionInstant;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "taskId", fetch = FetchType.EAGER)
+  @OneToMany(cascade = ALL, mappedBy = "taskId", fetch = EAGER)
   private List<TaskStatus> statusHistory = new ArrayList<>();
 
   public TaskStatus getStatus() {
