@@ -14,7 +14,7 @@ import org.thymeleaf.context.Context;
 
 @Service
 @AllArgsConstructor
-public class TilingMailer implements Consumer<ZoneTilingJob> {
+public class TilingFinishedMailer implements Consumer<ZoneTilingJob> {
   private final Mailer mailer;
   public static final String TILING_TEMPLATE_NAME = "zone_tiling";
   private HTMLTemplateParser htmlTemplateParser;
