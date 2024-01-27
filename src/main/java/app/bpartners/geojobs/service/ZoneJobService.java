@@ -23,9 +23,7 @@ public class ZoneJobService<T extends Task, J extends Job<T>> {
   }
 
   public J findById(String id) {
-    return repository
-        .findById(id)
-        .orElseThrow(() -> new NotFoundException("ZoneJob.Id " + id + " not found"));
+    return repository.findById(id).orElseThrow(() -> new NotFoundException("zoneJob.id=" + id));
   }
 
   public J refreshStatus(J job) {
@@ -42,7 +40,7 @@ public class ZoneJobService<T extends Task, J extends Job<T>> {
   public J create(J job) {
     if (!job.isPending()) {
       throw new IllegalArgumentException(
-          "Only PENDING job can be created. " + "You sure that tasks are all PENDING?");
+          "Only PENDING job can be created. " + "You sure all tasks are PENDING?");
     }
 
     return repository.save(job);

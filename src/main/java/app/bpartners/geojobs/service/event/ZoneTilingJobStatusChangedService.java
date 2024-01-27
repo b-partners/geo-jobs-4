@@ -37,6 +37,8 @@ public class ZoneTilingJobStatusChangedService implements Consumer<ZoneTilingJob
   }
 
   private String sendFinishedEmail(ZoneTilingJob job) {
+    // TODO: we surely would like to receive email only _once_ on finished,
+    //  especially in case of failure.
     tilingFinishedMailer.accept(job);
     return "Finished, mail sent, job=" + job;
   }

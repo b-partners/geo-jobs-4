@@ -26,7 +26,7 @@ public class DetectionMapper {
     var tileCoordinates = tile.getCoordinates();
     tileValidator.accept(tile);
 
-    var fileData = detectionResponse.getRstRaw().values().stream().toList().get(0); //
+    var fileData = detectionResponse.getRstRaw().values().stream().toList().get(0);
 
     List<DetectionResponse.ImageData.Region> regions =
         fileData.getRegions().values().stream().toList();

@@ -7,6 +7,7 @@ import app.bpartners.geojobs.endpoint.rest.model.Parcel;
 import app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob;
 import app.bpartners.geojobs.model.BoundedPageSize;
 import app.bpartners.geojobs.model.PageFromOne;
+import app.bpartners.geojobs.service.geo.ParcelService;
 import app.bpartners.geojobs.service.geo.tiling.ZoneTilingJobService;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ZoneTilingController {
   private final ZoneTilingJobMapper mapper;
   private final ZoneTilingJobService service;
+  private final ParcelService parcelService;
   private final TilingTaskMapper tilingTaskMapper;
 
   @PostMapping("/tilingJobs")
@@ -40,7 +42,7 @@ public class ZoneTilingController {
 
   @GetMapping("/tilingJobs/{id}/parcels")
   public List<Parcel> getZTJParcels(@PathVariable("id") String jobId) {
-    return service.getAJobParcel(jobId).stream()
+    return parcelService.getParcelsByJobId(jobId).stream()
         .map(parcel -> tilingTaskMapper.toRest(parcel, jobId))
         .toList();
   }
