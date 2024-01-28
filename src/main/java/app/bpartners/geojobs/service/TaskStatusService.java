@@ -10,7 +10,8 @@ import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.model.exception.NotFoundException;
 import app.bpartners.geojobs.repository.model.Job;
-import app.bpartners.geojobs.repository.model.Status;
+import app.bpartners.geojobs.repository.model.Status.HealthStatus;
+import app.bpartners.geojobs.repository.model.Status.ProgressionStatus;
 import app.bpartners.geojobs.repository.model.Task;
 import app.bpartners.geojobs.repository.model.TaskStatus;
 import lombok.AllArgsConstructor;
@@ -38,7 +39,7 @@ public class TaskStatusService<T extends Task, J extends Job<T>> {
     return updateStatus(task, FINISHED, FAILED);
   }
 
-  private T updateStatus(T task, Status.ProgressionStatus progression, Status.HealthStatus health) {
+  private T updateStatus(T task, ProgressionStatus progression, HealthStatus health) {
     task.addStatus(
         TaskStatus.builder()
             .id(randomUUID().toString())

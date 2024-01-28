@@ -1,6 +1,7 @@
 package app.bpartners.geojobs.service.geo.detection;
 
 import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.model.exception.ApiException;
@@ -16,7 +17,6 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -43,7 +43,7 @@ public class ObjectsDetector implements Function<DetectionTask, DetectionRespons
   public DetectionResponse apply(DetectionTask task) {
     RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.setContentType(APPLICATION_JSON);
 
     Tile tile = task.getTile();
     File file = bucketComponent.download(tile.getBucketPath());

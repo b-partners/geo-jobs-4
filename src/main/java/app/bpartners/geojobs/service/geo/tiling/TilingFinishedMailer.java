@@ -17,7 +17,7 @@ import org.thymeleaf.context.Context;
 public class TilingFinishedMailer implements Consumer<ZoneTilingJob> {
   private final Mailer mailer;
   public static final String TILING_TEMPLATE_NAME = "zone_tiling";
-  private HTMLTemplateParser htmlTemplateParser;
+  private final HTMLTemplateParser htmlTemplateParser;
 
   @SneakyThrows
   @Override
