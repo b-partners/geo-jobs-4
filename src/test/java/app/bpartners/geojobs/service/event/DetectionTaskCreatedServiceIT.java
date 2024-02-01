@@ -5,8 +5,7 @@ import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PE
 import static app.bpartners.geojobs.repository.model.geo.JobType.DETECTION;
 import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,6 +18,7 @@ import app.bpartners.geojobs.repository.DetectedTileRepository;
 import app.bpartners.geojobs.repository.DetectionTaskRepository;
 import app.bpartners.geojobs.repository.model.JobStatus;
 import app.bpartners.geojobs.repository.model.TaskStatus;
+import app.bpartners.geojobs.repository.model.geo.detection.DetectedObject;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectedTile;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
@@ -90,7 +90,7 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
                                                 new BigDecimal("195.38624338624336"),
                                                 new BigDecimal("210.6243386243386")))
                                         .build())
-                                .regionAttributes(Map.of("label", "roof","confidence","0.8436"))
+                                .regionAttributes(Map.of("label", "roof", "confidence", "0.8436"))
                                 .build(),
                             "1",
                             DetectionResponse.ImageData.Region.builder()
@@ -107,7 +107,7 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
                                                 new BigDecimal("195.38624338624336"),
                                                 new BigDecimal("210.6243386243386")))
                                         .build())
-                                .regionAttributes(Map.of("label", "roof","confidence","0.9612"))
+                                .regionAttributes(Map.of("label", "roof", "confidence", "0.9612"))
                                 .build()))
                     .build()))
         .build();
@@ -181,13 +181,18 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
 
     DetectedTile detectedTile = detectedTileCaptor.getValue();
 
+    List<DetectedObject> actualObjects = detectedTile.getDetectedObjects();
     assertNotNull(detectedTile.getId());
     assertNotNull(detectedTile.getTile());
-    assertNotNull(detectedTile.getDetectedObjects());
-    assertFalse(detectedTile.getDetectedObjects().isEmpty());
+    assertNotNull(actualObjects);
+    assertFalse(actualObjects.isEmpty());
+    assertTrue(
+            actualObjects.stream()
+                    .allMatch(
+                            detectedObject ->
+                                    detectedObject.getConfidence() != null && detectedObject.getConfidence() > 0));
     assertFalse(
-        detectedTile
-            .getDetectedObjects()
+        actualObjects
             .get(0)
             .getFeature()
             .getGeometry()

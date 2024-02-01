@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.IntStream;
 import org.springframework.stereotype.Component;
 
@@ -49,9 +48,9 @@ public class DetectionMapper {
     var label = regionAttributes.get("label");
     Double confidence;
     try {
-        confidence = Double.valueOf(regionAttributes.get("confidence"));
-    } catch (NumberFormatException e){
-        confidence = null;
+      confidence = Double.valueOf(regionAttributes.get("confidence"));
+    } catch (NumberFormatException e) {
+      confidence = null;
     }
     var polygon = region.getShapeAttributes();
     var objectId = randomUUID().toString();
