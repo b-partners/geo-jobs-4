@@ -187,16 +187,10 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
     assertNotNull(actualObjects);
     assertFalse(actualObjects.isEmpty());
     assertTrue(
-            actualObjects.stream()
-                    .allMatch(
-                            detectedObject ->
-                                    detectedObject.getConfidence() != null && detectedObject.getConfidence() > 0));
-    assertFalse(
-        actualObjects
-            .get(0)
-            .getFeature()
-            .getGeometry()
-            .getCoordinates()
-            .isEmpty());
+        actualObjects.stream()
+            .allMatch(
+                detectedObject ->
+                    detectedObject.getConfidence() != null && detectedObject.getConfidence() > 0));
+    assertFalse(actualObjects.get(0).getFeature().getGeometry().getCoordinates().isEmpty());
   }
 }
