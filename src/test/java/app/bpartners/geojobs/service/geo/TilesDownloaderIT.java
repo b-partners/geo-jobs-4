@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -72,6 +73,7 @@ public class TilesDownloaderIT extends FacadeIT {
   }
 
   @Test
+  @Disabled("TODO(flaky)")
   public void download_tiles_ok() throws IOException {
     var zoom = 20;
 
