@@ -143,6 +143,35 @@ paths:
                   $ref: "#/components/schemas/DetectedParcel"
         '500':
           $ref: '#/components/responses/500'
+  '/detectionJobs/{id}/geojsonsUrl':
+    get:
+      tags:
+        - Detection
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ZDJ identifier
+          schema:
+            type: string
+      operationId: getZDJGeojsonsUrl
+      description: |
+        Get a secured URL to a ZIP containing the detection results as GeoJSON,
+        one GeoJSON per objectType for the whole job.
+      responses:
+        200:
+          description: Information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                  status:
+                    $ref: "#/components/schemas/Status"
+        '500':
+          $ref: '#/components/responses/500'
   '/detectionJobs/{id}/process':
     post:
       tags:
