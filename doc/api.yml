@@ -162,7 +162,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/DetectableObjectType"
+                $ref: "#/components/schemas/DetectableObjectConfiguration"
       responses:
         200:
           description: The processed (-ing) ZDJ
@@ -314,10 +314,10 @@ components:
           type: string
         zoneTilingJobId:
           type: string
-        objectTypesToDetect:
+        objectsToDetect:
           type: array
           items:
-           $ref: "#/components/schemas/DetectableObjectType"
+           $ref: "#/components/schemas/DetectableObjectConfiguration"
     ZoneDetectionJob:
       allOf:
         - $ref: "#/components/schemas/CreateZoneDetectionJob"
@@ -329,6 +329,14 @@ components:
           format: date-time
         status:
           $ref: "#/components/schemas/Status"
+    DetectableObjectConfiguration:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/DetectableObjectType"
+        confidence:
+          type: number
+          description: between 0 and 1
     DetectableObjectType:
       type: string
       enum:
@@ -412,6 +420,8 @@ components:
             $ref: "#/components/schemas/Feature"
           confidence:
             type: number
+          detectorVersion:
+            type: string
 
     Status:
       type: object
