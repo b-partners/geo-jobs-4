@@ -18,10 +18,10 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
     super(repository, eventProducer);
   }
 
-  public List<ZoneDetectionJob> fireTasks(String jobId) {
+  public ZoneDetectionJob fireTasks(String jobId) {
     var job = findById(jobId);
     job.getTasks().forEach(task -> eventProducer.accept(List.of(new DetectionTaskCreated(task))));
-    return List.of(job);
+    return job;
   }
 
   @Override

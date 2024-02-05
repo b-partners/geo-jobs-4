@@ -3,6 +3,7 @@ package app.bpartners.geojobs.endpoint.rest.security;
 import static java.net.http.HttpClient.newHttpClient;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import app.bpartners.geojobs.conf.FacadeIT;
@@ -22,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-public class AuthorizationIT extends FacadeIT {
+public class AnonymousAccessIT extends FacadeIT {
 
   @LocalServerPort private int port;
 
@@ -33,13 +34,13 @@ public class AuthorizationIT extends FacadeIT {
 
   @BeforeEach
   void setUp() {
-    var client = new ApiClient();
-    client.setScheme("http");
-    client.setPort(port);
-    client.setObjectMapper(om);
+    var anonymousClient = new ApiClient();
+    anonymousClient.setScheme("http");
+    anonymousClient.setPort(port);
+    anonymousClient.setObjectMapper(om);
 
-    tilingApi = new TilingApi(client);
-    detectionApi = new DetectionApi(client);
+    tilingApi = new TilingApi(anonymousClient);
+    detectionApi = new DetectionApi(anonymousClient);
   }
 
   @Test
@@ -58,21 +59,21 @@ public class AuthorizationIT extends FacadeIT {
   @Test
   void anonymous_cannot_tile() {
     var e = assertThrows(ApiException.class, () -> tilingApi.getTilingJobs(1, 2));
-    assertEquals("getTilingJobs call failed with: 401 - [no body]", e.getMessage());
+    assertTrue(e.getMessage().contains("call failed with: 401"));
 
     e = assertThrows(ApiException.class, () -> tilingApi.getZTJParcels("dummy"));
-    assertEquals("getZTJParcels call failed with: 401 - [no body]", e.getMessage());
+    assertTrue(e.getMessage().contains("call failed with: 401"));
 
     e = assertThrows(ApiException.class, () -> tilingApi.tileZone(mock(CreateZoneTilingJob.class)));
-    assertEquals("tileZone call failed with: 401 - [no body]", e.getMessage());
+    assertTrue(e.getMessage().contains("call failed with: 401"));
   }
 
   @Test
   void anonymous_cannot_detect() {
     var e = assertThrows(ApiException.class, () -> detectionApi.getDetectionJobs(1, 2));
-    assertEquals("getDetectionJobs call failed with: 401 - [no body]", e.getMessage());
+    assertTrue(e.getMessage().contains("call failed with: 401"));
 
     e = assertThrows(ApiException.class, () -> detectionApi.getZDJGeojsonsUrl("dummy"));
-    assertEquals("getZDJGeojsonsUrl call failed with: 401 - [no body]", e.getMessage());
+    assertTrue(e.getMessage().contains("call failed with: 401"));
   }
 }

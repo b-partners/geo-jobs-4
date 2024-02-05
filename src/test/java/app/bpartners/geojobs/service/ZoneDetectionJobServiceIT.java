@@ -4,7 +4,6 @@ import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
 import static app.bpartners.geojobs.repository.model.geo.JobType.DETECTION;
 import static java.util.UUID.randomUUID;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.only;
@@ -81,12 +80,9 @@ class ZoneDetectionJobServiceIT extends FacadeIT {
     when(repository.findById(any())).thenReturn(Optional.of(zoneDetectionJob()));
     when(repository.save(any())).thenReturn(zoneDetectionJob());
 
-    List<ZoneDetectionJob> actual = service.fireTasks(zoneDetectionJob().getId());
-    var actualJob = actual.get(0);
+    ZoneDetectionJob actual = service.fireTasks(zoneDetectionJob().getId());
 
-    assertEquals(1, actual.size());
-    assertNotNull(actualJob.getId());
-
+    assertNotNull(actual.getId());
     verify(eventProducer, only()).accept(any());
   }
 }

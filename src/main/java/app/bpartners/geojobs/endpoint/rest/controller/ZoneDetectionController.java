@@ -20,14 +20,10 @@ public class ZoneDetectionController {
   private final ZoneDetectionJobMapper mapper;
 
   @PostMapping("/detectionJobs/{id}/process")
-  public List<app.bpartners.geojobs.endpoint.rest.model.ZoneDetectionJob> processZDJ(
+  public app.bpartners.geojobs.endpoint.rest.model.ZoneDetectionJob processZDJ(
       @PathVariable("id") String jobId,
       @RequestBody List<DetectableObjectConfiguration> detectableObjectConfigurations) {
-
-    List<ZoneDetectionJob> processedZDJ = service.fireTasks(jobId);
-
-    return processedZDJ.stream()
-        .map(job -> mapper.toRest(job, detectableObjectConfigurations))
-        .toList();
+    ZoneDetectionJob processedZDJ = service.fireTasks(jobId);
+    return mapper.toRest(processedZDJ, detectableObjectConfigurations);
   }
 }
