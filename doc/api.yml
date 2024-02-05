@@ -314,6 +314,10 @@ components:
           type: string
         zoneTilingJobId:
           type: string
+        type:
+          enum:
+            - MACHINE
+            - HUMAN
         objectsToDetect:
           type: array
           items:
