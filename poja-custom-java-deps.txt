@@ -1,2 +1,3 @@
+implementation 'org.springframework.boot:spring-boot-starter-security'
 implementation 'app.bpartners:geo-jobs-gen:latest'
 implementation 'org.thymeleaf:thymeleaf:3.1.1.RELEASE'
