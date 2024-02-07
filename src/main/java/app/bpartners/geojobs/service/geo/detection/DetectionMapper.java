@@ -1,22 +1,35 @@
 package app.bpartners.geojobs.service.geo.detection;
 
+import static app.bpartners.geojobs.endpoint.rest.model.MultiPolygon.TypeEnum.POLYGON;
+import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
+import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
+import static app.bpartners.geojobs.repository.model.geo.JobType.DETECTION;
+import static app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob.DetectionType.MACHINE;
+import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.endpoint.rest.model.Feature;
 import app.bpartners.geojobs.endpoint.rest.model.MultiPolygon;
+import app.bpartners.geojobs.repository.model.JobStatus;
+import app.bpartners.geojobs.repository.model.TaskStatus;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectableObjectType;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectedObject;
 import app.bpartners.geojobs.repository.model.geo.detection.DetectedTile;
+import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
+import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
 import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
+import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
+import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
 import app.bpartners.geojobs.service.geo.tiling.TileValidator;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 public class DetectionMapper {
   private static final TileValidator tileValidator = new TileValidator();
 
@@ -38,7 +51,7 @@ public class DetectionMapper {
         .id(detectedTileId)
         .tile(tile)
         .detectedObjects(detectedObjects)
-        .creationDatetime(Instant.now())
+        .creationDatetime(now())
         .build();
   }
 
@@ -90,9 +103,57 @@ public class DetectionMapper {
     return new Feature()
         .id(randomUUID().toString())
         .zoom(zoom)
-        .geometry(
-            new MultiPolygon()
-                .type(MultiPolygon.TypeEnum.POLYGON)
-                .coordinates(List.of(List.of(coordinates))));
+        .geometry(new MultiPolygon().type(POLYGON).coordinates(List.of(List.of(coordinates))));
+  }
+
+  public DetectionTask toDomain(Tile tile, String zoneDetectionJobId) {
+    String taskId = randomUUID().toString();
+    return DetectionTask.builder()
+        .id(taskId)
+        .jobId(zoneDetectionJobId)
+        .tile(tile)
+        .statusHistory(
+            List.of(
+                TaskStatus.builder()
+                    .health(UNKNOWN)
+                    .progression(PENDING)
+                    .jobType(DETECTION)
+                    .creationDatetime(now())
+                    .taskId(taskId)
+                    .build()))
+        .submissionInstant(now())
+        .build();
+  }
+
+  public ZoneDetectionJob fromTilingJob(ZoneTilingJob job) {
+    String zoneDetectionJobId = randomUUID().toString();
+    List<Tile> tiles = new ArrayList<>();
+    List<TilingTask> tasks = job.getTasks();
+    tasks.stream()
+        .map(task -> task.getParcel().getTiles())
+        .flatMap(List::stream)
+        .forEach(tiles::add);
+    List<DetectionTask> zoneDetectionTasks =
+        tiles.stream().map(tile -> toDomain(tile, zoneDetectionJobId)).toList();
+
+    return ZoneDetectionJob.builder()
+        .id(zoneDetectionJobId)
+        .zoneTilingJob(job)
+        .tasks(zoneDetectionTasks)
+        .type(MACHINE)
+        .zoneName(job.getZoneName())
+        .emailReceiver(job.getEmailReceiver())
+        .submissionInstant(now())
+        .statusHistory(
+            List.of(
+                JobStatus.builder()
+                    .jobId(zoneDetectionJobId)
+                    .id(randomUUID().toString())
+                    .creationDatetime(now())
+                    .jobType(DETECTION)
+                    .progression(PENDING)
+                    .health(UNKNOWN)
+                    .build()))
+        .build();
   }
 }

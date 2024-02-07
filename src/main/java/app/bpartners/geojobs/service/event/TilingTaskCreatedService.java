@@ -1,6 +1,7 @@
 package app.bpartners.geojobs.service.event;
 
 import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
+import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.endpoint.event.gen.TilingTaskCreated;
@@ -15,7 +16,6 @@ import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
 import app.bpartners.geojobs.service.geo.tiling.TilesDownloader;
 import app.bpartners.geojobs.service.geo.tiling.TilingTaskStatusService;
 import java.io.File;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -81,7 +81,7 @@ public class TilingTaskCreatedService implements Consumer<TilingTaskCreated> {
       enrichedAccumulator.add(
           Tile.builder()
               .id(randomUUID().toString())
-              .creationDatetime(Instant.now().toString())
+              .creationDatetime(now().toString())
               .coordinates(new TileCoordinates().x(x).y(y).z(z))
               .bucketPath(bucketName + "/" + bucketKey + filePath)
               .build());
