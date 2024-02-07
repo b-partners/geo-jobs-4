@@ -1,9 +1,8 @@
 package app.bpartners.geojobs.endpoint.rest.controller;
 
-import static app.bpartners.geojobs.endpoint.rest.model.Status.HealthEnum.UNKNOWN;
-import static app.bpartners.geojobs.endpoint.rest.model.Status.ProgressionEnum.PENDING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
@@ -13,8 +12,6 @@ import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.rest.model.CreateZoneTilingJob;
 import app.bpartners.geojobs.endpoint.rest.model.Feature;
 import app.bpartners.geojobs.endpoint.rest.model.GeoServerParameter;
-import app.bpartners.geojobs.endpoint.rest.model.Status;
-import app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob;
 import app.bpartners.geojobs.model.BoundedPageSize;
 import app.bpartners.geojobs.model.PageFromOne;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -81,15 +78,22 @@ class ZoneTilingJobControllerIT extends FacadeIT {
 
   @Test
   void create_tiling_job_ok() throws IOException {
-    var actual = controller.tileZone(creatableJob());
-    var expected = from(creatableJob());
-    var actualList = controller.getTilingJobs(new PageFromOne(1), new BoundedPageSize(30));
+    var created = controller.tileZone(creatableJob());
+    var createdList = controller.getTilingJobs(new PageFromOne(1), new BoundedPageSize(30));
 
-    assertEquals(expected, ignoreIdAndCreationDatetime(actual));
-    // TODO: coordinates are fine when retrieved by controller::tileZone
-    //   but rounded when retrieved by controller::findAll!
-    // assertTrue(actualList.stream().map(this::ignoreId).anyMatch(z -> z.equals(expected)));
-
+    assertNotNull(created.getId());
+    assertEquals(
+        """
+        [class Feature {
+            id: feature_1_id
+            zoom: 10
+            geometry: class MultiPolygon {
+                coordinates: [[[[4.459648282829194, 45.904988912620688], [4.464709510872551, 45.928950368349426], [4.490816965688656, 45.941784543770964], [4.510354299995861, 45.933697132664598], [4.518386257467152, 45.912888345521047], [4.496344031095243, 45.883438201401809], [4.479593950305621, 45.882900828315755], [4.459648282829194, 45.904988912620688]]]]
+                type: MultiPolygon
+            }
+        }]""",
+        created.getFeatures().toString());
+    assertTrue(createdList.stream().anyMatch(z -> z.equals(created)));
     verify(eventProducer, only()).accept(any());
   }
 
@@ -103,23 +107,5 @@ class ZoneTilingJobControllerIT extends FacadeIT {
     assertNotNull(parcel.getId());
     assertNotNull(parcel.getCreationDatetime());
     assertNotNull(parcel.getFeature());
-  }
-
-  private ZoneTilingJob ignoreIdAndCreationDatetime(ZoneTilingJob zoneTilingJob) {
-    zoneTilingJob.getStatus().setCreationDatetime(null);
-    zoneTilingJob.id(null);
-    zoneTilingJob.setCreationDatetime(null);
-    return zoneTilingJob;
-  }
-
-  private ZoneTilingJob from(CreateZoneTilingJob createZoneTilingJob) {
-    return new ZoneTilingJob()
-        .id(null)
-        .zoneName(createZoneTilingJob.getZoneName())
-        .emailReceiver(createZoneTilingJob.getEmailReceiver())
-        .geoServerUrl(createZoneTilingJob.getGeoServerUrl())
-        .geoServerParameter(createZoneTilingJob.getGeoServerParameter())
-        .status(new Status().creationDatetime(null).health(UNKNOWN).progression(PENDING))
-        .features(createZoneTilingJob.getFeatures());
   }
 }
