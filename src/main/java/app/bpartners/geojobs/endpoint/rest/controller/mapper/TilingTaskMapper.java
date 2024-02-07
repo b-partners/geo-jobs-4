@@ -1,5 +1,7 @@
 package app.bpartners.geojobs.endpoint.rest.controller.mapper;
 
+import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
+import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
 import static java.util.UUID.randomUUID;
@@ -35,9 +37,8 @@ public class TilingTaskMapper {
         .statusHistory(
             List.of(
                 TaskStatus.builder()
-                    .health(app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN)
-                    .progression(
-                        app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING)
+                    .health(UNKNOWN)
+                    .progression(PENDING)
                     .creationDatetime(now())
                     .taskId(generatedId)
                     .build()))

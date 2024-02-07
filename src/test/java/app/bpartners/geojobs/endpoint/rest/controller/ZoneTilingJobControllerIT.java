@@ -1,5 +1,6 @@
 package app.bpartners.geojobs.endpoint.rest.controller;
 
+import static app.bpartners.geojobs.endpoint.rest.model.CreateZoneTilingJob.ZoomLevelEnum.TOWN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,6 +34,7 @@ class ZoneTilingJobControllerIT extends FacadeIT {
         .emailReceiver("mock@hotmail.com")
         .zoneName("Lyon")
         .geoServerUrl("https://data.grandlyon.com/fr/geoserv/grandlyon/ows")
+        .zoomLevel(TOWN)
         .geoServerParameter(
             om.readValue(
                 """
@@ -72,7 +74,6 @@ class ZoneTilingJobControllerIT extends FacadeIT {
                                   [ 4.479593950305621, 45.882900828315755 ],
                                   [ 4.459648282829194, 45.904988912620688 ] ] ] ] } }""",
                         Feature.class)
-                    .zoom(10)
                     .id("feature_1_id")));
   }
 
@@ -84,14 +85,14 @@ class ZoneTilingJobControllerIT extends FacadeIT {
     assertNotNull(created.getId());
     assertEquals(
         """
-        [class Feature {
-            id: feature_1_id
-            zoom: 10
-            geometry: class MultiPolygon {
-                coordinates: [[[[4.459648282829194, 45.904988912620688], [4.464709510872551, 45.928950368349426], [4.490816965688656, 45.941784543770964], [4.510354299995861, 45.933697132664598], [4.518386257467152, 45.912888345521047], [4.496344031095243, 45.883438201401809], [4.479593950305621, 45.882900828315755], [4.459648282829194, 45.904988912620688]]]]
-                type: MultiPolygon
-            }
-        }]""",
+            [class Feature {
+                id: feature_1_id
+                zoom: 14
+                geometry: class MultiPolygon {
+                    coordinates: [[[[4.459648282829194, 45.904988912620688], [4.464709510872551, 45.928950368349426], [4.490816965688656, 45.941784543770964], [4.510354299995861, 45.933697132664598], [4.518386257467152, 45.912888345521047], [4.496344031095243, 45.883438201401809], [4.479593950305621, 45.882900828315755], [4.459648282829194, 45.904988912620688]]]]
+                    type: MultiPolygon
+                }
+            }]""",
         created.getFeatures().toString());
     assertTrue(createdList.stream().anyMatch(z -> z.equals(created)));
     verify(eventProducer, only()).accept(any());
