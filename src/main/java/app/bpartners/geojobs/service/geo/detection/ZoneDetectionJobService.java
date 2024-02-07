@@ -38,7 +38,7 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
         List.of(ZoneDetectionJobStatusChanged.builder().oldJob(oldJob).newJob(newJob).build()));
   }
 
-  public void saveZoneDetectionJobFromZTJ(ZoneTilingJob job) {
+  public void saveZDJFromZTJ(ZoneTilingJob job) {
     ZoneDetectionJob zoneDetectionJob = detectionMapper.fromTilingJob(job);
     zoneDetectionJobRepository.save(zoneDetectionJob);
   }

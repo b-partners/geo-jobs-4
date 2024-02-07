@@ -1,6 +1,5 @@
 package app.bpartners.geojobs.service.event;
 
-import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobStatusChanged;
 import app.bpartners.geojobs.repository.model.JobStatus;
 import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 public class ZoneTilingJobStatusChangedService implements Consumer<ZoneTilingJobStatusChanged> {
 
   private TilingFinishedMailer tilingFinishedMailer;
-  private EventProducer eventProducer;
   private ZoneDetectionJobService zoneDetectionJobService;
 
   @Override
@@ -40,11 +38,11 @@ public class ZoneTilingJobStatusChangedService implements Consumer<ZoneTilingJob
     log.info(message);
   }
 
-  private String processFinishedJob(ZoneTilingJob job) {
+  private String processFinishedJob(ZoneTilingJob ztj) {
     // TODO: we surely would like to receive email only _once_ on finished,
     //  especially in case of failure.
-    zoneDetectionJobService.saveZoneDetectionJobFromZTJ(job);
-    tilingFinishedMailer.accept(job);
-    return "Finished, mail sent, job=" + job;
+    zoneDetectionJobService.saveZDJFromZTJ(ztj);
+    tilingFinishedMailer.accept(ztj);
+    return "Finished, mail sent, job=" + ztj;
   }
 }

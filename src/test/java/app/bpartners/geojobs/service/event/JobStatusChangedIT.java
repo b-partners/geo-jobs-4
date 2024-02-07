@@ -68,7 +68,7 @@ public class JobStatusChangedIT extends FacadeIT {
     subject.accept(zoneTilingJobStatusChanged);
 
     verify(zoneDetectionJobService, times(1))
-        .saveZoneDetectionJobFromZTJ(zoneTilingJobStatusChanged.getNewJob());
+        .saveZDJFromZTJ(zoneTilingJobStatusChanged.getNewJob());
     verify(tilingFinishedMailer, times(1)).accept(any());
   }
 }
