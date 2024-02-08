@@ -108,5 +108,6 @@ class ZoneTilingJobControllerIT extends FacadeIT {
     assertNotNull(parcel.getId());
     assertNotNull(parcel.getCreationDatetime());
     assertNotNull(parcel.getFeature());
+    assertNotNull(parcel.getTiles());
   }
 }

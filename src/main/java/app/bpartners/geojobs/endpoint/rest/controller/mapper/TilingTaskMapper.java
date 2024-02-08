@@ -50,12 +50,9 @@ public class TilingTaskMapper {
   public Parcel toRest(app.bpartners.geojobs.repository.model.geo.Parcel model, String jobId) {
     ZoneTilingJob zoneTilingJob = zoneTilingJobRepository.findById(jobId).get();
     return new Parcel()
-        .id(UUID.randomUUID().toString())
+        .id(randomUUID().toString())
         .creationDatetime(Instant.parse(model.getCreationDatetime()))
-        .tiles(
-            ofNullable(model.getTiles())
-                .map(tiles -> tiles.stream().map(this::toRest).toList())
-                .orElse(null))
+        .tiles(model.getTiles().stream().map(this::toRest).toList())
         .tilingStatus(
             ofNullable(zoneTilingJob.getStatus())
                 .map(

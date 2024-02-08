@@ -26,7 +26,17 @@ public class Parcel implements Serializable {
   private Feature feature;
   private URL geoServerUrl;
   private GeoServerParameter geoServerParameter;
-  private List<Tile> tiles = new ArrayList<>();
+
+  @Builder.Default private List<Tile> tiles = new ArrayList<>();
+
   private Status tilingStatus;
   private String creationDatetime;
+
+  public void setTiles(List<Tile> tiles) {
+    if (tiles == null) {
+      this.tiles = new ArrayList<>();
+      return;
+    }
+    this.tiles = tiles;
+  }
 }
