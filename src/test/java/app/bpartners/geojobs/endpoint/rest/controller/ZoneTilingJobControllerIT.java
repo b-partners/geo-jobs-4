@@ -1,6 +1,7 @@
 package app.bpartners.geojobs.endpoint.rest.controller;
 
 import static app.bpartners.geojobs.endpoint.rest.model.CreateZoneTilingJob.ZoomLevelEnum.TOWN;
+import static java.time.Instant.now;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,10 +16,16 @@ import app.bpartners.geojobs.endpoint.rest.model.Feature;
 import app.bpartners.geojobs.endpoint.rest.model.GeoServerParameter;
 import app.bpartners.geojobs.model.BoundedPageSize;
 import app.bpartners.geojobs.model.PageFromOne;
+import app.bpartners.geojobs.repository.ZoneTilingJobRepository;
+import app.bpartners.geojobs.repository.model.geo.Parcel;
+import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
+import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
+import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -99,15 +106,60 @@ class ZoneTilingJobControllerIT extends FacadeIT {
   }
 
   @Test
-  void read_parcels() throws JsonProcessingException {
+  void read_parcels_right_after_job_creation() throws JsonProcessingException {
     var createdJob = controller.tileZone(creatableJob());
-    var actual = controller.getZTJParcels(createdJob.getId());
-    var parcel = actual.get(0);
+    var parcels = controller.getZTJParcels(createdJob.getId());
+    var parcel = parcels.get(0);
 
-    assertEquals(1, actual.size());
+    assertEquals(1, parcels.size());
     assertNotNull(parcel.getId());
     assertNotNull(parcel.getCreationDatetime());
     assertNotNull(parcel.getFeature());
     assertNotNull(parcel.getTiles());
+  }
+
+  @Autowired ZoneTilingJobRepository tilingJobRepository;
+
+  @Test
+  void read_parcel_with_non_emptyTiles() {
+    var jobId1 = "job1";
+    var jobId2 = "job2";
+    var job1 = aZTJ(jobId1, "task1", "tile1");
+    var job2 = aZTJ(jobId2, "task2", "tile2");
+
+    tilingJobRepository.saveAll(List.of(job1, job2));
+    var parcels1 = controller.getZTJParcels(jobId1);
+    var parcels2 = controller.getZTJParcels(jobId2);
+
+    assertEquals(1, parcels1.size());
+    assertEquals(1, parcels1.get(0).getTiles().size());
+    assertEquals("tile1", parcels1.get(0).getTiles().get(0).getId());
+    assertEquals(1, parcels2.size());
+    assertEquals(1, parcels2.get(0).getTiles().size());
+    assertEquals("tile2", parcels2.get(0).getTiles().get(0).getId());
+  }
+
+  @NotNull
+  private static ZoneTilingJob aZTJ(String jobId, String taskId, String tileId) {
+    var job1 = new ZoneTilingJob();
+    job1.setId(jobId);
+    job1.setEmailReceiver("dummy@email.com");
+    job1.setZoneName("dummy");
+    var now = now();
+    job1.setTasks(
+        List.of(
+            TilingTask.builder()
+                .id(taskId)
+                .jobId(jobId)
+                .submissionInstant(now)
+                .parcel(
+                    Parcel.builder()
+                        .tiles(
+                            List.of(
+                                Tile.builder().id(tileId).creationDatetime(now.toString()).build()))
+                        .creationDatetime(now.toString())
+                        .build())
+                .build()));
+    return job1;
   }
 }

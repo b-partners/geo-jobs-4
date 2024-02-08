@@ -17,7 +17,7 @@ import lombok.ToString;
 @Setter
 public class Tile implements Serializable {
   private String id;
-  private String creationDatetime;
+  private String creationDatetime; // TODO(Instant)
   private TileCoordinates coordinates;
   private String bucketPath;
 }

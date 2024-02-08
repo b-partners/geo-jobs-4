@@ -30,7 +30,7 @@ public class Parcel implements Serializable {
   @Builder.Default private List<Tile> tiles = new ArrayList<>();
 
   private Status tilingStatus;
-  private String creationDatetime;
+  private String creationDatetime; // TODO(Instant)
 
   public void setTiles(List<Tile> tiles) {
     if (tiles == null) {
