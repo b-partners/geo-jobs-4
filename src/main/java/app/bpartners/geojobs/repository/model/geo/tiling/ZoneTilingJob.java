@@ -1,9 +1,9 @@
 package app.bpartners.geojobs.repository.model.geo.tiling;
 
-import static app.bpartners.geojobs.repository.model.geo.JobType.TILING;
+import static app.bpartners.geojobs.repository.model.geo.GeoJobType.TILING;
 
 import app.bpartners.geojobs.repository.model.Job;
-import app.bpartners.geojobs.repository.model.geo.JobType;
+import app.bpartners.geojobs.repository.model.JobType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import java.io.Serializable;

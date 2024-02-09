@@ -1,12 +1,10 @@
 package app.bpartners.geojobs.repository.model;
 
-import static jakarta.persistence.EnumType.STRING;
 import static java.util.UUID.randomUUID;
-import static org.hibernate.type.SqlTypes.NAMED_ENUM;
 
-import app.bpartners.geojobs.repository.model.geo.JobType;
+import app.bpartners.geojobs.repository.conf.JobTypeConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
@@ -15,7 +13,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.JdbcTypeCode;
 
 @PrimaryKeyJoinColumn(name = "id")
 @Entity
@@ -29,8 +26,7 @@ public class JobStatus extends Status {
   @JoinColumn(referencedColumnName = "id")
   private String jobId;
 
-  @Enumerated(STRING)
-  @JdbcTypeCode(NAMED_ENUM)
+  @Convert(converter = JobTypeConverter.class)
   private JobType jobType;
 
   public static JobStatus from(String id, Status status, JobType jobType) {

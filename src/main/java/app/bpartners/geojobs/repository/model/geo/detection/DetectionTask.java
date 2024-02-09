@@ -1,10 +1,10 @@
 package app.bpartners.geojobs.repository.model.geo.detection;
 
-import static app.bpartners.geojobs.repository.model.geo.JobType.DETECTION;
+import static app.bpartners.geojobs.repository.model.geo.GeoJobType.DETECTION;
 import static org.hibernate.type.SqlTypes.JSON;
 
 import app.bpartners.geojobs.repository.model.Task;
-import app.bpartners.geojobs.repository.model.geo.JobType;
+import app.bpartners.geojobs.repository.model.geo.GeoJobType;
 import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
@@ -30,7 +30,7 @@ public class DetectionTask extends Task implements Serializable {
   private Tile tile;
 
   @Override
-  public JobType getJobType() {
+  public GeoJobType getJobType() {
     return DETECTION;
   }
 }

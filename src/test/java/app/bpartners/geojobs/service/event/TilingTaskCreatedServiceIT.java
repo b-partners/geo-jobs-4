@@ -6,7 +6,7 @@ import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.FINISHED;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;
-import static app.bpartners.geojobs.repository.model.geo.JobType.TILING;
+import static app.bpartners.geojobs.repository.model.geo.GeoJobType.TILING;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.UUID.randomUUID;

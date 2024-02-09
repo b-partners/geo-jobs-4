@@ -1,10 +1,10 @@
 package app.bpartners.geojobs.repository.model.geo.tiling;
 
-import static app.bpartners.geojobs.repository.model.geo.JobType.TILING;
+import static app.bpartners.geojobs.repository.model.geo.GeoJobType.TILING;
 import static org.hibernate.type.SqlTypes.JSON;
 
 import app.bpartners.geojobs.repository.model.Task;
-import app.bpartners.geojobs.repository.model.geo.JobType;
+import app.bpartners.geojobs.repository.model.geo.GeoJobType;
 import app.bpartners.geojobs.repository.model.geo.Parcel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
@@ -30,7 +30,7 @@ public class TilingTask extends Task implements Serializable {
   private Parcel parcel;
 
   @Override
-  public JobType getJobType() {
+  public GeoJobType getJobType() {
     return TILING;
   }
 }

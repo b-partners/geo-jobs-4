@@ -5,7 +5,6 @@ import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
 import static org.hibernate.annotations.FetchMode.SELECT;
 
-import app.bpartners.geojobs.repository.model.geo.JobType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.OneToMany;

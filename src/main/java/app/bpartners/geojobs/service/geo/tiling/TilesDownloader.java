@@ -1,5 +1,6 @@
 package app.bpartners.geojobs.service.geo.tiling;
 
+import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
 import static java.nio.file.Files.createTempFile;
 
 import app.bpartners.geojobs.file.FileUnzipper;
@@ -57,7 +58,7 @@ public class TilesDownloader implements Function<Parcel, File> {
             .queryParam("zoom_size", parcel.getFeature().getZoom());
 
     ResponseEntity<byte[]> responseEntity =
-        //TODO: It seems downloader use same folder for consecutive calls.
+        // TODO: It seems downloader use same folder for consecutive calls.
         //  No way to sanitize it here as only know z, but neither x nor y.
         //  In case where two consecutive tileJobs have same z,
         //  then we won't be able to decide which (x,y) belongs to which job.
@@ -70,7 +71,7 @@ public class TilesDownloader implements Function<Parcel, File> {
         throw new RuntimeException(e);
       }
     }
-    throw new ApiException(ApiException.ExceptionType.SERVER_EXCEPTION, "Server error");
+    throw new ApiException(SERVER_EXCEPTION, "Server error");
   }
 
   private File unzip(File downloadedTiles, Parcel parcel) throws IOException {

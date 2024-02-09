@@ -4,7 +4,6 @@ import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
 import static java.util.stream.Collectors.toList;
 
-import app.bpartners.geojobs.repository.model.geo.JobType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
