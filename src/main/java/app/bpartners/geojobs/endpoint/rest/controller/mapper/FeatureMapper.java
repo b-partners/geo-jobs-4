@@ -17,7 +17,7 @@ public class FeatureMapper {
         .feature(rest)
         .geoServerUrl(geoServerUrl)
         .geoServerParameter(GeoServerParameter)
-        .creationDatetime(String.valueOf(now()))
+        .creationDatetime(now())
         .build();
   }
 

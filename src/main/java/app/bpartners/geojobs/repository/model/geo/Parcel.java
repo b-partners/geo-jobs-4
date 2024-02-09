@@ -6,6 +6,7 @@ import app.bpartners.geojobs.repository.model.Status;
 import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
 import java.io.Serializable;
 import java.net.URL;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -30,7 +31,7 @@ public class Parcel implements Serializable {
   @Builder.Default private List<Tile> tiles = new ArrayList<>();
 
   private Status tilingStatus;
-  private String creationDatetime; // TODO(Instant)
+  private Instant creationDatetime;
 
   public void setTiles(List<Tile> tiles) {
     if (tiles == null) {

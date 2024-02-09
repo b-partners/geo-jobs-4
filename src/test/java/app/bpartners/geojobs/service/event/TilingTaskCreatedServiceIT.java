@@ -7,6 +7,7 @@ import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.FI
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;
 import static app.bpartners.geojobs.repository.model.geo.GeoJobType.TILING;
+import static java.time.Instant.now;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.UUID.randomUUID;
@@ -42,7 +43,6 @@ import app.bpartners.geojobs.service.geo.tiling.TilingTaskStatusService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.List;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -178,7 +178,7 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
         .parcel(
             Parcel.builder()
                 .id(randomUUID().toString())
-                .creationDatetime(String.valueOf(Instant.now()))
+                .creationDatetime(now())
                 .geoServerParameter(new GeoServerParameter().layers("grand-lyon"))
                 .feature(lyonFeature)
                 .build())
@@ -316,7 +316,7 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
     TilingTaskCreated createdEventPayload = TilingTaskCreated.builder().task(created).build();
 
     subject.accept(createdEventPayload);
-    toCreate.setSubmissionInstant(Instant.now());
+    toCreate.setSubmissionInstant(now());
     TilingTask task1 = repository.findById(taskId).get();
     var sortedStatuses =
         task1.getStatusHistory().stream()

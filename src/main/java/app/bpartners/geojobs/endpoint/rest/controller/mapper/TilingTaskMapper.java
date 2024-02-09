@@ -16,7 +16,6 @@ import app.bpartners.geojobs.repository.model.TaskStatus;
 import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
 import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
 import java.net.URL;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -51,7 +50,7 @@ public class TilingTaskMapper {
     ZoneTilingJob zoneTilingJob = zoneTilingJobRepository.findById(jobId).get();
     return new Parcel()
         .id(randomUUID().toString())
-        .creationDatetime(Instant.parse(model.getCreationDatetime()))
+        .creationDatetime(model.getCreationDatetime())
         .tiles(model.getTiles().stream().map(this::toRest).toList())
         .tilingStatus(
             ofNullable(zoneTilingJob.getStatus())
@@ -69,7 +68,7 @@ public class TilingTaskMapper {
     return new Tile()
         .id(model.getId())
         .coordinates(model.getCoordinates())
-        .creationDatetime(Instant.parse(model.getCreationDatetime()))
+        .creationDatetime(model.getCreationDatetime())
         .bucketPath(model.getBucketPath());
   }
 }

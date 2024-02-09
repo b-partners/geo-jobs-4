@@ -81,7 +81,7 @@ public class TilingTaskCreatedService implements Consumer<TilingTaskCreated> {
       enrichedAccumulator.add(
           Tile.builder()
               .id(randomUUID().toString())
-              .creationDatetime(now().toString())
+              .creationDatetime(now())
               .coordinates(new TileCoordinates().x(x).y(y).z(z))
               .bucketPath(bucketName + "/" + bucketKey + filePath)
               .build());

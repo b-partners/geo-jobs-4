@@ -154,10 +154,8 @@ class ZoneTilingJobControllerIT extends FacadeIT {
                 .submissionInstant(now)
                 .parcel(
                     Parcel.builder()
-                        .tiles(
-                            List.of(
-                                Tile.builder().id(tileId).creationDatetime(now.toString()).build()))
-                        .creationDatetime(now.toString())
+                        .tiles(List.of(Tile.builder().id(tileId).creationDatetime(now).build()))
+                        .creationDatetime(now)
                         .build())
                 .build()));
     return job1;
