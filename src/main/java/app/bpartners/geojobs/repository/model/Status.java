@@ -50,8 +50,7 @@ public class Status {
   public static Status reduce(List<Status> statuses) {
     var sortedStatuses =
         statuses.stream().sorted(comparing(Status::getCreationDatetime, naturalOrder())).toList();
-    return sortedStatuses.stream()
-        // TODO(invalid-history)? may be should give no default value like this...
+    return sortedStatuses.parallelStream()
         .reduce(Status.builder().progression(PENDING).health(UNKNOWN).build(), Status::reduce);
   }
 
@@ -81,8 +80,7 @@ public class Status {
         case PROCESSING, FINISHED -> newProgression;
       };
       case FINISHED -> switch (newProgression) {
-        case PENDING, PROCESSING -> throw new IllegalArgumentException(
-            errorMessage); // TODO(invalid-history): test using detected invalid history
+        case PENDING, PROCESSING -> throw new IllegalArgumentException(errorMessage);
         case FINISHED -> newProgression;
       };
     };
