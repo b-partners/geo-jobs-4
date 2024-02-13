@@ -2,11 +2,13 @@ package app.bpartners.geojobs.service.event;
 
 import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
 
+import app.bpartners.geojobs.endpoint.event.EventProducer;
+import app.bpartners.geojobs.endpoint.event.gen.InDoubtTilesDetected;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionJobStatusChanged;
 import app.bpartners.geojobs.model.exception.ApiException;
 import app.bpartners.geojobs.repository.model.detection.ZoneDetectionJob;
 import app.bpartners.geojobs.service.detection.DetectionFinishedMailer;
-import app.bpartners.geojobs.service.detection.ZoneDetectionJobService;
+import java.util.List;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class ZoneDetectionJobStatusChangedService
     implements Consumer<ZoneDetectionJobStatusChanged> {
   private final DetectionFinishedMailer mailer;
-  private final ZoneDetectionJobService zoneDetectionJobService;
+  private final EventProducer eventProducer;
 
   @Override
   public void accept(ZoneDetectionJobStatusChanged event) {
@@ -40,22 +42,24 @@ public class ZoneDetectionJobStatusChangedService
     var notFinishedMessage = "Not finished yet, nothing to do, event=" + event;
     var doNothingMessage = "Old job already finished, do nothing";
     var message =
-            switch (oldProgression) {
-              case PENDING, PROCESSING -> switch (newProgression) {
-                case FINISHED -> switch (newHealth) {
-                  case UNKNOWN -> throw new IllegalStateException(illegalFinishedMessage);
-                  case SUCCEEDED -> handleFinishedJob(newJob);
-                  case FAILED -> throw new ApiException(SERVER_EXCEPTION, "Failed to process zdj=" + newJob);
-                };
-                case PENDING, PROCESSING -> notFinishedMessage;
-              };
-              case FINISHED -> doNothingMessage;
+        switch (oldProgression) {
+          case PENDING, PROCESSING -> switch (newProgression) {
+            case FINISHED -> switch (newHealth) {
+              case UNKNOWN -> throw new IllegalStateException(illegalFinishedMessage);
+              case SUCCEEDED -> handleFinishedJob(newJob);
+              case FAILED -> throw new ApiException(
+                  SERVER_EXCEPTION, "Failed to process zdj=" + newJob);
             };
+            case PENDING, PROCESSING -> notFinishedMessage;
+          };
+          case FINISHED -> doNothingMessage;
+        };
     log.info(message);
   }
+
   private String handleFinishedJob(ZoneDetectionJob zdj) {
     mailer.accept(zdj);
-    zoneDetectionJobService.handleInDoubtObjects(zdj);
-    return "Finished, mail sent, zdj=" + zdj;
+    eventProducer.accept(List.of(InDoubtTilesDetected.builder().jobId(zdj.getId()).build()));
+    return "Finished, mail sent, ztj=" + zdj;
   }
 }
