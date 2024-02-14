@@ -9,6 +9,7 @@ import app.bpartners.geojobs.endpoint.rest.model.Parcel;
 import app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob;
 import app.bpartners.geojobs.model.BoundedPageSize;
 import app.bpartners.geojobs.model.PageFromOne;
+import app.bpartners.geojobs.repository.model.geo.ArcgisImageZoom;
 import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
 import app.bpartners.geojobs.service.geo.ParcelService;
 import app.bpartners.geojobs.service.geo.tiling.ZoneTilingJobService;
@@ -44,8 +45,11 @@ public class ZoneTilingController {
     var serverUrl = new URL(job.getGeoServerUrl());
     return job.getFeatures().stream()
         .map(
-            feature ->
-                tilingTaskMapper.from(feature, serverUrl, job.getGeoServerParameter(), jobId))
+            feature -> {
+              feature.setZoom(
+                  ArcgisImageZoom.valueOf(job.getZoomLevel().toString()).getZoomLevel());
+              return tilingTaskMapper.from(feature, serverUrl, job.getGeoServerParameter(), jobId);
+            })
         .collect(toList());
   }
 

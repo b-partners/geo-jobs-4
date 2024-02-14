@@ -107,6 +107,7 @@ class ZoneTilingJobControllerIT extends FacadeIT {
     assertNotNull(parcel.getCreationDatetime());
     assertNotNull(parcel.getFeature());
     assertNotNull(parcel.getTiles());
+    assertEquals(14, parcel.getFeature().getZoom());
   }
 
   @Autowired ZoneTilingJobRepository tilingJobRepository;
