@@ -3,6 +3,7 @@ package app.bpartners.geojobs.repository.model;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.repository.conf.JobTypeConverter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -23,6 +24,7 @@ import lombok.experimental.SuperBuilder;
 public class TaskStatus extends Status {
   @JoinColumn private String taskId;
 
+  @JsonIgnore // TODO(status.jobType-serialization)
   @Convert(converter = JobTypeConverter.class)
   private JobType jobType;
 
