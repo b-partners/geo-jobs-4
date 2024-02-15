@@ -1,18 +1,19 @@
 package app.bpartners.geojobs.repository.model;
 
-import static app.bpartners.geojobs.repository.model.Status.HealthStatus.FAILED;
-import static app.bpartners.geojobs.repository.model.Status.HealthStatus.SUCCEEDED;
-import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.FINISHED;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;
+import static app.bpartners.geojobs.job.model.Status.HealthStatus.FAILED;
+import static app.bpartners.geojobs.job.model.Status.HealthStatus.SUCCEEDED;
+import static app.bpartners.geojobs.job.model.Status.HealthStatus.UNKNOWN;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.FINISHED;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PENDING;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PROCESSING;
 import static java.lang.Thread.sleep;
 import static java.time.Instant.now;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import app.bpartners.geojobs.repository.model.Status.HealthStatus;
-import app.bpartners.geojobs.repository.model.Status.ProgressionStatus;
+import app.bpartners.geojobs.job.model.Status;
+import app.bpartners.geojobs.job.model.Status.HealthStatus;
+import app.bpartners.geojobs.job.model.Status.ProgressionStatus;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 

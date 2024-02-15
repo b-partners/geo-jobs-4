@@ -2,6 +2,7 @@ package app.bpartners.geojobs.repository.model.geo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import app.bpartners.geojobs.repository.model.Parcel;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

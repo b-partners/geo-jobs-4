@@ -1,21 +1,21 @@
 package app.bpartners.geojobs.service.event;
 
-import static app.bpartners.geojobs.repository.model.Status.HealthStatus.FAILED;
-import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.FINISHED;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;
+import static app.bpartners.geojobs.job.model.Status.HealthStatus.FAILED;
+import static app.bpartners.geojobs.job.model.Status.HealthStatus.UNKNOWN;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.FINISHED;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PROCESSING;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobStatusChanged;
-import app.bpartners.geojobs.repository.model.JobStatus;
-import app.bpartners.geojobs.repository.model.Status.HealthStatus;
-import app.bpartners.geojobs.repository.model.Status.ProgressionStatus;
-import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
-import app.bpartners.geojobs.service.geo.detection.ZoneDetectionJobService;
-import app.bpartners.geojobs.service.geo.tiling.TilingFinishedMailer;
+import app.bpartners.geojobs.job.model.JobStatus;
+import app.bpartners.geojobs.job.model.Status.HealthStatus;
+import app.bpartners.geojobs.job.model.Status.ProgressionStatus;
+import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
+import app.bpartners.geojobs.service.detection.ZoneDetectionJobService;
+import app.bpartners.geojobs.service.tiling.TilingFinishedMailer;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 

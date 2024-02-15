@@ -1,11 +1,11 @@
 package app.bpartners.geojobs.service.event;
 
-import static app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob.DetectionType.HUMAN;
+import static app.bpartners.geojobs.repository.model.detection.ZoneDetectionJob.DetectionType.HUMAN;
 
 import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionJobCreated;
-import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
-import app.bpartners.geojobs.service.geo.detection.ZoneDetectionJobService;
+import app.bpartners.geojobs.repository.model.detection.ZoneDetectionJob;
+import app.bpartners.geojobs.service.detection.ZoneDetectionJobService;
 import java.util.List;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;

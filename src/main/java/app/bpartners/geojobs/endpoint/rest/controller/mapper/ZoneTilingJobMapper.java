@@ -1,15 +1,15 @@
 package app.bpartners.geojobs.endpoint.rest.controller.mapper;
 
-import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
+import static app.bpartners.geojobs.job.model.Status.HealthStatus.UNKNOWN;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PENDING;
 import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.endpoint.rest.model.CreateZoneTilingJob;
-import app.bpartners.geojobs.repository.model.JobStatus;
-import app.bpartners.geojobs.repository.model.geo.ArcgisImageZoom;
-import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
-import app.bpartners.geojobs.service.geo.ParcelService;
+import app.bpartners.geojobs.job.model.JobStatus;
+import app.bpartners.geojobs.repository.model.ArcgisImageZoom;
+import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
+import app.bpartners.geojobs.service.ParcelService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

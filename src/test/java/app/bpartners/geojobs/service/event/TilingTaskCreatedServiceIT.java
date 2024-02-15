@@ -2,10 +2,10 @@ package app.bpartners.geojobs.service.event;
 
 import static app.bpartners.geojobs.endpoint.rest.model.Status.HealthEnum.SUCCEEDED;
 import static app.bpartners.geojobs.file.FileHashAlgorithm.SHA256;
-import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.FINISHED;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;
+import static app.bpartners.geojobs.job.model.Status.HealthStatus.UNKNOWN;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.FINISHED;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PENDING;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PROCESSING;
 import static java.time.Instant.now;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
@@ -30,14 +30,14 @@ import app.bpartners.geojobs.endpoint.rest.model.Tile;
 import app.bpartners.geojobs.endpoint.rest.model.TileCoordinates;
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.file.FileHash;
+import app.bpartners.geojobs.job.model.TaskStatus;
 import app.bpartners.geojobs.repository.TilingTaskRepository;
 import app.bpartners.geojobs.repository.ZoneTilingJobRepository;
-import app.bpartners.geojobs.repository.model.TaskStatus;
-import app.bpartners.geojobs.repository.model.geo.Parcel;
-import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
-import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
-import app.bpartners.geojobs.service.geo.tiling.TilesDownloader;
-import app.bpartners.geojobs.service.geo.tiling.TilingTaskStatusService;
+import app.bpartners.geojobs.repository.model.Parcel;
+import app.bpartners.geojobs.repository.model.tiling.TilingTask;
+import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
+import app.bpartners.geojobs.service.tiling.TilesDownloader;
+import app.bpartners.geojobs.service.tiling.TilingTaskStatusService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Paths;
@@ -300,8 +300,7 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
         task1.getStatusHistory().stream()
             .sorted(
                 comparing(
-                    app.bpartners.geojobs.repository.model.Status::getCreationDatetime,
-                    naturalOrder()))
+                    app.bpartners.geojobs.job.model.Status::getCreationDatetime, naturalOrder()))
             .toList();
     assertThrows(IllegalArgumentException.class, () -> subject.accept(createdEventPayload));
     TilingTask task2 = repository.findById(taskId).get();
@@ -309,8 +308,7 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
         task2.getStatusHistory().stream()
             .sorted(
                 comparing(
-                    app.bpartners.geojobs.repository.model.Status::getCreationDatetime,
-                    naturalOrder()))
+                    app.bpartners.geojobs.job.model.Status::getCreationDatetime, naturalOrder()))
             .toList();
 
     assertEquals(sortedStatuses, expectedStatuses);

@@ -1,7 +1,7 @@
 package app.bpartners.geojobs.endpoint.rest.controller.mapper;
 
-import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
+import static app.bpartners.geojobs.job.model.Status.HealthStatus.UNKNOWN;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PENDING;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
 import static java.util.UUID.randomUUID;
@@ -11,10 +11,10 @@ import app.bpartners.geojobs.endpoint.rest.model.GeoServerParameter;
 import app.bpartners.geojobs.endpoint.rest.model.Parcel;
 import app.bpartners.geojobs.endpoint.rest.model.Status;
 import app.bpartners.geojobs.endpoint.rest.model.Tile;
+import app.bpartners.geojobs.job.model.TaskStatus;
 import app.bpartners.geojobs.repository.ZoneTilingJobRepository;
-import app.bpartners.geojobs.repository.model.TaskStatus;
-import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
-import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
+import app.bpartners.geojobs.repository.model.tiling.TilingTask;
+import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import java.net.URL;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -48,7 +48,7 @@ public class TilingTaskMapper {
         .build();
   }
 
-  public Parcel toRest(app.bpartners.geojobs.repository.model.geo.Parcel model, String jobId) {
+  public Parcel toRest(app.bpartners.geojobs.repository.model.Parcel model, String jobId) {
     ZoneTilingJob zoneTilingJob = zoneTilingJobRepository.findById(jobId).get();
     return new Parcel()
         .id(randomUUID().toString())
@@ -66,7 +66,7 @@ public class TilingTaskMapper {
         .feature(model.getFeature());
   }
 
-  public Tile toRest(app.bpartners.geojobs.repository.model.geo.tiling.Tile model) {
+  public Tile toRest(app.bpartners.geojobs.repository.model.tiling.Tile model) {
     return new Tile()
         .id(model.getId())
         .coordinates(model.getCoordinates())

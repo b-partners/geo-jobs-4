@@ -2,7 +2,7 @@ package app.bpartners.geojobs.endpoint.event.gen;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
+import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

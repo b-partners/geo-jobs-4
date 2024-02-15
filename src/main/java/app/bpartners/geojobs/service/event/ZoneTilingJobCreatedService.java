@@ -1,7 +1,7 @@
 package app.bpartners.geojobs.service.event;
 
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobCreated;
-import app.bpartners.geojobs.service.geo.tiling.ZoneTilingJobService;
+import app.bpartners.geojobs.service.tiling.ZoneTilingJobService;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,9 +1,9 @@
 package app.bpartners.geojobs.service.event;
 
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobStatusChanged;
-import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
-import app.bpartners.geojobs.service.geo.detection.ZoneDetectionJobService;
-import app.bpartners.geojobs.service.geo.tiling.TilingFinishedMailer;
+import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
+import app.bpartners.geojobs.service.detection.ZoneDetectionJobService;
+import app.bpartners.geojobs.service.tiling.TilingFinishedMailer;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -2,8 +2,8 @@ package app.bpartners.geojobs.endpoint.rest.controller;
 
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.ZoneDetectionJobMapper;
 import app.bpartners.geojobs.endpoint.rest.model.DetectableObjectConfiguration;
-import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
-import app.bpartners.geojobs.service.geo.detection.ZoneDetectionJobService;
+import app.bpartners.geojobs.repository.model.detection.ZoneDetectionJob;
+import app.bpartners.geojobs.service.detection.ZoneDetectionJobService;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

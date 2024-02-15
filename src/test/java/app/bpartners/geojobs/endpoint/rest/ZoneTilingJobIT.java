@@ -3,7 +3,7 @@ package app.bpartners.geojobs.endpoint.rest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import app.bpartners.geojobs.conf.FacadeIT;
-import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
+import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

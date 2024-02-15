@@ -1,11 +1,11 @@
 package app.bpartners.geojobs.service.event;
 
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.FINISHED;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PROCESSING;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.FINISHED;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PROCESSING;
 
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionJobStatusChanged;
-import app.bpartners.geojobs.service.geo.detection.DetectionFinishedMailer;
-import app.bpartners.geojobs.service.geo.detection.ZoneDetectionJobService;
+import app.bpartners.geojobs.service.detection.DetectionFinishedMailer;
+import app.bpartners.geojobs.service.detection.ZoneDetectionJobService;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

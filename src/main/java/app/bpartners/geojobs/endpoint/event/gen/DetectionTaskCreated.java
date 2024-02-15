@@ -1,6 +1,6 @@
 package app.bpartners.geojobs.endpoint.event.gen;
 
-import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
+import app.bpartners.geojobs.repository.model.detection.DetectionTask;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import javax.annotation.processing.Generated;

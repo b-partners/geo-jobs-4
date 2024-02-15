@@ -7,9 +7,9 @@ import static org.mockito.Mockito.when;
 
 import app.bpartners.geojobs.conf.FacadeIT;
 import app.bpartners.geojobs.file.BucketComponent;
-import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
-import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
-import app.bpartners.geojobs.service.geo.detection.ObjectsDetector;
+import app.bpartners.geojobs.repository.model.detection.DetectionTask;
+import app.bpartners.geojobs.repository.model.tiling.Tile;
+import app.bpartners.geojobs.service.detection.ObjectsDetector;
 import java.io.File;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;

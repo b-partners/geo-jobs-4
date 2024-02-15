@@ -1,7 +1,7 @@
 package app.bpartners.geojobs.endpoint.rest.controller.mapper;
 
-import app.bpartners.geojobs.repository.model.JobStatus;
-import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
+import app.bpartners.geojobs.job.model.JobStatus;
+import app.bpartners.geojobs.repository.model.detection.ZoneDetectionJob;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;

@@ -2,7 +2,7 @@ package app.bpartners.geojobs.endpoint.rest.controller.mapper;
 
 import app.bpartners.geojobs.endpoint.rest.model.CreateZoneTilingJob;
 import app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob.ZoomLevelEnum;
-import app.bpartners.geojobs.repository.model.geo.ArcgisImageZoom;
+import app.bpartners.geojobs.repository.model.ArcgisImageZoom;
 import org.springframework.stereotype.Component;
 
 @Component

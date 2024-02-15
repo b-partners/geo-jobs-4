@@ -1,8 +1,8 @@
 package app.bpartners.geojobs.service;
 
-import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
-import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
-import static app.bpartners.geojobs.repository.model.geo.GeoJobType.DETECTION;
+import static app.bpartners.geojobs.job.model.Status.HealthStatus.UNKNOWN;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PENDING;
+import static app.bpartners.geojobs.repository.model.GeoJobType.DETECTION;
 import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -13,14 +13,14 @@ import static org.mockito.Mockito.when;
 
 import app.bpartners.geojobs.conf.FacadeIT;
 import app.bpartners.geojobs.endpoint.event.EventProducer;
+import app.bpartners.geojobs.job.model.JobStatus;
+import app.bpartners.geojobs.job.model.TaskStatus;
 import app.bpartners.geojobs.repository.DetectionTaskRepository;
 import app.bpartners.geojobs.repository.ZoneDetectionJobRepository;
-import app.bpartners.geojobs.repository.model.JobStatus;
-import app.bpartners.geojobs.repository.model.TaskStatus;
-import app.bpartners.geojobs.repository.model.geo.detection.DetectionTask;
-import app.bpartners.geojobs.repository.model.geo.detection.ZoneDetectionJob;
-import app.bpartners.geojobs.repository.model.geo.tiling.Tile;
-import app.bpartners.geojobs.service.geo.detection.ZoneDetectionJobService;
+import app.bpartners.geojobs.repository.model.detection.DetectionTask;
+import app.bpartners.geojobs.repository.model.detection.ZoneDetectionJob;
+import app.bpartners.geojobs.repository.model.tiling.Tile;
+import app.bpartners.geojobs.service.detection.ZoneDetectionJobService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

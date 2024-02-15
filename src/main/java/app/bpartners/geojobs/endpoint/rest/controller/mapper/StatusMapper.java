@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public class StatusMapper<T extends app.bpartners.geojobs.repository.model.Status> {
+public class StatusMapper<T extends app.bpartners.geojobs.job.model.Status> {
 
   public static Status.ProgressionEnum toProgressionEnum(
-      app.bpartners.geojobs.repository.model.Status.ProgressionStatus domain) {
+      app.bpartners.geojobs.job.model.Status.ProgressionStatus domain) {
     return switch (domain) {
       case PENDING -> Status.ProgressionEnum.PENDING;
       case PROCESSING -> Status.ProgressionEnum.PROCESSING;
@@ -18,7 +18,7 @@ public class StatusMapper<T extends app.bpartners.geojobs.repository.model.Statu
   }
 
   public static Status.HealthEnum toHealthStatus(
-      app.bpartners.geojobs.repository.model.Status.HealthStatus domain) {
+      app.bpartners.geojobs.job.model.Status.HealthStatus domain) {
     return switch (domain) {
       case SUCCEEDED -> Status.HealthEnum.SUCCEEDED;
       case FAILED -> Status.HealthEnum.FAILED;
