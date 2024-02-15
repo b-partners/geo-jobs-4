@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 public class DatasourceConf {
 
+  //TODO: https://stackoverflow.com/questions/47651864/caused-by-org-postgresql-util-psqlexception-fatal-remaining-connection-slots
+  //  https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Managing.html
+
   private final String driverClassName;
   private final String appPropDbUrl;
   private final String appProdDbUsername;
