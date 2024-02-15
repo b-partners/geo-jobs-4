@@ -1,6 +1,7 @@
 package app.bpartners.geojobs.service;
 
 import static app.bpartners.geojobs.repository.model.Status.HealthStatus.FAILED;
+import static app.bpartners.geojobs.repository.model.Status.HealthStatus.SUCCEEDED;
 import static app.bpartners.geojobs.repository.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.FINISHED;
 import static app.bpartners.geojobs.repository.model.Status.ProgressionStatus.PENDING;
@@ -47,15 +48,18 @@ class TaskStatusServiceTest {
 
   @Test
   void invoke_jobService_onStatusChange_when_status_changes() {
-    var taskId = "taskId";
     var jobId = "jobId";
+    when(jobRepository.findById(jobId))
+        .thenReturn(Optional.of(aTestJob(jobId, PENDING, UNKNOWN)))
+        .thenReturn(Optional.of(aTestJob(jobId, PENDING, UNKNOWN)));
+    var taskId = "taskId";
     var oldTask = aTestTask(taskId, jobId, PENDING, UNKNOWN);
     when(taskRepository.existsById(taskId)).thenReturn(true);
-    var oldJob = aTestJob(jobId, PENDING, UNKNOWN);
-    var newJob = aTestJob(jobId, FINISHED, FAILED);
-    when(jobRepository.findById(jobId))
-        .thenReturn(Optional.of(oldJob))
-        .thenReturn(Optional.of(newJob));
+    when(taskRepository.findAllByJobId(jobId))
+        .thenReturn(
+            List.of(
+                aTestTask(taskId, jobId, FINISHED, SUCCEEDED),
+                aTestTask(taskId, jobId, FINISHED, FAILED)));
 
     subject.fail(oldTask);
 
@@ -69,16 +73,71 @@ class TaskStatusServiceTest {
   }
 
   @Test
-  void do_NOT_invoke_jobService_onStatusChange_when_status_does_NOT_changes() {
-    var taskId = "taskId";
+  void aTaskFails_then_job_fails_while_remaining_processing() {
     var jobId = "jobId";
-    var oldTask = aTestTask(taskId, jobId, PROCESSING, UNKNOWN);
-    when(taskRepository.existsById(taskId)).thenReturn(true);
-    var oldJob = aTestJob(jobId, PROCESSING, UNKNOWN);
-    var newJob = aTestJob(jobId, PROCESSING, UNKNOWN);
     when(jobRepository.findById(jobId))
-        .thenReturn(Optional.of(oldJob))
-        .thenReturn(Optional.of(newJob));
+        .thenReturn(Optional.of(aTestJob(jobId, PENDING, UNKNOWN)))
+        .thenReturn(Optional.of(aTestJob(jobId, PENDING, UNKNOWN)));
+    var taskId = "taskId";
+    var oldTask = aTestTask(taskId, jobId, PENDING, UNKNOWN);
+    when(taskRepository.existsById(taskId)).thenReturn(true);
+    when(taskRepository.findAllByJobId(jobId))
+        .thenReturn(
+            List.of(
+                aTestTask(taskId, jobId, PROCESSING, UNKNOWN),
+                aTestTask(taskId, jobId, FINISHED, FAILED)));
+
+    subject.fail(oldTask);
+
+    var eventsCaptor = ArgumentCaptor.forClass(List.class);
+    verify(eventProducer, times(1)).accept(eventsCaptor.capture());
+    var statusChanged = (StatusChanged) eventsCaptor.getValue().get(0);
+    assertEquals(PENDING, statusChanged.oldStatus.getProgression());
+    assertEquals(UNKNOWN, statusChanged.oldStatus.getHealth());
+    assertEquals(PROCESSING, statusChanged.newStatus.getProgression());
+    assertEquals(FAILED, statusChanged.newStatus.getHealth());
+  }
+
+  @Test
+  void aTaskSucceeds_then_job_remains_processing_if_other_tasks_are_still_processing() {
+    var jobId = "jobId";
+    when(jobRepository.findById(jobId))
+        .thenReturn(Optional.of(aTestJob(jobId, PENDING, UNKNOWN)))
+        .thenReturn(Optional.of(aTestJob(jobId, PENDING, UNKNOWN)));
+    var taskId = "taskId";
+    var oldTask = aTestTask(taskId, jobId, PENDING, UNKNOWN);
+    when(taskRepository.existsById(taskId)).thenReturn(true);
+    when(taskRepository.findAllByJobId(jobId))
+        .thenReturn(
+            List.of(
+                aTestTask(taskId, jobId, PROCESSING, UNKNOWN),
+                aTestTask(taskId, jobId, FINISHED, SUCCEEDED)));
+
+    subject.fail(oldTask);
+
+    var eventsCaptor = ArgumentCaptor.forClass(List.class);
+    verify(eventProducer, times(1)).accept(eventsCaptor.capture());
+    var statusChanged = (StatusChanged) eventsCaptor.getValue().get(0);
+    assertEquals(PENDING, statusChanged.oldStatus.getProgression());
+    assertEquals(UNKNOWN, statusChanged.oldStatus.getHealth());
+    assertEquals(PROCESSING, statusChanged.newStatus.getProgression());
+    assertEquals(UNKNOWN, statusChanged.newStatus.getHealth());
+  }
+
+  @Test
+  void do_NOT_invoke_jobService_onStatusChange_when_status_does_NOT_changes() {
+    var jobId = "jobId";
+    when(jobRepository.findById(jobId))
+        .thenReturn(Optional.of(aTestJob(jobId, PROCESSING, UNKNOWN)))
+        .thenReturn(Optional.of(aTestJob(jobId, PROCESSING, UNKNOWN)));
+    var taskId = "taskId";
+    var oldTask = aTestTask(taskId, jobId, PENDING, UNKNOWN);
+    when(taskRepository.existsById(taskId)).thenReturn(true);
+    when(taskRepository.findAllByJobId(jobId))
+        .thenReturn(
+            List.of(
+                aTestTask(taskId, jobId, FINISHED, SUCCEEDED),
+                aTestTask(taskId, jobId, PROCESSING, UNKNOWN)));
 
     subject.process(oldTask);
 

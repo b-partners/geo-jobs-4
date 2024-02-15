@@ -66,7 +66,7 @@ public class TaskStatusService<T extends Task, J extends Job> {
             .build();
     task.hasNewStatus(taskStatus);
     var updatedTask = repository.save(task);
-    jobService.hasNewTaskStatus(oldJob, taskStatus);
+    jobService.recomputeStatus(oldJob);
 
     return updatedTask;
   }
