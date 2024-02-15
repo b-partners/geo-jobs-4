@@ -4,12 +4,12 @@ import static java.util.stream.Collectors.toList;
 
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.TilingTaskMapper;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.ZoneTilingJobMapper;
+import app.bpartners.geojobs.endpoint.rest.controller.mapper.ZoomMapper;
 import app.bpartners.geojobs.endpoint.rest.model.CreateZoneTilingJob;
 import app.bpartners.geojobs.endpoint.rest.model.Parcel;
 import app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob;
 import app.bpartners.geojobs.model.BoundedPageSize;
 import app.bpartners.geojobs.model.PageFromOne;
-import app.bpartners.geojobs.repository.model.geo.ArcgisImageZoom;
 import app.bpartners.geojobs.repository.model.geo.tiling.TilingTask;
 import app.bpartners.geojobs.service.geo.ParcelService;
 import app.bpartners.geojobs.service.geo.tiling.ZoneTilingJobService;
@@ -32,6 +32,7 @@ public class ZoneTilingController {
   private final ZoneTilingJobService service;
   private final ParcelService parcelService;
   private final ZoneTilingJobMapper mapper;
+  private final ZoomMapper zoomMapper;
   private final TilingTaskMapper tilingTaskMapper;
 
   @PostMapping("/tilingJobs")
@@ -46,8 +47,7 @@ public class ZoneTilingController {
     return job.getFeatures().stream()
         .map(
             feature -> {
-              feature.setZoom(
-                  ArcgisImageZoom.valueOf(job.getZoomLevel().toString()).getZoomLevel());
+              feature.setZoom(zoomMapper.toDomain(job.getZoomLevel()).getZoomLevel());
               return tilingTaskMapper.from(feature, serverUrl, job.getGeoServerParameter(), jobId);
             })
         .collect(toList());

@@ -7,6 +7,7 @@ import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.endpoint.rest.model.CreateZoneTilingJob;
 import app.bpartners.geojobs.repository.model.JobStatus;
+import app.bpartners.geojobs.repository.model.geo.ArcgisImageZoom;
 import app.bpartners.geojobs.repository.model.geo.tiling.ZoneTilingJob;
 import app.bpartners.geojobs.service.geo.ParcelService;
 import lombok.AllArgsConstructor;
@@ -15,9 +16,9 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class ZoneTilingJobMapper {
-  private final TilingTaskMapper taskMapper;
   private final ParcelService parcelService;
   private final StatusMapper<JobStatus> statusMapper;
+  private final ZoomMapper zoomMapper;
 
   public ZoneTilingJob toDomain(CreateZoneTilingJob rest) {
     var generatedId = randomUUID();
@@ -49,7 +50,7 @@ public class ZoneTilingJobMapper {
         .id(domain.getId())
         .zoneName(domain.getZoneName())
         .creationDatetime(domain.getSubmissionInstant())
-        // .zoomLevel() //TODO
+        .zoomLevel(zoomMapper.toRest(ArcgisImageZoom.fromZoomLevel(parcel0.getFeature().getZoom())))
 
         // All parcels of the same job have same geoServer url and parameter
         .geoServerUrl(parcel0.getGeoServerUrl().toString())

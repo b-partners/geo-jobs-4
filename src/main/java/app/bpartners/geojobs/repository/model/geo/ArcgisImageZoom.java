@@ -40,4 +40,13 @@ public enum ArcgisImageZoom {
   ArcgisImageZoom(int zoomLevel) {
     this.zoomLevel = zoomLevel;
   }
+
+  public static ArcgisImageZoom fromZoomLevel(int z) {
+    for (var arcgisZoom : ArcgisImageZoom.values()) {
+      if (arcgisZoom.getZoomLevel() == z) {
+        return arcgisZoom;
+      }
+    }
+    throw new IllegalArgumentException("Unknown zoomLevel: " + z);
+  }
 }
