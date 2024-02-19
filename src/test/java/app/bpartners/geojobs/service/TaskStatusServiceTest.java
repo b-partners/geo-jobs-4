@@ -6,7 +6,6 @@ import static app.bpartners.geojobs.job.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.FINISHED;
 import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PENDING;
 import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PROCESSING;
-import static jakarta.persistence.LockModeType.PESSIMISTIC_WRITE;
 import static java.time.Instant.now;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -59,8 +58,6 @@ class TaskStatusServiceTest {
   void invoke_jobService_onStatusChange_when_status_changes() {
     var jobId = "jobId";
     when(jobRepository.findById(jobId)).thenReturn(Optional.of(aTestJob(jobId, PENDING, UNKNOWN)));
-    when(em.find(TestJob.class, jobId, PESSIMISTIC_WRITE))
-        .thenReturn(aTestJob(jobId, PENDING, UNKNOWN));
     var taskId = "taskId";
     var oldTask = aTestTask(taskId, jobId, PENDING, UNKNOWN);
     when(taskRepository.existsById(taskId)).thenReturn(true);
@@ -85,8 +82,6 @@ class TaskStatusServiceTest {
   void aTaskFails_then_job_fails_while_remaining_processing() {
     var jobId = "jobId";
     when(jobRepository.findById(jobId)).thenReturn(Optional.of(aTestJob(jobId, PENDING, UNKNOWN)));
-    when(em.find(TestJob.class, jobId, PESSIMISTIC_WRITE))
-        .thenReturn(aTestJob(jobId, PENDING, UNKNOWN));
     var taskId = "taskId";
     var oldTask = aTestTask(taskId, jobId, PENDING, UNKNOWN);
     when(taskRepository.existsById(taskId)).thenReturn(true);
@@ -111,8 +106,6 @@ class TaskStatusServiceTest {
   void aTaskSucceeds_then_job_remains_processing_if_other_tasks_are_still_processing() {
     var jobId = "jobId";
     when(jobRepository.findById(jobId)).thenReturn(Optional.of(aTestJob(jobId, PENDING, UNKNOWN)));
-    when(em.find(TestJob.class, jobId, PESSIMISTIC_WRITE))
-        .thenReturn(aTestJob(jobId, PENDING, UNKNOWN));
     var taskId = "taskId";
     var oldTask = aTestTask(taskId, jobId, PENDING, UNKNOWN);
     when(taskRepository.existsById(taskId)).thenReturn(true);
@@ -138,8 +131,6 @@ class TaskStatusServiceTest {
     var jobId = "jobId";
     when(jobRepository.findById(jobId))
         .thenReturn(Optional.of(aTestJob(jobId, PROCESSING, UNKNOWN)));
-    when(em.find(TestJob.class, jobId, PESSIMISTIC_WRITE))
-        .thenReturn(aTestJob(jobId, PROCESSING, UNKNOWN));
     var taskId = "taskId";
     var oldTask = aTestTask(taskId, jobId, PENDING, UNKNOWN);
     when(taskRepository.existsById(taskId)).thenReturn(true);
@@ -202,7 +193,7 @@ class TaskStatusServiceTest {
 
     @Override
     public Job semanticClone() {
-      return this.toBuilder().build();
+      return this.toBuilder().statusHistory(new ArrayList<>(getStatusHistory())).build();
     }
   }
 

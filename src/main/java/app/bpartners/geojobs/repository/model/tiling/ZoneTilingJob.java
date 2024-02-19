@@ -6,6 +6,7 @@ import app.bpartners.geojobs.job.model.Job;
 import app.bpartners.geojobs.job.model.JobType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
+import java.util.ArrayList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -23,6 +24,6 @@ public class ZoneTilingJob extends Job {
 
   @Override
   public Job semanticClone() {
-    return this.toBuilder().build();
+    return this.toBuilder().statusHistory(new ArrayList<>(getStatusHistory())).build();
   }
 }

@@ -11,6 +11,7 @@ import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToOne;
+import java.util.ArrayList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,7 +40,7 @@ public class ZoneDetectionJob extends Job {
 
   @Override
   public Job semanticClone() {
-    return this.toBuilder().build();
+    return this.toBuilder().statusHistory(new ArrayList<>(getStatusHistory())).build();
   }
 
   public enum DetectionType {

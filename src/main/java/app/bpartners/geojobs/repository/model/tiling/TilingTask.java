@@ -19,7 +19,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @Getter
 @Setter
 @JsonIgnoreProperties({"status"})

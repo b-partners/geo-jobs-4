@@ -59,7 +59,9 @@ public class TaskStatusService<T extends Task, J extends Job> {
             .taskId(task.getId())
             .build();
     task.hasNewStatus(taskStatus);
-    var updatedTask = repository.save(task);
+    var updatedTask =
+        repository.save(
+            task); // TODO: generated deadlock, why? also: restrict saving to status only
     jobService.recomputeStatus(oldJob);
 
     return updatedTask;

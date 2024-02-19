@@ -1,6 +1,7 @@
 package app.bpartners.geojobs.service.event;
 
 import static app.bpartners.geojobs.file.FileHashAlgorithm.SHA256;
+import static app.bpartners.geojobs.job.model.Status.HealthStatus.FAILED;
 import static app.bpartners.geojobs.job.model.Status.HealthStatus.SUCCEEDED;
 import static app.bpartners.geojobs.job.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.FINISHED;
@@ -9,6 +10,7 @@ import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PROCESSIN
 import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 import static java.util.concurrent.Executors.newFixedThreadPool;
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +37,7 @@ import app.bpartners.geojobs.repository.model.Parcel;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
 import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import app.bpartners.geojobs.service.tiling.TilesDownloader;
+import app.bpartners.geojobs.service.tiling.TilingTaskService;
 import app.bpartners.geojobs.service.tiling.TilingTaskStatusService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -57,7 +60,8 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
   @Autowired ZoneTilingController zoneTilingController;
   @MockBean BucketComponent bucketComponent;
   @MockBean TilesDownloader tilesDownloader;
-  @Autowired TilingTaskRepository repository;
+  @Autowired TilingTaskRepository tilingTaskRepository;
+  @Autowired TilingTaskService tilingTaskService;
   @Autowired ZoneTilingJobRepository zoneTilingJobRepository;
   @MockBean EventProducer eventProducer;
   @Autowired ObjectMapper om;
@@ -207,7 +211,7 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
                         .health(UNKNOWN)
                         .build()))
             .build();
-    TilingTask created = repository.save(toCreate);
+    TilingTask created = tilingTaskRepository.save(toCreate);
     TilingTaskCreated createdEventPayload = TilingTaskCreated.builder().task(created).build();
 
     subject.accept(createdEventPayload);
@@ -222,7 +226,7 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
     zoneTilingJobRepository.save(aZTJ(jobId));
     String taskId = randomUUID().toString();
     TilingTask toCreate = aZTT(jobId, taskId);
-    TilingTask created = repository.save(toCreate);
+    TilingTask created = tilingTaskRepository.save(toCreate);
     TilingTaskCreated createdEventPayload = TilingTaskCreated.builder().task(created).build();
 
     subject.accept(createdEventPayload);
@@ -240,18 +244,18 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
   void concurrently_tile() {
     var callersNb = 40;
     var executorService = newFixedThreadPool(callersNb);
-    var tasks = new ArrayList<Callable<Boolean>>();
+    var callables = new ArrayList<Callable<Boolean>>();
     String jobId = randomUUID().toString();
     zoneTilingJobRepository.save(aZTJ(jobId));
     for (int i = 0; i < callersNb; i++) {
       String taskId = randomUUID().toString();
       TilingTask toCreate = aZTT(jobId, taskId);
-      TilingTask created = repository.save(toCreate);
+      TilingTask created = tilingTaskRepository.save(toCreate);
       TilingTaskCreated createdEventPayload = TilingTaskCreated.builder().task(created).build();
-      tasks.add(() -> isTilingEventHandledSuccessfully(createdEventPayload));
+      callables.add(() -> isTilingEventHandledSuccessfully(createdEventPayload));
     }
 
-    var futures = executorService.invokeAll(tasks);
+    var futures = executorService.invokeAll(callables);
 
     var succeeded =
         futures.stream()
@@ -261,11 +265,77 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
     assertEquals(callersNb, succeeded);
   }
 
+  @SneakyThrows
+  @Test
+  void concurrently_save_tasks() {
+    /*******************************************************************/
+    /**************** Concurrently create new tasks...  ****************/
+    /*******************************************************************/
+    var callersNb = 40;
+    var executorService = newFixedThreadPool(callersNb);
+    List<Callable<Boolean>> callables = new ArrayList<>();
+    String jobId = randomUUID().toString();
+    zoneTilingJobRepository.save(aZTJ(jobId));
+    for (int i = 0; i < callersNb; i++) {
+      String taskId = randomUUID().toString();
+      TilingTask toCreate = aZTT(jobId, taskId);
+      callables.add(() -> isTaskSavedSuccessfully(toCreate));
+    }
+
+    var futures = executorService.invokeAll(callables);
+
+    assertFuturesAllSucceed(futures);
+
+    /*******************************************************************/
+    /*********** ...then concurrently make them all fail! **************/
+    /*******************************************************************/
+    var savedTasks = tilingTaskRepository.findAllByJobId(jobId);
+    callables =
+        savedTasks.stream()
+            .map(
+                task ->
+                    (Callable<Boolean>)
+                        () ->
+                            isTaskSavedSuccessfully(
+                                task.toBuilder()
+                                    .statusHistory(
+                                        List.of(
+                                            TaskStatus.builder()
+                                                .progression(FINISHED)
+                                                .health(FAILED)
+                                                .build()))
+                                    .build()))
+            .collect(toList());
+
+    futures = executorService.invokeAll(callables);
+
+    assertFuturesAllSucceed(futures);
+  }
+
+  private static void assertFuturesAllSucceed(List<Future<Boolean>> futures) {
+    var succeeded =
+        futures.stream()
+            .map(TilingTaskCreatedServiceIT::getFutureBoolean)
+            .filter(result -> result)
+            .count();
+    assertEquals(futures.size(), succeeded);
+  }
+
   private Boolean isTilingEventHandledSuccessfully(TilingTaskCreated createdEventPayload) {
     try {
       subject.accept(createdEventPayload);
       return true;
     } catch (Exception e) {
+      return false;
+    }
+  }
+
+  private Boolean isTaskSavedSuccessfully(TilingTask tilingTask) {
+    try {
+      tilingTaskService.save(tilingTask);
+      return true;
+    } catch (Exception e) {
+      log.error("Task saving failed, task={}", tilingTask, e);
       return false;
     }
   }
@@ -281,7 +351,7 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
     zoneTilingJobRepository.save(aZTJ(jobId));
     String taskId = randomUUID().toString();
     TilingTask toCreate = aZTT(jobId, taskId);
-    TilingTask created = repository.save(toCreate);
+    TilingTask created = tilingTaskRepository.save(toCreate);
     TilingTaskCreated createdEventPayload = TilingTaskCreated.builder().task(created).build();
 
     subject.accept(createdEventPayload);
@@ -312,12 +382,14 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
     zoneTilingJobRepository.save(aZTJ(jobId));
     String taskId = randomUUID().toString();
     TilingTask toCreate = aZTT_processing(jobId, taskId);
-    TilingTask created = repository.save(toCreate);
+    TilingTask created = tilingTaskRepository.save(toCreate);
     List<TaskStatus> statuses =
-        repository.findById(created.getId()).orElseThrow().getStatusHistory().stream().toList();
+        tilingTaskRepository.findById(created.getId()).orElseThrow().getStatusHistory().stream()
+            .toList();
 
     List<TaskStatus> statusesAfterFailedStatusTransition =
-        repository.findById(created.getId()).orElseThrow().getStatusHistory().stream().toList();
+        tilingTaskRepository.findById(created.getId()).orElseThrow().getStatusHistory().stream()
+            .toList();
 
     assertEquals(statusesAfterFailedStatusTransition, statuses);
     assertFalse(statuses.isEmpty());
@@ -329,7 +401,7 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
     String jobId = randomUUID().toString();
     zoneTilingJobRepository.save(aZTJ(jobId));
     TilingTask toCreate = aZTT(jobId, randomUUID().toString());
-    TilingTask created = repository.save(toCreate);
+    TilingTask created = tilingTaskRepository.save(toCreate);
     TilingTaskCreated ztjCreated = TilingTaskCreated.builder().task(created).build();
 
     subject.accept(ztjCreated);
@@ -350,7 +422,7 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
     String jobId = randomUUID().toString();
     zoneTilingJobRepository.save(aZTJ(jobId));
     TilingTask toCreate = aZTT(jobId, randomUUID().toString());
-    TilingTask created = repository.save(toCreate);
+    TilingTask created = tilingTaskRepository.save(toCreate);
     TilingTaskCreated ztjCreated = TilingTaskCreated.builder().task(created).build();
 
     // first attempt
