@@ -39,7 +39,7 @@ public class TaskStatusService<T extends Task, J extends Job> {
 
   @Transactional
   public T fail(T task) {
-    return update(task, FINISHED, FAILED);
+    return update(task, FINISHED, FAILED); //TODO: fail(oneTask) seem to set job.tasks.status to job.status!
   }
 
   private T update(T task, ProgressionStatus progression, HealthStatus health) {
