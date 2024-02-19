@@ -26,7 +26,7 @@ public interface Statusable<S extends Status> {
                 .get(0));
   }
 
-  default void hasNewStatus(Status status) {
+  default Statusable<S> hasNewStatus(Status status) {
     var statusHistory = getStatusHistory();
     var subtypedStatus = from(status);
     if (statusHistory.isEmpty()) {
@@ -34,6 +34,7 @@ public interface Statusable<S extends Status> {
     } else {
       statusHistory.add(from(getStatus().to(subtypedStatus)));
     }
+    return this;
   }
 
   S from(Status status);
