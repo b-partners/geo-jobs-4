@@ -40,7 +40,7 @@ public class RetryableTaskStatusService<T extends Task, J extends Job> {
         throw e;
       }
       var sleepDuration = (long) (MAX_SLEEP_DURATION.toMillis() * Math.random());
-      log.info("Retry: attemptNb={}/{}, sleep(ms)={}", attemptNb, MAX_RETRY, sleepDuration);
+      log.info("Retry: attemptNb={}/{}, sleep(ms)={}", attemptNb, MAX_RETRY, sleepDuration, e);
       sleep(sleepDuration);
       return retry(taskFunction, task, attemptNb + 1);
     }

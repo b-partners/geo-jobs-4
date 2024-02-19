@@ -4,6 +4,7 @@ import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.TilingTaskCreated;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobCreated;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneTilingJobStatusChanged;
+import app.bpartners.geojobs.job.repository.JobStatusRepository;
 import app.bpartners.geojobs.job.repository.TaskRepository;
 import app.bpartners.geojobs.job.service.JobService;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
@@ -17,9 +18,10 @@ public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> 
 
   public ZoneTilingJobService(
       JpaRepository<ZoneTilingJob, String> repository,
+      JobStatusRepository jobStatusRepository,
       TaskRepository<TilingTask> taskRepository,
       EventProducer eventProducer) {
-    super(repository, taskRepository, eventProducer, ZoneTilingJob.class);
+    super(repository, jobStatusRepository, taskRepository, eventProducer, ZoneTilingJob.class);
   }
 
   @Override

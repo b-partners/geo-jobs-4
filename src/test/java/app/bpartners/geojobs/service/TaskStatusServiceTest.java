@@ -23,6 +23,7 @@ import app.bpartners.geojobs.job.model.Status.HealthStatus;
 import app.bpartners.geojobs.job.model.Status.ProgressionStatus;
 import app.bpartners.geojobs.job.model.Task;
 import app.bpartners.geojobs.job.model.TaskStatus;
+import app.bpartners.geojobs.job.repository.JobStatusRepository;
 import app.bpartners.geojobs.job.repository.TaskRepository;
 import app.bpartners.geojobs.job.service.JobService;
 import app.bpartners.geojobs.job.service.TaskStatusService;
@@ -39,10 +40,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 class TaskStatusServiceTest {
   JpaRepository<TestJob, String> jobRepository = mock();
+  JobStatusRepository jobStatusRepository = mock();
   EventProducer eventProducer = mock();
   TaskRepository<TestTask> taskRepository = mock();
   JobService<TestTask, TestJob> jobService =
-      new TestJobService(jobRepository, taskRepository, eventProducer);
+      new TestJobService(jobRepository, jobStatusRepository, taskRepository, eventProducer);
   TaskStatusService<TestTask, TestJob> subject =
       new TaskStatusService<>(taskRepository, jobService);
   EntityManager em = mock();
@@ -207,9 +209,10 @@ class TaskStatusServiceTest {
   static class TestJobService extends JobService<TestTask, TestJob> {
     public TestJobService(
         JpaRepository<TestJob, String> repository,
+        JobStatusRepository jobStatusRepository,
         TaskRepository<TestTask> taskRepository,
         EventProducer eventProducer) {
-      super(repository, taskRepository, eventProducer, TestJob.class);
+      super(repository, jobStatusRepository, taskRepository, eventProducer, TestJob.class);
     }
 
     @Override

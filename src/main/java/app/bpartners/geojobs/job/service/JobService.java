@@ -5,7 +5,6 @@ import static app.bpartners.geojobs.job.model.Status.HealthStatus.SUCCEEDED;
 import static app.bpartners.geojobs.job.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.FINISHED;
 import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PROCESSING;
-import static jakarta.persistence.LockModeType.PESSIMISTIC_WRITE;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.toList;
@@ -16,6 +15,7 @@ import app.bpartners.geojobs.job.model.JobStatus;
 import app.bpartners.geojobs.job.model.Status;
 import app.bpartners.geojobs.job.model.Task;
 import app.bpartners.geojobs.job.model.TaskStatus;
+import app.bpartners.geojobs.job.repository.JobStatusRepository;
 import app.bpartners.geojobs.job.repository.TaskRepository;
 import app.bpartners.geojobs.model.BoundedPageSize;
 import app.bpartners.geojobs.model.PageFromOne;
@@ -31,16 +31,21 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public abstract class JobService<T extends Task, J extends Job> {
   protected final JpaRepository<J, String> repository;
+  protected final JobStatusRepository jobStatusRepository;
   protected final TaskRepository<T> taskRepository;
   protected final EventProducer eventProducer;
   private final Class<J> jobClazz;
 
+  @Setter @PersistenceContext EntityManager em;
+
   protected JobService(
       JpaRepository<J, String> repository,
+      JobStatusRepository jobStatusRepository,
       TaskRepository<T> taskRepository,
       EventProducer eventProducer,
       Class<J> jobClazz) {
     this.repository = repository;
+    this.jobStatusRepository = jobStatusRepository;
     this.taskRepository = taskRepository;
     this.eventProducer = eventProducer;
     this.jobClazz = jobClazz;
@@ -70,7 +75,7 @@ public abstract class JobService<T extends Task, J extends Job> {
     if (!oldStatus.getProgression().equals(newStatus.getProgression())
         || !oldStatus.getHealth().equals(newStatus.getHealth())) {
       onStatusChanged(oldJob, newJob);
-      newJob = pwSave(newJob);
+      jobStatusRepository.save(newStatus);
     }
     return newJob;
   }
@@ -132,12 +137,5 @@ public abstract class JobService<T extends Task, J extends Job> {
 
   protected List<T> getTasks(J job) {
     return taskRepository.findAllByJobId(job.getId());
-  }
-
-  @Setter @PersistenceContext EntityManager em;
-
-  private J pwSave(J job) {
-    em.find(jobClazz, job.getId(), PESSIMISTIC_WRITE);
-    return repository.save(job);
   }
 }

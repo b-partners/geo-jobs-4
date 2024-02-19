@@ -4,6 +4,7 @@ import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.DetectionTaskCreated;
 import app.bpartners.geojobs.endpoint.event.gen.InDoubtTilesDetected;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionJobStatusChanged;
+import app.bpartners.geojobs.job.repository.JobStatusRepository;
 import app.bpartners.geojobs.job.service.JobService;
 import app.bpartners.geojobs.repository.DetectedTileRepository;
 import app.bpartners.geojobs.repository.DetectionTaskRepository;
@@ -23,11 +24,12 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
 
   public ZoneDetectionJobService(
       JpaRepository<ZoneDetectionJob, String> repository,
+      JobStatusRepository jobStatusRepository,
       DetectionTaskRepository taskRepository,
       DetectedTileRepository detectedTileRepository,
       EventProducer eventProducer,
       DetectionMapper detectionMapper) {
-    super(repository, taskRepository, eventProducer, ZoneDetectionJob.class);
+    super(repository, jobStatusRepository, taskRepository, eventProducer, ZoneDetectionJob.class);
     this.detectionMapper = detectionMapper;
     this.detectedTileRepository = detectedTileRepository;
   }
