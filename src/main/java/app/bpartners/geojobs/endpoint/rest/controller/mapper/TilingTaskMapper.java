@@ -12,9 +12,7 @@ import app.bpartners.geojobs.endpoint.rest.model.Parcel;
 import app.bpartners.geojobs.endpoint.rest.model.Status;
 import app.bpartners.geojobs.endpoint.rest.model.Tile;
 import app.bpartners.geojobs.job.model.TaskStatus;
-import app.bpartners.geojobs.repository.ZoneTilingJobRepository;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
-import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import java.net.URL;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -24,7 +22,6 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class TilingTaskMapper {
   private final FeatureMapper featureMapper;
-  private final ZoneTilingJobRepository zoneTilingJobRepository;
 
   public TilingTask from(
       Feature createFeature,
@@ -49,13 +46,12 @@ public class TilingTaskMapper {
   }
 
   public Parcel toRest(app.bpartners.geojobs.repository.model.Parcel model, String jobId) {
-    ZoneTilingJob zoneTilingJob = zoneTilingJobRepository.findById(jobId).get();
     return new Parcel()
         .id(randomUUID().toString())
         .creationDatetime(model.getCreationDatetime())
         .tiles(model.getTiles().stream().map(this::toRest).toList())
         .tilingStatus(
-            ofNullable(zoneTilingJob.getStatus())
+            ofNullable(model.getTilingStatus())
                 .map(
                     status ->
                         new Status()

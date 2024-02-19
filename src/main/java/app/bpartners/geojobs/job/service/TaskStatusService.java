@@ -39,7 +39,7 @@ public class TaskStatusService<T extends Task, J extends Job> {
 
   @Transactional
   public T fail(T task) {
-    return update(task, FINISHED, FAILED); //TODO: fail(oneTask) seem to set job.tasks.status to job.status!
+    return update(task, FINISHED, FAILED);
   }
 
   private T update(T task, ProgressionStatus progression, HealthStatus health) {
@@ -59,9 +59,7 @@ public class TaskStatusService<T extends Task, J extends Job> {
             .taskId(task.getId())
             .build();
     task.hasNewStatus(taskStatus);
-    var updatedTask =
-        repository.save(
-            task); // TODO: generated deadlock, why? also: restrict saving to status only
+    var updatedTask = repository.save(task);
     jobService.recomputeStatus(oldJob);
 
     return updatedTask;
