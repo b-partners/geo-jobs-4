@@ -14,9 +14,6 @@ import app.bpartners.geojobs.job.model.Status.ProgressionStatus;
 import app.bpartners.geojobs.job.model.Task;
 import app.bpartners.geojobs.job.model.TaskStatus;
 import app.bpartners.geojobs.model.exception.NotFoundException;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import lombok.Setter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,18 +42,15 @@ public class TaskStatusService<T extends Task, J extends Job> {
     return update(task, FINISHED, FAILED);
   }
 
-  @Setter @PersistenceContext EntityManager em;
-
   private T update(T task, ProgressionStatus progression, HealthStatus health) {
     var taskId = task.getId();
     if (!repository.existsById(taskId)) {
       throw new NotFoundException("task.id=" + taskId);
     }
     var jobIb = task.getJobId();
-    var oldJob = jobService.pwFindById(jobIb);
-    em.detach(oldJob); // else future getXxx will still retrieve latest version from db
+    var oldJob = jobService.findById(jobIb);
 
-    TaskStatus taskStatus =
+    var taskStatus =
         TaskStatus.builder()
             .id(randomUUID().toString())
             .creationDatetime(now())

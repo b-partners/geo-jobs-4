@@ -30,6 +30,8 @@ import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -47,7 +49,6 @@ class TaskStatusServiceTest {
 
   @BeforeEach
   void setUp() {
-    subject.setEm(em);
     jobService.setEm(em);
     when(jobRepository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
   }
@@ -189,10 +190,17 @@ class TaskStatusServiceTest {
     }
   }
 
+  @SuperBuilder(toBuilder = true)
+  @NoArgsConstructor
   static class TestJob extends Job {
     @Override
     protected JobType getType() {
       return null;
+    }
+
+    @Override
+    public Job semanticClone() {
+      return this.toBuilder().build();
     }
   }
 

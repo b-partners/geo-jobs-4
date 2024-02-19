@@ -12,12 +12,17 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @AllArgsConstructor
 @JsonIgnoreProperties({"status", "done"})
 public class ZoneTilingJob extends Job {
   @Override
   protected JobType getType() {
     return TILING;
+  }
+
+  @Override
+  public Job semanticClone() {
+    return this.toBuilder().build();
   }
 }

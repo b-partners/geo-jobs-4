@@ -37,6 +37,11 @@ public class ZoneDetectionJob extends Job {
     return DETECTION;
   }
 
+  @Override
+  public Job semanticClone() {
+    return this.toBuilder().build();
+  }
+
   public enum DetectionType {
     MACHINE,
     HUMAN

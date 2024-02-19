@@ -56,4 +56,6 @@ public abstract class Job implements Serializable, Statusable<JobStatus> {
     }
     this.statusHistory = statusHistory;
   }
+
+  public abstract Job semanticClone();
 }
