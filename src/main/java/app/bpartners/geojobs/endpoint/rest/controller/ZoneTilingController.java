@@ -62,8 +62,6 @@ public class ZoneTilingController {
 
   @GetMapping("/tilingJobs/{id}/parcels")
   public List<Parcel> getZTJParcels(@PathVariable("id") String jobId) {
-    return parcelService.getParcelsByJobId(jobId).stream()
-        .map(parcel -> tilingTaskMapper.toRest(parcel, jobId))
-        .toList();
+    return parcelService.getParcelsByJobId(jobId).stream().map(tilingTaskMapper::toRest).toList();
   }
 }

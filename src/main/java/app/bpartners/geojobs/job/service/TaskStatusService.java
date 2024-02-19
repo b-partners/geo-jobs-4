@@ -13,17 +13,23 @@ import app.bpartners.geojobs.job.model.Status.HealthStatus;
 import app.bpartners.geojobs.job.model.Status.ProgressionStatus;
 import app.bpartners.geojobs.job.model.Task;
 import app.bpartners.geojobs.job.model.TaskStatus;
+import app.bpartners.geojobs.job.repository.TaskStatusRepository;
 import app.bpartners.geojobs.model.exception.NotFoundException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 public class TaskStatusService<T extends Task, J extends Job> {
 
-  protected final JpaRepository<T, String> repository;
+  protected final JpaRepository<T, String> taskRepository;
+  protected final TaskStatusRepository taskStatusRepository;
   protected final JobService<T, J> jobService;
 
-  public TaskStatusService(JpaRepository<T, String> repository, JobService<T, J> jobService) {
-    this.repository = repository;
+  public TaskStatusService(
+      JpaRepository<T, String> taskRepository,
+      TaskStatusRepository taskStatusRepository,
+      JobService<T, J> jobService) {
+    this.taskRepository = taskRepository;
+    this.taskStatusRepository = taskStatusRepository;
     this.jobService = jobService;
   }
 
@@ -44,7 +50,7 @@ public class TaskStatusService<T extends Task, J extends Job> {
 
   private T update(T task, ProgressionStatus progression, HealthStatus health) {
     var taskId = task.getId();
-    if (!repository.existsById(taskId)) {
+    if (!taskRepository.existsById(taskId)) {
       throw new NotFoundException("task.id=" + taskId);
     }
     var jobIb = task.getJobId();
@@ -59,9 +65,9 @@ public class TaskStatusService<T extends Task, J extends Job> {
             .taskId(task.getId())
             .build();
     task.hasNewStatus(taskStatus);
-    var updatedTask = repository.save(task);
+    taskStatusRepository.save(taskStatus);
     jobService.recomputeStatus(oldJob);
 
-    return updatedTask;
+    return task;
   }
 }

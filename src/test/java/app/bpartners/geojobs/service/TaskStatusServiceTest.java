@@ -24,6 +24,7 @@ import app.bpartners.geojobs.job.model.Task;
 import app.bpartners.geojobs.job.model.TaskStatus;
 import app.bpartners.geojobs.job.repository.JobStatusRepository;
 import app.bpartners.geojobs.job.repository.TaskRepository;
+import app.bpartners.geojobs.job.repository.TaskStatusRepository;
 import app.bpartners.geojobs.job.service.JobService;
 import app.bpartners.geojobs.job.service.TaskStatusService;
 import jakarta.persistence.EntityManager;
@@ -42,10 +43,11 @@ class TaskStatusServiceTest {
   JobStatusRepository jobStatusRepository = mock();
   EventProducer eventProducer = mock();
   TaskRepository<TestTask> taskRepository = mock();
+  TaskStatusRepository taskStatusRepository = mock();
   JobService<TestTask, TestJob> jobService =
       new TestJobService(jobRepository, jobStatusRepository, taskRepository, eventProducer);
   TaskStatusService<TestTask, TestJob> subject =
-      new TaskStatusService<>(taskRepository, jobService);
+      new TaskStatusService<>(taskRepository, taskStatusRepository, jobService);
   EntityManager em = mock();
 
   @BeforeEach

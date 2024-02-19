@@ -45,7 +45,7 @@ public class TilingTaskMapper {
         .build();
   }
 
-  public Parcel toRest(app.bpartners.geojobs.repository.model.Parcel model, String jobId) {
+  public Parcel toRest(app.bpartners.geojobs.repository.model.Parcel model) {
     return new Parcel()
         .id(randomUUID().toString())
         .creationDatetime(model.getCreationDatetime())

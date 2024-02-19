@@ -6,7 +6,6 @@ import app.bpartners.geojobs.repository.TilingTaskRepository;
 import app.bpartners.geojobs.repository.ZoneDetectionJobRepository;
 import app.bpartners.geojobs.repository.ZoneTilingJobRepository;
 import app.bpartners.geojobs.repository.model.Parcel;
-import app.bpartners.geojobs.repository.model.tiling.TilingTask;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,12 @@ public class ParcelService {
     var zoneTilingJob = tilingJobRepository.findById(jobId);
     if (zoneTilingJob.isPresent()) {
       return tilingTaskRepository.findAllByJobId(jobId).stream()
-          .map(TilingTask::getParcel)
+          .map(
+              tilingTask -> {
+                var parcel = tilingTask.getParcel();
+                parcel.setTilingStatus(tilingTask.getStatus());
+                return parcel;
+              })
           .toList();
     }
 

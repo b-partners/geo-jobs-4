@@ -1,5 +1,6 @@
 package app.bpartners.geojobs.service.tiling;
 
+import app.bpartners.geojobs.job.repository.TaskStatusRepository;
 import app.bpartners.geojobs.job.service.JobService;
 import app.bpartners.geojobs.job.service.RetryableTaskStatusService;
 import app.bpartners.geojobs.job.service.TaskStatusService;
@@ -14,8 +15,9 @@ public class TilingTaskStatusService extends TaskStatusService<TilingTask, ZoneT
 
   public TilingTaskStatusService(
       JpaRepository<TilingTask, String> repository,
+      TaskStatusRepository taskStatusRepository,
       JobService<TilingTask, ZoneTilingJob> zoneJobService) {
-    super(repository, zoneJobService);
+    super(repository, taskStatusRepository, zoneJobService);
   }
 
   @Bean

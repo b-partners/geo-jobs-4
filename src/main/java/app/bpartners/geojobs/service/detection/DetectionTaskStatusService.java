@@ -1,5 +1,6 @@
 package app.bpartners.geojobs.service.detection;
 
+import app.bpartners.geojobs.job.repository.TaskStatusRepository;
 import app.bpartners.geojobs.job.service.JobService;
 import app.bpartners.geojobs.job.service.RetryableTaskStatusService;
 import app.bpartners.geojobs.job.service.TaskStatusService;
@@ -14,8 +15,9 @@ public class DetectionTaskStatusService extends TaskStatusService<DetectionTask,
 
   public DetectionTaskStatusService(
       JpaRepository<DetectionTask, String> repository,
+      TaskStatusRepository taskStatusRepository,
       JobService<DetectionTask, ZoneDetectionJob> zoneJobService) {
-    super(repository, zoneJobService);
+    super(repository, taskStatusRepository, zoneJobService);
   }
 
   @Bean
