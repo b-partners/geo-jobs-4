@@ -49,6 +49,7 @@ public class JobStatus extends Status {
         .jobType(jobType)
         .progression(status.getProgression())
         .health(status.getHealth())
+        .message(status.getMessage())
         .creationDatetime(status.getCreationDatetime())
         .build();
   }

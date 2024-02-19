@@ -78,13 +78,17 @@ public class TilingTaskConsumer implements Consumer<TilingTask> {
   }
 
   public static TilingTask withNewStatus(
-      TilingTask task, Status.ProgressionStatus progression, Status.HealthStatus health) {
+      TilingTask task,
+      Status.ProgressionStatus progression,
+      Status.HealthStatus health,
+      String message) {
     return (TilingTask)
         task.hasNewStatus(
             Status.builder()
                 .progression(progression)
                 .health(health)
                 .creationDatetime(now())
+                .message(message)
                 .build());
   }
 }

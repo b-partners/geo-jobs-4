@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.TilingTaskFailed;
 import app.bpartners.geojobs.endpoint.event.gen.TilingTaskSucceeded;
+import app.bpartners.geojobs.job.model.TaskStatus;
 import app.bpartners.geojobs.job.service.RetryableTaskStatusService;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
 import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
@@ -29,6 +30,13 @@ class TilingTaskFailedServiceTest {
   @Test
   void fail_if_max_attempt_reached() {
     var task = new TilingTask();
+    task.setStatusHistory(
+        List.of(
+            TaskStatus.builder()
+                .progression(PROCESSING)
+                .health(UNKNOWN)
+                .message("An error message")
+                .build()));
     var taskFailed = TilingTaskFailed.builder().task(task).attemptNb(4).build();
 
     subject.accept(taskFailed);

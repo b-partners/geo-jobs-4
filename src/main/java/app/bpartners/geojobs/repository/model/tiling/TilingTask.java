@@ -13,7 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
 
@@ -23,7 +22,6 @@ import org.hibernate.annotations.JdbcTypeCode;
 @SuperBuilder
 @Getter
 @Setter
-@ToString
 @JsonIgnoreProperties({"status"})
 public class TilingTask extends Task implements Serializable {
   @JdbcTypeCode(JSON)
@@ -32,5 +30,10 @@ public class TilingTask extends Task implements Serializable {
   @Override
   public GeoJobType getJobType() {
     return TILING;
+  }
+
+  @Override
+  public String toString() {
+    return "TilingTask{" + "parcel=" + parcel + ", status=" + getStatus() + '}';
   }
 }

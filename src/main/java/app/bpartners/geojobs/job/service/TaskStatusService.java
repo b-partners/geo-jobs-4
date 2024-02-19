@@ -18,7 +18,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.Setter;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 public class TaskStatusService<T extends Task, J extends Job> {
@@ -31,7 +30,7 @@ public class TaskStatusService<T extends Task, J extends Job> {
     this.jobService = jobService;
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional
   public T process(T task) {
     return update(task, PROCESSING, UNKNOWN);
   }

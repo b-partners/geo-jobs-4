@@ -15,8 +15,10 @@ import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import java.util.List;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class TilingTaskFailedService implements Consumer<TilingTaskFailed> {
@@ -33,6 +35,7 @@ public class TilingTaskFailedService implements Consumer<TilingTaskFailed> {
     var attemptNb = tilingTaskFailed.getAttemptNb();
     if (attemptNb > MAX_ATTEMPT) {
       taskStatusService.fail(task);
+      log.error("Max attempt reached for tilingTaskFailed={}", tilingTaskFailed);
       return;
     }
 
@@ -40,11 +43,13 @@ public class TilingTaskFailedService implements Consumer<TilingTaskFailed> {
       tilingTaskConsumer.accept(task);
     } catch (Exception e) {
       eventProducer.accept(
-          List.of(new TilingTaskFailed(withNewStatus(task, PROCESSING, UNKNOWN), attemptNb + 1)));
+          List.of(
+              new TilingTaskFailed(
+                  withNewStatus(task, PROCESSING, UNKNOWN, e.getMessage()), attemptNb + 1)));
       return;
     }
 
     eventProducer.accept(
-        List.of(new TilingTaskSucceeded(withNewStatus(task, FINISHED, SUCCEEDED))));
+        List.of(new TilingTaskSucceeded(withNewStatus(task, FINISHED, SUCCEEDED, null))));
   }
 }
