@@ -6,7 +6,6 @@ import static app.bpartners.geojobs.job.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.FINISHED;
 import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PROCESSING;
 import static java.time.Instant.now;
-import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.job.model.Job;
 import app.bpartners.geojobs.job.model.Status.HealthStatus;
@@ -14,21 +13,14 @@ import app.bpartners.geojobs.job.model.Status.ProgressionStatus;
 import app.bpartners.geojobs.job.model.Task;
 import app.bpartners.geojobs.job.model.TaskStatus;
 import app.bpartners.geojobs.job.repository.TaskStatusRepository;
-import app.bpartners.geojobs.model.exception.NotFoundException;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 public class TaskStatusService<T extends Task, J extends Job> {
 
-  protected final JpaRepository<T, String> taskRepository;
   protected final TaskStatusRepository taskStatusRepository;
   protected final JobService<T, J> jobService;
 
-  public TaskStatusService(
-      JpaRepository<T, String> taskRepository,
-      TaskStatusRepository taskStatusRepository,
-      JobService<T, J> jobService) {
-    this.taskRepository = taskRepository;
+  public TaskStatusService(TaskStatusRepository taskStatusRepository, JobService<T, J> jobService) {
     this.taskStatusRepository = taskStatusRepository;
     this.jobService = jobService;
   }
@@ -49,16 +41,11 @@ public class TaskStatusService<T extends Task, J extends Job> {
   }
 
   private T update(T task, ProgressionStatus progression, HealthStatus health) {
-    var taskId = task.getId();
-    if (!taskRepository.existsById(taskId)) {
-      throw new NotFoundException("task.id=" + taskId);
-    }
     var jobIb = task.getJobId();
     var oldJob = jobService.findById(jobIb);
 
     var taskStatus =
         TaskStatus.builder()
-            .id(randomUUID().toString())
             .creationDatetime(now())
             .progression(progression)
             .health(health)

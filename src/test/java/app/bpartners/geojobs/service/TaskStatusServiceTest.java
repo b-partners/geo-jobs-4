@@ -47,7 +47,7 @@ class TaskStatusServiceTest {
   JobService<TestTask, TestJob> jobService =
       new TestJobService(jobRepository, jobStatusRepository, taskRepository, eventProducer);
   TaskStatusService<TestTask, TestJob> subject =
-      new TaskStatusService<>(taskRepository, taskStatusRepository, jobService);
+      new TaskStatusService<>(taskStatusRepository, jobService);
   EntityManager em = mock();
 
   @BeforeEach
@@ -62,7 +62,6 @@ class TaskStatusServiceTest {
     when(jobRepository.findById(jobId)).thenReturn(Optional.of(aTestJob(jobId, PENDING, UNKNOWN)));
     var taskId = "taskId";
     var oldTask = aTestTask(taskId, jobId, PENDING, UNKNOWN);
-    when(taskRepository.existsById(taskId)).thenReturn(true);
     when(taskRepository.findAllByJobId(jobId))
         .thenReturn(
             List.of(
@@ -86,7 +85,6 @@ class TaskStatusServiceTest {
     when(jobRepository.findById(jobId)).thenReturn(Optional.of(aTestJob(jobId, PENDING, UNKNOWN)));
     var taskId = "taskId";
     var oldTask = aTestTask(taskId, jobId, PENDING, UNKNOWN);
-    when(taskRepository.existsById(taskId)).thenReturn(true);
     when(taskRepository.findAllByJobId(jobId))
         .thenReturn(
             List.of(
@@ -110,7 +108,6 @@ class TaskStatusServiceTest {
     when(jobRepository.findById(jobId)).thenReturn(Optional.of(aTestJob(jobId, PENDING, UNKNOWN)));
     var taskId = "taskId";
     var oldTask = aTestTask(taskId, jobId, PENDING, UNKNOWN);
-    when(taskRepository.existsById(taskId)).thenReturn(true);
     when(taskRepository.findAllByJobId(jobId))
         .thenReturn(
             List.of(
@@ -135,7 +132,6 @@ class TaskStatusServiceTest {
         .thenReturn(Optional.of(aTestJob(jobId, PROCESSING, UNKNOWN)));
     var taskId = "taskId";
     var oldTask = aTestTask(taskId, jobId, PENDING, UNKNOWN);
-    when(taskRepository.existsById(taskId)).thenReturn(true);
     when(taskRepository.findAllByJobId(jobId))
         .thenReturn(
             List.of(

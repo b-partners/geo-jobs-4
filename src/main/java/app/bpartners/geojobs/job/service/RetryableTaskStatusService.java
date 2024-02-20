@@ -1,7 +1,6 @@
 package app.bpartners.geojobs.job.service;
 
 import static java.lang.Thread.sleep;
-import static java.time.temporal.ChronoUnit.MINUTES;
 
 import app.bpartners.geojobs.job.model.Job;
 import app.bpartners.geojobs.job.model.Task;
@@ -11,13 +10,13 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @AllArgsConstructor
+@Slf4j
 public class RetryableTaskStatusService<T extends Task, J extends Job> {
 
   private final TaskStatusService<T, J> taskStatusService;
-  private final Duration MAX_SLEEP_DURATION = Duration.of(1, MINUTES);
-  private final int MAX_RETRY = 5;
+  private final Duration maxSleepDuration;
+  private final int maxRetry;
 
   public T process(T task) {
     return retry(taskStatusService::process, task, 0);
@@ -36,11 +35,11 @@ public class RetryableTaskStatusService<T extends Task, J extends Job> {
     try {
       return taskFunction.apply(task);
     } catch (Exception e) {
-      if (attemptNb > MAX_RETRY) {
+      if (attemptNb >= maxRetry) {
         throw e;
       }
-      var sleepDuration = (long) (MAX_SLEEP_DURATION.toMillis() * Math.random());
-      log.info("Retry: attemptNb={}/{}, sleep(ms)={}", attemptNb, MAX_RETRY, sleepDuration, e);
+      var sleepDuration = (long) (maxSleepDuration.toMillis() * Math.random());
+      log.info("Retry: attemptNb={}/{}, sleep(ms)={}", attemptNb, maxRetry, sleepDuration, e);
       sleep(sleepDuration);
       return retry(taskFunction, task, attemptNb + 1);
     }

@@ -67,8 +67,9 @@ public abstract class JobService<T extends Task, J extends Job> {
     em.detach(oldJob); // else following getXxx will still retrieve latest version from db
     var newJob = (J) oldJob.semanticClone();
 
-    var newTaskStatuses =
-        taskRepository.findAllByJobId(jobId).stream().map(Task::getStatus).collect(toList());
+    var tasks = taskRepository.findAllByJobId(jobId);
+    tasks.forEach(em::detach); // else maintaining task <--> taskStatus will result in SQL updates
+    var newTaskStatuses = tasks.stream().map(Task::getStatus).collect(toList());
     newJob.hasNewStatus(jobStatusFromTaskStatuses(jobId, oldStatus, newTaskStatuses));
 
     var newStatus = newJob.getStatus();

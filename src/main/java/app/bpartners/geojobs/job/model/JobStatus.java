@@ -1,7 +1,5 @@
 package app.bpartners.geojobs.job.model;
 
-import static java.util.UUID.randomUUID;
-
 import app.bpartners.geojobs.job.repository.JobTypeConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Convert;
@@ -45,7 +43,7 @@ public class JobStatus extends Status {
   public static JobStatus from(String id, Status status, JobType jobType) {
     return JobStatus.builder()
         .jobId(id)
-        .id(randomUUID().toString())
+        .id(status.getId())
         .jobType(jobType)
         .progression(status.getProgression())
         .health(status.getHealth())

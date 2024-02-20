@@ -23,5 +23,6 @@ public class EnvConf {
             "{\"userId\":\""
                 + ANNOTATOR_USER_ID_FOR_GEOJOBS
                 + "\", \"teamId\":\"geo_jobs_team_id\"}");
+    registry.add("jobs.status.update.retry.max.attempt", () -> 0);
   }
 }

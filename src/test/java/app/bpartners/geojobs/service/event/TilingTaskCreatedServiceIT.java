@@ -285,7 +285,7 @@ class TilingTaskCreatedServiceIT extends FacadeIT {
     /*******************************************************************/
     /********************* Concurrently tile...  ***********************/
     /*******************************************************************/
-    var callersNb = 40;
+    var callersNb = 100;
     var callables = new ArrayList<Callable<Boolean>>();
     var jobId = randomUUID().toString();
     zoneTilingJobRepository.save(aZTJ(jobId));
