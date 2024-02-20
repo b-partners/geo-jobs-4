@@ -7,31 +7,28 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
 
 @Entity
+@Getter
+@SuperBuilder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-@Builder
 @ToString
-@EqualsAndHashCode
-public class DetectableObjectType implements Serializable {
+public class DetectableObjectConfiguration {
   @Id private String id;
 
   @JoinColumn(referencedColumnName = "id")
-  private String objectId;
+  private String detectionJobId;
 
   @Enumerated(STRING)
   @JdbcTypeCode(NAMED_ENUM)
-  private DetectableType detectableType;
+  private DetectableType objectType;
+
+  private Double confidence;
 }
