@@ -32,6 +32,7 @@ public class EventConsumer implements Consumer<List<EventConsumer.Acknowledgeabl
   @Override
   public void accept(List<AcknowledgeableTypedEvent> ackEvents) {
     for (AcknowledgeableTypedEvent ackEvent : ackEvents) {
+      //TODO: not synchronously like this! Parallelize with newTreadPool(batchSize)
       eventServiceInvoker.accept(ackEvent.getEvent());
       ackEvent.ack();
     }
