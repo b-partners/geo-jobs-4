@@ -79,7 +79,7 @@ Resources:
           Type: SQS
           Properties:
             Queue: !Sub '{{resolve:ssm:/geo-jobs/${Env}/sqs/mailbox-queue-arn}}'
-            BatchSize: 1
+            BatchSize: 5
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
