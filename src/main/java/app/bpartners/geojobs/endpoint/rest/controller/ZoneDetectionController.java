@@ -24,7 +24,7 @@ public class ZoneDetectionController {
 
   @GetMapping("/detectionJobs")
   public List<app.bpartners.geojobs.endpoint.rest.model.ZoneDetectionJob> getDetectionJobs(
-      PageFromOne page, BoundedPageSize pageSize) {
+      @RequestParam PageFromOne page, @RequestParam BoundedPageSize pageSize) {
     return service.findAll(page, pageSize).stream()
         .map(
             zdj -> {
