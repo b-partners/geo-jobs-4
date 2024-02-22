@@ -31,7 +31,10 @@ public class TilingTaskConsumer implements Consumer<TilingTask> {
     var parcel = tilingTask.getParcel();
     File downloadedTiles = tilesDownloader.apply(parcel);
     String bucketKey = downloadedTiles.getName();
+
     bucketComponent.upload(downloadedTiles, bucketKey);
+    downloadedTiles.delete();
+
     setParcelTiles(downloadedTiles, parcel, bucketKey);
   }
 

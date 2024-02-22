@@ -62,7 +62,12 @@ public class TilesDownloader implements Function<Parcel, File> {
 
     if (responseEntity.getStatusCode().value() == 200) {
       try {
-        return unzip(fileWriter.apply(responseEntity.getBody(), null), parcel);
+        var zip = fileWriter.apply(responseEntity.getBody(), null);
+
+        var unzipped = unzip(zip, parcel);
+        zip.delete();
+
+        return unzipped;
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
