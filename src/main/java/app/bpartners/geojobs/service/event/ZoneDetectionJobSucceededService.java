@@ -1,6 +1,7 @@
 package app.bpartners.geojobs.service.event;
 
 import static app.bpartners.annotator.endpoint.rest.model.JobStatus.TO_REVIEW;
+import static app.bpartners.annotator.endpoint.rest.model.JobType.REVIEWING;
 import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
 import static java.util.UUID.randomUUID;
 
@@ -89,6 +90,7 @@ public class ZoneDetectionJobSucceededService implements Consumer<ZoneDetectionJ
               .labels(labels)
               .ownerEmail("tech@bpartners.app")
               .status(TO_REVIEW)
+              .type(REVIEWING)
               .annotatedTasks(annotatedTasks)
               .teamId(annotatorUserInfoGetter.getTeamId()));
     } catch (app.bpartners.annotator.endpoint.rest.client.ApiException e) {
