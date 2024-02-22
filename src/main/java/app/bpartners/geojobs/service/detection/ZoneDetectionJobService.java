@@ -1,5 +1,7 @@
 package app.bpartners.geojobs.service.detection;
 
+import static app.bpartners.geojobs.repository.model.detection.ZoneDetectionJob.DetectionType.HUMAN;
+
 import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.DetectionTaskCreated;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionJobStatusChanged;
@@ -54,7 +56,8 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
 
   public void saveZDJFromZTJ(ZoneTilingJob job) {
     ZoneDetectionJob zoneDetectionJob = detectionMapper.fromTilingJob(job);
-    repository.save(zoneDetectionJob);
+    ZoneDetectionJob savedZDJ = repository.save(zoneDetectionJob);
+    repository.save(savedZDJ.toBuilder().detectionType(HUMAN).build());
   }
 
   public ZoneDetectionJob save(ZoneDetectionJob job) {
