@@ -9,10 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import app.bpartners.geojobs.conf.FacadeIT;
+import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.DetectionTaskCreated;
 import app.bpartners.geojobs.endpoint.rest.model.TileCoordinates;
 import app.bpartners.geojobs.file.BucketComponent;
@@ -65,7 +65,7 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
   @MockBean DetectionTaskRepository detectionTaskRepository;
 
   @MockBean ZoneDetectionJobService zoneDetectionJobService;
-
+  @MockBean EventProducer eventProducer;
   @Captor ArgumentCaptor<DetectedTile> detectedTileCaptor;
 
   DetectionResponse detectionResponse() {
@@ -177,6 +177,8 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
 
     subject.accept(detectionTaskCreated());
 
+    var eventsCaptor = ArgumentCaptor.forClass(List.class);
+    verify(eventProducer, times(1)).accept(eventsCaptor.capture());
     verify(detectedTileRepository).save(detectedTileCaptor.capture());
 
     DetectedTile detectedTile = detectedTileCaptor.getValue();
