@@ -66,7 +66,7 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
     eventProducer.accept(
         List.of(ZoneDetectionJobStatusChanged.builder().oldJob(oldJob).newJob(newJob).build()));
   }
-
+  @Transactional
   public void saveZDJFromZTJ(ZoneTilingJob job) {
     var zoneDetectionJob = detectionMapper.fromTilingJob(job);
     var savedZDJ = repository.save(zoneDetectionJob);
@@ -74,29 +74,31 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
 
     var detectionJobId = savedZDJ.getId();
     var tilingTasks = tilingTaskRepository.findAllByJobId(job.getId());
-    var detectionTasks =
+
+    List<DetectionTask> detectionTasks =
         tilingTasks.stream()
             .map(
                 tilingTask -> {
                   var parcels = tilingTask.getParcels();
                   var generatedTaskId = randomUUID().toString();
-                  return DetectionTask.builder()
-                      .id(generatedTaskId)
-                      .jobId(detectionJobId)
-                      .parcels(parcels)
-                      .statusHistory(
-                          List.of(
-                              TaskStatus.builder()
-                                  .health(UNKNOWN)
-                                  .progression(PENDING)
-                                  .creationDatetime(now())
-                                  .taskId(generatedTaskId)
-                                  .build()))
-                      .submissionInstant(now())
-                      .build();
+                  DetectionTask detectionTask = new DetectionTask();
+                  detectionTask.setId(generatedTaskId);
+                  detectionTask.setJobId(detectionJobId);
+                  detectionTask.setParcels(parcels);
+                  detectionTask.setStatusHistory(
+                      List.of(
+                          TaskStatus.builder()
+                              .health(UNKNOWN)
+                              .progression(PENDING)
+                              .creationDatetime(now())
+                              .taskId(generatedTaskId)
+                              .build()));
+                  detectionTask.setSubmissionInstant(now());
+                  return detectionTask;
                 })
             .toList();
-    taskRepository.saveAll(detectionTasks);
+
+    super.create(savedZDJ, detectionTasks);
   }
 
   public ZoneDetectionJob save(ZoneDetectionJob job) {
