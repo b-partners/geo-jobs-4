@@ -41,11 +41,14 @@ public class ObjectsDetector implements Function<DetectionTask, DetectionRespons
   @SneakyThrows
   @Override
   public DetectionResponse apply(DetectionTask task) {
+    Tile tile = task.getTile();
+    if (tile == null) {
+      return null;
+    }
     RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(APPLICATION_JSON);
 
-    Tile tile = task.getTile();
     File file = bucketComponent.download(tile.getBucketPath());
     String base64ImgData = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(file));
 

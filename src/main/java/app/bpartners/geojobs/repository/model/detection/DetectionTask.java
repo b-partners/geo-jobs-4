@@ -41,7 +41,7 @@ public class DetectionTask extends Task implements Serializable {
   private List<Parcel> parcels;
 
   public Tile getTile() {
-    return getParcel().getParcelContent().getFirstTile();
+    return getParcel() == null ? null : getParcel().getParcelContent().getFirstTile();
   }
 
   public Parcel getParcel() {

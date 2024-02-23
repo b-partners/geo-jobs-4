@@ -11,20 +11,28 @@ import app.bpartners.geojobs.service.detection.DetectionResponse;
 import app.bpartners.geojobs.service.detection.ObjectsDetector;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @AllArgsConstructor
 @Component
+@Slf4j
 public class DetectionTaskConsumer implements Consumer<DetectionTask> {
   private final DetectedTileRepository detectedTileRepository;
   private final ObjectsDetector objectsDetector;
 
   @Override
   public void accept(DetectionTask task) {
+    var detectedParcel = task.getParcel();
+    var associatedTile = task.getTile();
+    if (detectedParcel == null || associatedTile == null) {
+      log.info("ERROR: {} has any parcel and tile", task);
+      return;
+    }
     DetectionResponse response = objectsDetector.apply(task);
     DetectedTile detectedTile =
         DetectionMapper.toDetectedTile(
-            response, task.getTile(), task.getParcel().getId(), task.getJobId());
+            response, associatedTile, detectedParcel.getId(), task.getJobId());
     detectedTileRepository.save(detectedTile);
   }
 
