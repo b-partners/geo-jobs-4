@@ -45,9 +45,12 @@ public class ParcelService {
           .map(
               detectionTask -> {
                 var parcel = detectionTask.getParcel();
-                var parcelContent = parcel.getParcelContent();
-                parcelContent.setDetectionStatus(detectionTask.getStatus());
-                return parcel;
+                  if(parcel != null) {
+                      var parcelContent = parcel.getParcelContent();
+                      parcelContent.setDetectionStatus(detectionTask.getStatus());
+                      return parcel;
+                  }
+                  return null;
               })
           .toList();
     }
