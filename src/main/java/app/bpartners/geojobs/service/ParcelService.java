@@ -29,9 +29,12 @@ public class ParcelService {
           .map(
               tilingTask -> {
                 var parcel = tilingTask.getParcel();
-                var parcelContent = parcel.getParcelContent();
-                parcelContent.setTilingStatus(tilingTask.getStatus());
-                return parcel;
+                if(parcel != null) {
+                    var parcelContent = parcel.getParcelContent();
+                    parcelContent.setTilingStatus(tilingTask.getStatus());
+                    return parcel;
+                }
+                return null;
               })
           .toList();
     }
