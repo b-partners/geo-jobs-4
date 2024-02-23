@@ -66,13 +66,11 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
     eventProducer.accept(
         List.of(ZoneDetectionJobStatusChanged.builder().oldJob(oldJob).newJob(newJob).build()));
   }
+
   @Transactional
   public void saveZDJFromZTJ(ZoneTilingJob job) {
     var zoneDetectionJob = detectionMapper.fromTilingJob(job);
-    var savedZDJ = repository.save(zoneDetectionJob);
-    repository.save(savedZDJ.toBuilder().detectionType(HUMAN).build());
-
-    var detectionJobId = savedZDJ.getId();
+    var detectionJobId = zoneDetectionJob.getId();
     var tilingTasks = tilingTaskRepository.findAllByJobId(job.getId());
 
     List<DetectionTask> detectionTasks =
@@ -98,7 +96,8 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
                 })
             .toList();
 
-    super.create(savedZDJ, detectionTasks);
+    var savedZDJ = super.create(zoneDetectionJob, detectionTasks);
+    repository.save(savedZDJ.toBuilder().detectionType(HUMAN).build());
   }
 
   public ZoneDetectionJob save(ZoneDetectionJob job) {
