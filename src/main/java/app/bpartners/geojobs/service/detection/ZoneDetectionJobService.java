@@ -97,7 +97,7 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
             .toList();
 
     var savedZDJ = super.create(zoneDetectionJob, detectionTasks);
-    repository.save(savedZDJ.toBuilder().detectionType(HUMAN).build());
+    repository.save(savedZDJ.toBuilder().id(randomUUID().toString()).detectionType(HUMAN).build());
   }
 
   public ZoneDetectionJob save(ZoneDetectionJob job) {
