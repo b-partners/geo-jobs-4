@@ -22,6 +22,7 @@ import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetectionJob> {
@@ -44,12 +45,14 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
     this.objectConfigurationRepository = objectConfigurationRepository;
   }
 
+  @Transactional
   public ZoneDetectionJob fireTasks(String jobId) {
     var job = findById(jobId);
     getTasks(job).forEach(task -> eventProducer.accept(List.of(new DetectionTaskCreated(task))));
     return job;
   }
 
+  @Transactional
   public ZoneDetectionJob fireTasks(
       String jobId, List<DetectableObjectConfiguration> objectConfigurations) {
     var job = findById(jobId);
