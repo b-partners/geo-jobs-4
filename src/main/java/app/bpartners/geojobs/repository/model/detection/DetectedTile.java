@@ -4,9 +4,7 @@ import static jakarta.persistence.CascadeType.ALL;
 import static org.hibernate.type.SqlTypes.JSON;
 
 import app.bpartners.geojobs.repository.model.tiling.Tile;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
@@ -40,6 +38,8 @@ public class DetectedTile implements Serializable {
   private List<DetectedObject> detectedObjects;
 
   private String bucketPath;
+
+  private String parcelId;
 
   private String jobId;
 }

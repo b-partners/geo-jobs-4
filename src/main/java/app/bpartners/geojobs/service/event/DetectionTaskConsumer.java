@@ -23,7 +23,8 @@ public class DetectionTaskConsumer implements Consumer<DetectionTask> {
   public void accept(DetectionTask task) {
     DetectionResponse response = objectsDetector.apply(task);
     DetectedTile detectedTile =
-        DetectionMapper.toDetectedTile(response, task.getTile(), task.getJobId());
+        DetectionMapper.toDetectedTile(
+            response, task.getTile(), task.getParcel().getId(), task.getJobId());
     detectedTileRepository.save(detectedTile);
   }
 

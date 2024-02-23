@@ -2,6 +2,7 @@ package app.bpartners.geojobs.service.event;
 
 import static app.bpartners.geojobs.conf.EnvConf.ANNOTATOR_USER_ID_FOR_GEOJOBS;
 import static app.bpartners.geojobs.repository.model.detection.DetectableType.*;
+import static app.bpartners.geojobs.service.annotator.ExtractorIT.PARCEL_MOCK_ID;
 import static app.bpartners.geojobs.service.event.TilingTaskCreatedServiceIT.MOCK_FEATURE_AS_STRING;
 import static java.util.UUID.randomUUID;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -66,6 +67,7 @@ public class ZoneDetectionJobSucceededServiceIT extends FacadeIT {
         .bucketPath(LAYER_20_10_1_PNG)
         .tile(Tile.builder().build())
         .jobId(MOCK_JOB_ID)
+        .parcelId(PARCEL_MOCK_ID)
         .creationDatetime(Instant.now())
         .detectedObjects(detectedObjects)
         .build();

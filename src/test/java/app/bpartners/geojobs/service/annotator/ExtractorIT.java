@@ -45,6 +45,7 @@ public class ExtractorIT extends FacadeIT {
                 "coordinates": [ [ [
                   [ 4.459648282829194, 45.904988912620688 ]
                   ] ] ] } }""";
+  public static final String PARCEL_MOCK_ID = "parcel1";
   @Autowired private ObjectMapper om;
   @Autowired private LabelExtractor labelExtractor;
   @Autowired PolygonExtractor polygonExtractor;
@@ -58,6 +59,7 @@ public class ExtractorIT extends FacadeIT {
         .bucketPath(LAYER_20_10_1_PNG)
         .tile(Tile.builder().build())
         .jobId(MOCK_JOB_ID)
+        .parcelId(PARCEL_MOCK_ID)
         .creationDatetime(Instant.now())
         .detectedObjects(detectedObjects)
         .build();
