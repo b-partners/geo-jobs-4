@@ -29,10 +29,10 @@ public class ParcelService {
           .map(
               tilingTask -> {
                 var parcel = tilingTask.getParcel();
-                if(parcel != null) {
-                    var parcelContent = parcel.getParcelContent();
-                    parcelContent.setTilingStatus(tilingTask.getStatus());
-                    return parcel;
+                if (parcel != null) {
+                  var parcelContent = parcel.getParcelContent();
+                  parcelContent.setTilingStatus(tilingTask.getStatus());
+                  return parcel;
                 }
                 return null;
               })
@@ -45,12 +45,12 @@ public class ParcelService {
           .map(
               detectionTask -> {
                 var parcel = detectionTask.getParcel();
-                  if(parcel != null) {
-                      var parcelContent = parcel.getParcelContent();
-                      parcelContent.setDetectionStatus(detectionTask.getStatus());
-                      return parcel;
-                  }
-                  return null;
+                if (parcel != null) {
+                  var parcelContent = parcel.getParcelContent();
+                  parcelContent.setDetectionStatus(detectionTask.getStatus());
+                  return parcel;
+                }
+                return null;
               })
           .toList();
     }

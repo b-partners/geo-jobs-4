@@ -12,6 +12,7 @@ import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> {
@@ -31,6 +32,7 @@ public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> 
     return saved;
   }
 
+  @Transactional
   public void fireTasks(ZoneTilingJob job) {
     getTasks(job).forEach(task -> eventProducer.accept(List.of(new TilingTaskCreated(task))));
   }
