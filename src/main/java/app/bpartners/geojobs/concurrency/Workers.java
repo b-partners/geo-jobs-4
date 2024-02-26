@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 @PojaGenerated
 @Component
 public class Workers<T> {
-
   private final ExecutorService executorService;
 
   public Workers(@Value("${workers.thread.number:5}") int nbThreads) {

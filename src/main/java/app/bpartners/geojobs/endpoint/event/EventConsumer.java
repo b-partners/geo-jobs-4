@@ -27,7 +27,6 @@ import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 public class EventConsumer implements Consumer<List<EventConsumer.AcknowledgeableTypedEvent>> {
   private static final String DETAIL_PROPERTY = "detail";
   private static final String DETAIL_TYPE_PROPERTY = "detail-type";
-
   private final Workers<Void> workers;
   private final EventServiceInvoker eventServiceInvoker;
 
