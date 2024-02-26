@@ -12,6 +12,8 @@ import app.bpartners.geojobs.endpoint.event.gen.TilingTaskSucceeded;
 import app.bpartners.geojobs.job.service.RetryableTaskStatusService;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
 import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
@@ -42,14 +44,22 @@ public class TilingTaskFailedService implements Consumer<TilingTaskFailed> {
     try {
       tilingTaskConsumer.accept(task);
     } catch (Exception e) {
+      var errorMessage = e.getMessage() + ", stackTrace=" + stackTraceToString(e);
       eventProducer.accept(
           List.of(
               new TilingTaskFailed(
-                  withNewStatus(task, PROCESSING, UNKNOWN, e.getMessage()), attemptNb + 1)));
+                  withNewStatus(task, PROCESSING, UNKNOWN, errorMessage), attemptNb + 1)));
       return;
     }
 
     eventProducer.accept(
         List.of(new TilingTaskSucceeded(withNewStatus(task, FINISHED, SUCCEEDED, null))));
+  }
+
+  private String stackTraceToString(Exception e) {
+    var sw = new StringWriter();
+    var pw = new PrintWriter(sw);
+    e.printStackTrace(pw);
+    return pw.toString();
   }
 }

@@ -45,7 +45,8 @@ public class DetectionTaskFailedService implements Consumer<DetectionTaskFailed>
       eventProducer.accept(
           List.of(
               new DetectionTaskFailed(
-                  withNewStatus(task, PROCESSING, UNKNOWN, e.getMessage()), attemptNb + 1)));
+                  withNewStatus(task, PROCESSING, UNKNOWN, e.getMessage() /*TODO: stackTrace*/),
+                  attemptNb + 1)));
       return;
     }
 

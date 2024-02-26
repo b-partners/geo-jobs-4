@@ -27,20 +27,20 @@ public class TaskStatusService<T extends Task, J extends Job> {
 
   @Transactional
   public T process(T task) {
-    return update(task, PROCESSING, UNKNOWN);
+    return update(task, PROCESSING, UNKNOWN, null);
   }
 
   @Transactional
   public T succeed(T task) {
-    return update(task, FINISHED, SUCCEEDED);
+    return update(task, FINISHED, SUCCEEDED, null);
   }
 
   @Transactional
   public T fail(T task) {
-    return update(task, FINISHED, FAILED);
+    return update(task, FINISHED, FAILED, null);
   }
 
-  private T update(T task, ProgressionStatus progression, HealthStatus health) {
+  private T update(T task, ProgressionStatus progression, HealthStatus health, String message) {
     var jobIb = task.getJobId();
     var oldJob = jobService.findById(jobIb);
 
@@ -50,6 +50,7 @@ public class TaskStatusService<T extends Task, J extends Job> {
             .progression(progression)
             .health(health)
             .taskId(task.getId())
+            .message(message)
             .build();
     task.hasNewStatus(taskStatus);
     taskStatusRepository.save(taskStatus);
