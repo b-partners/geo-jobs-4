@@ -5,11 +5,10 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 public class EnvConf {
 
   public static final String ANNOTATOR_USER_ID_FOR_GEOJOBS = "geo-jobs_user_id";
-  public static final String DUMMY_ANNOTATOR_BUCKET_NAME = "dummy";
 
   void configureProperties(DynamicPropertyRegistry registry) {
     registry.add("annotator.api.url", () -> "http://dummy.com");
-    registry.add("tiles.downloader.mock", () -> "false");
+    registry.add("tiles.downloader.mock", () -> "true");
     registry.add(
         "tiles.downloader.api.url",
         () -> "https://p36gjgisjpttscydepu3suuupi0wkute.lambda-url.eu-west-3.on.aws/");
