@@ -9,6 +9,7 @@ public class EnvConf {
 
   void configureProperties(DynamicPropertyRegistry registry) {
     registry.add("annotator.api.url", () -> "http://dummy.com");
+    registry.add("tiles.downloader.mock", () -> "false");
     registry.add(
         "tiles.downloader.api.url",
         () -> "https://p36gjgisjpttscydepu3suuupi0wkute.lambda-url.eu-west-3.on.aws/");

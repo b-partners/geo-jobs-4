@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.zip.ZipFile;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
-@Conditional(IsNotPreprodEnvCondition.class)
+@ConditionalOnProperty(value = "tiles.downloader.mock", havingValue = "false")
 public class HttpApiTilesDownloader implements TilesDownloader {
   private final ObjectMapper om;
   private final String tilesDownloaderApiURl;

@@ -12,7 +12,6 @@
 
 package app.bpartners.annotator.endpoint.rest.model;
 
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
