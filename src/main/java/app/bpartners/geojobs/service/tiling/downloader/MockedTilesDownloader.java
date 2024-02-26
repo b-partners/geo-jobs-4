@@ -22,7 +22,7 @@ public class MockedTilesDownloader implements TilesDownloader {
     var rootDir = createTempDirectory("tiles").toFile();
     var zoomAndXDir = new File(rootDir.getAbsolutePath() + "/20/1");
     zoomAndXDir.mkdirs();
-    var yFile = new File(zoomAndXDir.getAbsolutePath() + "/" + randomUUID());
+    var yFile = new File(zoomAndXDir.getAbsolutePath() + "/" + randomUUID() + ".txt");
     writeRandomContent(yFile);
     return rootDir;
   }
