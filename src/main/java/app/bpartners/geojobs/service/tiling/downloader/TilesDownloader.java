@@ -1,4 +1,4 @@
-package app.bpartners.geojobs.service.tiling;
+package app.bpartners.geojobs.service.tiling.downloader;
 
 import app.bpartners.geojobs.repository.model.ParcelContent;
 import java.io.File;

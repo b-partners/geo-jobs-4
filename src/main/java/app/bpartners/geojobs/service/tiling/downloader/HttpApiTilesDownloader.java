@@ -7,7 +7,6 @@ import app.bpartners.geojobs.file.FileUnzipper;
 import app.bpartners.geojobs.file.FileWriter;
 import app.bpartners.geojobs.model.exception.ApiException;
 import app.bpartners.geojobs.repository.model.ParcelContent;
-import app.bpartners.geojobs.service.tiling.TilesDownloader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
