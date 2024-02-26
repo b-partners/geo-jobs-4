@@ -22,7 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 public class TilesDownloaderIT extends FacadeIT {
   @MockBean BucketComponent bucketComponent;
-  @Autowired TilesDownloader tilesDownloader;
+  @Autowired TilesDownloader httpApiTilesDownloader;
   @Autowired ObjectMapper om;
 
   private ParcelContent a_parcel_from_lyon(int zoom)
@@ -75,7 +75,7 @@ public class TilesDownloaderIT extends FacadeIT {
   public void download_tiles_ok() throws IOException {
     var zoom = 20;
 
-    var tilesDir = tilesDownloader.apply(a_parcel_from_lyon(zoom));
+    var tilesDir = httpApiTilesDownloader.apply(a_parcel_from_lyon(zoom));
 
     assertEquals(
         4,
