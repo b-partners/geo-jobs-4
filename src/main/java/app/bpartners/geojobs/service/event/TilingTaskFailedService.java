@@ -58,8 +58,7 @@ public class TilingTaskFailedService implements Consumer<TilingTaskFailed> {
 
   private String stackTraceToString(Exception e) {
     var sw = new StringWriter();
-    var pw = new PrintWriter(sw);
-    e.printStackTrace(pw);
-    return pw.toString();
+    e.printStackTrace(new PrintWriter(sw));
+    return sw.toString();
   }
 }
