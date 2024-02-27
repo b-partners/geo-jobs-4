@@ -1,9 +1,13 @@
 package app.bpartners.geojobs;
 
+import static java.lang.Runtime.getRuntime;
+
 import app.bpartners.geojobs.endpoint.event.EventConsumer;
+import app.bpartners.geojobs.endpoint.event.EventConsumer.SqsMessageAckTyper;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.SQSEvent;
+import com.zaxxer.hikari.HikariDataSource;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -22,15 +26,28 @@ public class MailboxEventHandler implements RequestHandler<SQSEvent, String> {
     List<SQSEvent.SQSMessage> messages = event.getRecords();
     log.info("SQS messages: {}", messages);
 
-    ConfigurableApplicationContext applicationContext = applicationContext();
-    EventConsumer eventConsumer = applicationContext.getBean(EventConsumer.class);
-    EventConsumer.SqsMessageAckTyper messageConverter =
-        applicationContext.getBean(EventConsumer.SqsMessageAckTyper.class);
+    var applicationContext = applicationContext();
+    getRuntime()
+        .addShutdownHook(
+            // in case, say, the execution timed out
+            new Thread(() -> onHandled(applicationContext)));
 
+    var eventConsumer = applicationContext.getBean(EventConsumer.class);
+    var messageConverter = applicationContext.getBean(SqsMessageAckTyper.class);
     eventConsumer.accept(messageConverter.toAcknowledgeableEvents(messages));
 
-    applicationContext.close();
+    onHandled(applicationContext);
     return "ok";
+  }
+
+  private void onHandled(ConfigurableApplicationContext applicationContext) {
+    try {
+      var hikariDatasource = applicationContext.getBean(HikariDataSource.class);
+      hikariDatasource.close();
+
+      applicationContext.close();
+    } catch (Exception ignored) {
+    }
   }
 
   private ConfigurableApplicationContext applicationContext(String... args) {
