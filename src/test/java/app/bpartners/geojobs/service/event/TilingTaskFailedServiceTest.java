@@ -25,7 +25,8 @@ class TilingTaskFailedServiceTest {
   TilingTaskConsumer tilingTaskConsumer = mock();
   EventProducer eventProducer = mock();
   TilingTaskFailedService subject =
-      new TilingTaskFailedService(taskStatusService, tilingTaskConsumer, eventProducer);
+      new TilingTaskFailedService(
+          taskStatusService, tilingTaskConsumer, eventProducer, new ExceptionToStringFunction());
 
   @Test
   void fail_if_max_attempt_reached() {
@@ -59,7 +60,8 @@ class TilingTaskFailedServiceTest {
                 throw new RuntimeException();
               }
             },
-            eventProducer);
+            eventProducer,
+            new ExceptionToStringFunction());
 
     failingSubject.accept(taskFailed);
 

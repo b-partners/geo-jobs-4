@@ -26,6 +26,7 @@ public class DetectionTaskFailedService implements Consumer<DetectionTaskFailed>
   private final RetryableTaskStatusService<DetectionTask, ZoneDetectionJob> taskStatusService;
   private final DetectionTaskConsumer detectionTaskConsumer;
   private final EventProducer eventProducer;
+  private final ExceptionToStringFunction exceptionToStringFunction;
 
   private static final int MAX_ATTEMPT = 3;
 
@@ -45,7 +46,7 @@ public class DetectionTaskFailedService implements Consumer<DetectionTaskFailed>
       eventProducer.accept(
           List.of(
               new DetectionTaskFailed(
-                  withNewStatus(task, PROCESSING, UNKNOWN, e.getMessage() /*TODO: stackTrace*/),
+                  withNewStatus(task, PROCESSING, UNKNOWN, exceptionToStringFunction.apply(e)),
                   attemptNb + 1)));
       return;
     }
