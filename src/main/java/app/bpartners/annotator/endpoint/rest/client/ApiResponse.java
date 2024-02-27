@@ -12,6 +12,7 @@
 
 package app.bpartners.annotator.endpoint.rest.client;
 
+import app.bpartners.annotator.endpoint.rest.OpenapiGenerated;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import java.util.Map;
  *
  * @param <T> The type of data that is deserialized from response body
  */
+@OpenapiGenerated
 public class ApiResponse<T> {
   private final int statusCode;
   private final Map<String, List<String>> headers;

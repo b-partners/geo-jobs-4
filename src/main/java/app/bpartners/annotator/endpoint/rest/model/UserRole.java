@@ -12,11 +12,12 @@
 
 package app.bpartners.annotator.endpoint.rest.model;
 
-
+import app.bpartners.annotator.endpoint.rest.OpenapiGenerated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /** Gets or Sets UserRole */
+@OpenapiGenerated
 public enum UserRole {
   ANNOTATOR("ANNOTATOR"),
 

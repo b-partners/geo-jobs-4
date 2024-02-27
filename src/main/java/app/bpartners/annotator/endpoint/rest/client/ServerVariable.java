@@ -1,8 +1,10 @@
 package app.bpartners.annotator.endpoint.rest.client;
 
+import app.bpartners.annotator.endpoint.rest.OpenapiGenerated;
 import java.util.HashSet;
 
 /** Representing a Server Variable for server URL template substitution. */
+@OpenapiGenerated
 public class ServerVariable {
   public String description;
   public String defaultValue;

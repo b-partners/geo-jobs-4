@@ -12,6 +12,7 @@
 
 package app.bpartners.annotator.endpoint.rest.client;
 
+import app.bpartners.annotator.endpoint.rest.OpenapiGenerated;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import java.text.DateFormat;
 import java.text.FieldPosition;
@@ -20,6 +21,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+@OpenapiGenerated
 public class RFC3339DateFormat extends DateFormat {
   private static final long serialVersionUID = 1L;
   private static final TimeZone TIMEZONE_Z = TimeZone.getTimeZone("UTC");

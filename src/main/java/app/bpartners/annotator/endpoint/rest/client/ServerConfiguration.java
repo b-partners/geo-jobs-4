@@ -1,8 +1,10 @@
 package app.bpartners.annotator.endpoint.rest.client;
 
+import app.bpartners.annotator.endpoint.rest.OpenapiGenerated;
 import java.util.Map;
 
 /** Representing a Server configuration. */
+@OpenapiGenerated
 public class ServerConfiguration {
   public String URL;
   public String description;
