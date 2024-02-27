@@ -4,7 +4,6 @@ import static java.nio.file.Files.createTempDirectory;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.repository.model.ParcelContent;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

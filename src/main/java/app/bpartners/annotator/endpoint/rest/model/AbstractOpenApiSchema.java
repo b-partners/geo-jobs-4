@@ -12,14 +12,13 @@
 
 package app.bpartners.annotator.endpoint.rest.model;
 
+import app.bpartners.annotator.endpoint.rest.OpenapiGenerated;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Map;
 import java.util.Objects;
 
 /** Abstract class for oneOf,anyOf schemas defined in OpenAPI spec */
-@javax.annotation.processing.Generated(
-    value = "org.openapitools.codegen.languages.JavaClientCodegen",
-    date = "2024-02-26T18:28:50.570918+01:00[Europe/Paris]")
+@OpenapiGenerated
 public abstract class AbstractOpenApiSchema {
 
   // store the actual instance of the schema/object

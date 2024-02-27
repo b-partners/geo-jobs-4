@@ -12,6 +12,7 @@
 
 package app.bpartners.annotator.endpoint.rest.api;
 
+import app.bpartners.annotator.endpoint.rest.OpenapiGenerated;
 import app.bpartners.annotator.endpoint.rest.client.ApiClient;
 import app.bpartners.annotator.endpoint.rest.client.ApiException;
 import app.bpartners.annotator.endpoint.rest.client.ApiResponse;
@@ -28,9 +29,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.function.Consumer;
 
-@javax.annotation.processing.Generated(
-    value = "org.openapitools.codegen.languages.JavaClientCodegen",
-    date = "2024-02-26T18:28:50.570918+01:00[Europe/Paris]")
+@OpenapiGenerated
 public class AnnotatedJobsApi {
   private final HttpClient memberVarHttpClient;
   private final ObjectMapper memberVarObjectMapper;

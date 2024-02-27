@@ -12,6 +12,7 @@
 
 package app.bpartners.annotator.endpoint.rest.model;
 
+import app.bpartners.annotator.endpoint.rest.OpenapiGenerated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -26,9 +27,7 @@ import java.util.Objects;
   AnnotatedTask.JSON_PROPERTY_FILENAME,
   AnnotatedTask.JSON_PROPERTY_ANNOTATION_BATCH
 })
-@javax.annotation.processing.Generated(
-    value = "org.openapitools.codegen.languages.JavaClientCodegen",
-    date = "2024-02-26T18:28:50.570918+01:00[Europe/Paris]")
+@OpenapiGenerated
 public class AnnotatedTask implements Serializable {
   private static final long serialVersionUID = 1L;
 

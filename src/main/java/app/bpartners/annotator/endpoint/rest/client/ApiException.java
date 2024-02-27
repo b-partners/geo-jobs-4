@@ -12,11 +12,10 @@
 
 package app.bpartners.annotator.endpoint.rest.client;
 
+import app.bpartners.annotator.endpoint.rest.OpenapiGenerated;
 import java.net.http.HttpHeaders;
 
-@javax.annotation.processing.Generated(
-    value = "org.openapitools.codegen.languages.JavaClientCodegen",
-    date = "2024-02-26T18:28:50.570918+01:00[Europe/Paris]")
+@OpenapiGenerated
 public class ApiException extends Exception {
   private int code = 0;
   private HttpHeaders responseHeaders = null;

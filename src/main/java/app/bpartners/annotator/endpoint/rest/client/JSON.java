@@ -1,5 +1,6 @@
 package app.bpartners.annotator.endpoint.rest.client;
 
+import app.bpartners.annotator.endpoint.rest.OpenapiGenerated;
 import app.bpartners.annotator.endpoint.rest.model.*;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.*;
@@ -11,9 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import org.openapitools.jackson.nullable.JsonNullableModule;
 
-@javax.annotation.processing.Generated(
-    value = "org.openapitools.codegen.languages.JavaClientCodegen",
-    date = "2024-02-26T18:28:50.570918+01:00[Europe/Paris]")
+@OpenapiGenerated
 public class JSON {
   private ObjectMapper mapper;
 

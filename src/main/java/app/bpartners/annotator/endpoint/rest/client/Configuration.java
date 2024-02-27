@@ -12,9 +12,9 @@
 
 package app.bpartners.annotator.endpoint.rest.client;
 
-@javax.annotation.processing.Generated(
-    value = "org.openapitools.codegen.languages.JavaClientCodegen",
-    date = "2024-02-26T18:28:50.570918+01:00[Europe/Paris]")
+import app.bpartners.annotator.endpoint.rest.OpenapiGenerated;
+
+@OpenapiGenerated
 public class Configuration {
   private static ApiClient defaultApiClient = new ApiClient();
 

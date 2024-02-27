@@ -14,6 +14,7 @@ package app.bpartners.annotator.endpoint.rest.client;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import app.bpartners.annotator.endpoint.rest.OpenapiGenerated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,9 +50,7 @@ import org.openapitools.jackson.nullable.JsonNullableModule;
  * <p>The setter methods of this class return the current object to facilitate a fluent style of
  * configuration.
  */
-@javax.annotation.processing.Generated(
-    value = "org.openapitools.codegen.languages.JavaClientCodegen",
-    date = "2024-02-26T18:28:50.570918+01:00[Europe/Paris]")
+@OpenapiGenerated
 public class ApiClient {
 
   private HttpClient.Builder builder;
