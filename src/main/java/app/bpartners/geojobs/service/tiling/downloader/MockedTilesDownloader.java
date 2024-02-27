@@ -12,7 +12,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(value = "tiles.downloader.mock", havingValue = "true")
+@ConditionalOnProperty(value = "tiles.downloader.mock.activated", havingValue = "true")
 public class MockedTilesDownloader implements TilesDownloader {
 
   @SneakyThrows

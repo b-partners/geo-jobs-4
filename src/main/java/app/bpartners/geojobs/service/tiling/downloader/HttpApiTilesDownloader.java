@@ -28,7 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
-@ConditionalOnProperty(value = "tiles.downloader.mock", havingValue = "false")
+@ConditionalOnProperty(value = "tiles.downloader.mock.activated", havingValue = "false")
 public class HttpApiTilesDownloader implements TilesDownloader {
   private final ObjectMapper om;
   private final String tilesDownloaderApiURl;
