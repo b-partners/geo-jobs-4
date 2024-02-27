@@ -1,7 +1,7 @@
 package app.bpartners.geojobs.service.annotator;
 
-import app.bpartners.annotator.endpoint.rest.model.Point;
-import app.bpartners.annotator.endpoint.rest.model.Polygon;
+import app.bpartners.gen.annotator.endpoint.rest.model.Point;
+import app.bpartners.gen.annotator.endpoint.rest.model.Polygon;
 import app.bpartners.geojobs.repository.model.detection.DetectedObject;
 import java.math.BigDecimal;
 import java.util.List;

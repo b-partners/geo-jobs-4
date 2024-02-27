@@ -3,10 +3,10 @@ package app.bpartners.geojobs.service.annotator;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toSet;
 
-import app.bpartners.annotator.endpoint.rest.model.AnnotatedTask;
-import app.bpartners.annotator.endpoint.rest.model.Annotation;
-import app.bpartners.annotator.endpoint.rest.model.AnnotationBatch;
-import app.bpartners.annotator.endpoint.rest.model.Label;
+import app.bpartners.gen.annotator.endpoint.rest.model.AnnotatedTask;
+import app.bpartners.gen.annotator.endpoint.rest.model.Annotation;
+import app.bpartners.gen.annotator.endpoint.rest.model.AnnotationBatch;
+import app.bpartners.gen.annotator.endpoint.rest.model.Label;
 import app.bpartners.geojobs.repository.model.detection.DetectableType;
 import java.util.HashSet;
 import java.util.List;

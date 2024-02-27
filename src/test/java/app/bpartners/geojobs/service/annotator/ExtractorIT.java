@@ -8,12 +8,12 @@ import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import app.bpartners.annotator.endpoint.rest.model.AnnotatedTask;
-import app.bpartners.annotator.endpoint.rest.model.Annotation;
-import app.bpartners.annotator.endpoint.rest.model.AnnotationBatch;
-import app.bpartners.annotator.endpoint.rest.model.Label;
-import app.bpartners.annotator.endpoint.rest.model.Point;
-import app.bpartners.annotator.endpoint.rest.model.Polygon;
+import app.bpartners.gen.annotator.endpoint.rest.model.AnnotatedTask;
+import app.bpartners.gen.annotator.endpoint.rest.model.Annotation;
+import app.bpartners.gen.annotator.endpoint.rest.model.AnnotationBatch;
+import app.bpartners.gen.annotator.endpoint.rest.model.Label;
+import app.bpartners.gen.annotator.endpoint.rest.model.Point;
+import app.bpartners.gen.annotator.endpoint.rest.model.Polygon;
 import app.bpartners.geojobs.conf.FacadeIT;
 import app.bpartners.geojobs.endpoint.rest.model.Feature;
 import app.bpartners.geojobs.repository.model.detection.DetectableObjectType;

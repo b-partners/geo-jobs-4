@@ -1,14 +1,14 @@
 package app.bpartners.geojobs.service.event;
 
-import static app.bpartners.annotator.endpoint.rest.model.JobStatus.TO_REVIEW;
-import static app.bpartners.annotator.endpoint.rest.model.JobType.REVIEWING;
+import static app.bpartners.gen.annotator.endpoint.rest.model.JobStatus.TO_REVIEW;
+import static app.bpartners.gen.annotator.endpoint.rest.model.JobType.REVIEWING;
 import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
 import static java.util.UUID.randomUUID;
 
-import app.bpartners.annotator.endpoint.rest.api.AnnotatedJobsApi;
-import app.bpartners.annotator.endpoint.rest.model.AnnotatedTask;
-import app.bpartners.annotator.endpoint.rest.model.CrupdateAnnotatedJob;
-import app.bpartners.annotator.endpoint.rest.model.Label;
+import app.bpartners.gen.annotator.endpoint.rest.api.AnnotatedJobsApi;
+import app.bpartners.gen.annotator.endpoint.rest.model.AnnotatedTask;
+import app.bpartners.gen.annotator.endpoint.rest.model.CrupdateAnnotatedJob;
+import app.bpartners.gen.annotator.endpoint.rest.model.Label;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionJobSucceeded;
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.model.exception.ApiException;
@@ -70,7 +70,7 @@ public class ZoneDetectionJobSucceededService implements Consumer<ZoneDetectionJ
   }
 
   private void sendAnnotations(String jobId)
-      throws app.bpartners.annotator.endpoint.rest.client.ApiException {
+      throws app.bpartners.gen.annotator.endpoint.rest.client.ApiException {
     List<DetectedTile> detectedTiles = detectedTileRepository.findAllByJobId(jobId);
     List<DetectableObjectConfiguration> detectableObjectConfigurations =
         objectConfigurationRepository.findAllByDetectionJobId(jobId);

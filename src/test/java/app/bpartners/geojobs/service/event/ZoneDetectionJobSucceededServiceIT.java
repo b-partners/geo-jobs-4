@@ -11,7 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import app.bpartners.annotator.endpoint.rest.api.AnnotatedJobsApi;
+import app.bpartners.gen.annotator.endpoint.rest.api.AnnotatedJobsApi;
 import app.bpartners.geojobs.conf.FacadeIT;
 import app.bpartners.geojobs.endpoint.event.gen.ZoneDetectionJobSucceeded;
 import app.bpartners.geojobs.endpoint.rest.model.Feature;

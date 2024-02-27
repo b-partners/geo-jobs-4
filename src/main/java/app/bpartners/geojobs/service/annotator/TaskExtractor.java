@@ -2,7 +2,7 @@ package app.bpartners.geojobs.service.annotator;
 
 import static java.util.UUID.randomUUID;
 
-import app.bpartners.annotator.endpoint.rest.model.AnnotatedTask;
+import app.bpartners.gen.annotator.endpoint.rest.model.AnnotatedTask;
 import app.bpartners.geojobs.repository.model.detection.DetectedTile;
 import java.util.List;
 import java.util.function.BiFunction;

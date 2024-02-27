@@ -1,6 +1,6 @@
 package app.bpartners.geojobs.service.annotator;
 
-import app.bpartners.annotator.endpoint.rest.client.ApiClient;
+import app.bpartners.gen.annotator.endpoint.rest.client.ApiClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
