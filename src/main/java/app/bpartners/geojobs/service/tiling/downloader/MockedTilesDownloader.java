@@ -4,20 +4,30 @@ import static java.nio.file.Files.createTempDirectory;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.repository.model.ParcelContent;
+import app.bpartners.geojobs.service.FalliblyDurableMockedFunction;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
 @ConditionalOnProperty(value = "tiles.downloader.mock.activated", havingValue = "true")
-public class MockedTilesDownloader implements TilesDownloader {
+public class MockedTilesDownloader extends FalliblyDurableMockedFunction<ParcelContent, File>
+    implements TilesDownloader {
+
+  public MockedTilesDownloader(
+      @Value("${tiles.downloader.mock.maxCallDuration}") long maxCallDurationInMillis,
+      @Value("${tiles.downloader.mock.failureRate}") double failureRate) {
+    super(Duration.ofMillis(maxCallDurationInMillis), failureRate);
+  }
 
   @SneakyThrows
   @Override
-  public File apply(ParcelContent parcelContent) {
+  protected File successfulMockedApply(ParcelContent parcelContent) {
     var rootDir = createTempDirectory("tiles").toFile();
     var zoomAndXDir = new File(rootDir.getAbsolutePath() + "/20/1");
     zoomAndXDir.mkdirs();
@@ -29,7 +39,7 @@ public class MockedTilesDownloader implements TilesDownloader {
     return rootDir;
   }
 
-  private void writeRandomContent(File file) throws IOException {
+  private static void writeRandomContent(File file) throws IOException {
     FileWriter writer = new FileWriter(file);
     var content = randomUUID().toString();
     writer.write(content);
