@@ -30,6 +30,10 @@ public class MailboxEventHandler implements RequestHandler<SQSEvent, String> {
     getRuntime()
         .addShutdownHook(
             // in case, say, the execution timed out
+            // TODO: no, we have no control over when AWS shuts the JVM down
+            //   Best is to regularly check whether we are nearing end of allowedTime,
+            //   in which case we close resources before timing out.
+            //   Frontal functions might have the same issue also.
             new Thread(() -> onHandled(applicationContext)));
 
     var eventConsumer = applicationContext.getBean(EventConsumer.class);
