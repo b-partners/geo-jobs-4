@@ -4,7 +4,7 @@ aurora_max_capacity: 32
 aurora_min_capacity: 16
 aurora_scale_point: 60
 aurora_sleep: 900
-cli_version: 11.9.0
+cli_version: 11.11.2
 custom_java_deps: poja-custom-java-deps.txt
 custom_java_env_vars: poja-custom-java-env-vars.txt
 custom_java_repositories: poja-custom-java-repositories.txt
@@ -16,7 +16,6 @@ java_facade_it: FacadeIT
 package_full_name: app.bpartners.geojobs
 region: eu-west-3
 reserved_concurrent_executions_nb: 250
-sentry_dsn: 'null'
 ses_source: lou@bpartners.app
 ssm_sg_id: /bpartners-imagery/sg/id
 ssm_subnet1_id: /bpartners-imagery/private/subnet1/id
