@@ -12,9 +12,9 @@ Globals:
     Timeout: 600
     EventInvokeConfig:
       MaximumRetryAttempts: 0
-    AutoPublishAlias: live
-    SnapStart:
-      ApplyOn: PublishedVersions
+    #AutoPublishAlias: live
+    #SnapStart:
+    #  ApplyOn: PublishedVersions
     VpcConfig:
       SecurityGroupIds:
         - !Sub '{{resolve:ssm:/bpartners-imagery/sg/id}}'
