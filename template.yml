@@ -75,7 +75,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.bpartners.geojobs.MailboxEventHandler::handleRequest
-      MemorySize: 512
+      MemorySize: 1500
       Role: !Sub '{{resolve:ssm:/geo-jobs/${Env}/execution/role-arn}}'
       
       Events:
@@ -83,7 +83,7 @@ Resources:
           Type: SQS
           Properties:
             Queue: !Sub '{{resolve:ssm:/geo-jobs/${Env}/sqs/mailbox-queue-arn}}'
-            BatchSize: 1
+            BatchSize: 3
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group

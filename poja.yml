@@ -30,5 +30,5 @@ with_publish_to_npm_registry: 'false'
 with_sentry: 'false'
 with_snapstart: 'true'
 with_swagger_ui: 'false'
-worker_batch: 1
-worker_memory: 512
+worker_batch: 3
+worker_memory: 1500
