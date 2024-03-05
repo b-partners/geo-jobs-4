@@ -26,6 +26,8 @@ import lombok.ToString;
 @ToString
 @Builder
 public class DetectionResponse {
+  public static final String REGION_LABEL_PROPERTY = "label";
+  public static final String REGION_CONFIDENCE_PROPERTY = "confidence";
   public static final String JSON_PROPERTY_SRC_IMAGE_URL = "src_image_url";
   public static final String JSON_PROPERTY_RST_IMAGE_URL = "rst_image_url";
   public static final String JSON_PROPERTY_RST_RAW = "Rst_raw";

@@ -5,6 +5,8 @@ import static app.bpartners.geojobs.job.model.Status.HealthStatus.UNKNOWN;
 import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PENDING;
 import static app.bpartners.geojobs.repository.model.GeoJobType.DETECTION;
 import static app.bpartners.geojobs.repository.model.detection.ZoneDetectionJob.DetectionType.MACHINE;
+import static app.bpartners.geojobs.service.detection.DetectionResponse.REGION_CONFIDENCE_PROPERTY;
+import static app.bpartners.geojobs.service.detection.DetectionResponse.REGION_LABEL_PROPERTY;
 import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 
@@ -56,10 +58,10 @@ public class DetectionMapper {
   public static DetectedObject toDetectedObject(
       DetectionResponse.ImageData.Region region, String detectedTileId, Integer zoom) {
     var regionAttributes = region.getRegionAttributes();
-    var label = regionAttributes.get("label");
+    var label = regionAttributes.get(REGION_LABEL_PROPERTY);
     Double confidence;
     try {
-      confidence = Double.valueOf(regionAttributes.get("confidence"));
+      confidence = Double.valueOf(regionAttributes.get(REGION_CONFIDENCE_PROPERTY));
     } catch (NumberFormatException e) {
       confidence = null;
     }

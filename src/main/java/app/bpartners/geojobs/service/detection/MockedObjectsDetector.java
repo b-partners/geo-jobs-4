@@ -1,8 +1,14 @@
 package app.bpartners.geojobs.service.detection;
 
+import static app.bpartners.geojobs.service.detection.DetectionResponse.REGION_CONFIDENCE_PROPERTY;
+import static app.bpartners.geojobs.service.detection.DetectionResponse.REGION_LABEL_PROPERTY;
+
+import app.bpartners.geojobs.repository.model.detection.DetectableType;
 import app.bpartners.geojobs.repository.model.detection.DetectionTask;
 import app.bpartners.geojobs.service.FalliblyDurableMockedFunction;
+import java.math.BigDecimal;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -21,10 +27,38 @@ public class MockedObjectsDetector
 
   @Override
   protected DetectionResponse successfulMockedApply(DetectionTask task) {
+    double randomConfidence = Math.random();
+    return aMockedDetectionResponse(randomConfidence, DetectableType.ROOF);
+  }
+
+  private DetectionResponse aMockedDetectionResponse(
+      Double confidence, DetectableType detectableType) {
+    double randomX = Math.random() * 100;
+    double randomY = Math.random() * 100;
     return DetectionResponse.builder()
         .rstImageUrl("dummyImageUrl")
         .srcImageUrl("dummyImageUrl")
-        .rstRaw(Map.of())
+        .rstRaw(
+            Map.of(
+                "dummyRstRawProperty",
+                DetectionResponse.ImageData.builder()
+                    .regions(
+                        Map.of(
+                            "dummyRegionProperty",
+                            DetectionResponse.ImageData.Region.builder()
+                                .regionAttributes(
+                                    Map.of(
+                                        REGION_CONFIDENCE_PROPERTY,
+                                        confidence.toString(),
+                                        REGION_LABEL_PROPERTY,
+                                        detectableType.toString()))
+                                .shapeAttributes(
+                                    DetectionResponse.ImageData.ShapeAttributes.builder()
+                                        .allPointsX(List.of(BigDecimal.valueOf(randomX)))
+                                        .allPointsY(List.of(BigDecimal.valueOf(randomY)))
+                                        .build())
+                                .build()))
+                    .build()))
         .build();
   }
 }
