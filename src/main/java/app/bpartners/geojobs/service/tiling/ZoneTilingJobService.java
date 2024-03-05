@@ -25,6 +25,7 @@ public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> 
     super(repository, jobStatusRepository, taskRepository, eventProducer, ZoneTilingJob.class);
   }
 
+  @Transactional
   @Override
   public ZoneTilingJob create(ZoneTilingJob job, List<TilingTask> tasks) {
     var saved = super.create(job, tasks);
