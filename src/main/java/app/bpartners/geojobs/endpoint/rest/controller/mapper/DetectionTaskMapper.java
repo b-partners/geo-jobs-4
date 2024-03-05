@@ -9,6 +9,7 @@ import app.bpartners.geojobs.model.exception.NotImplementedException;
 import app.bpartners.geojobs.repository.DetectedTileRepository;
 import app.bpartners.geojobs.repository.model.Parcel;
 import java.math.BigDecimal;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,15 +19,15 @@ public class DetectionTaskMapper {
   private final DetectedTileRepository detectedTileRepository;
 
   public DetectedParcel toRest(String jobId, Parcel parcel) {
-    var parcelContent = parcel.getParcelContent();
-    var detectedTiles = detectedTileRepository.findAllByParcelId(parcel.getId());
+    var detectedTiles =
+        parcel == null ? List.of() : detectedTileRepository.findAllByParcelId(parcel.getId());
     return new DetectedParcel()
         .id(randomUUID().toString()) // TODO DetectedParcel must be persisted
         .creationDatetime(now()) // TODO change when DetectedParcel is persisted
         .detectionJobIb(jobId)
-        .parcelId(parcel.getId())
+        .parcelId(parcel == null ? null : parcel.getId())
         .status(
-            ofNullable(parcelContent.getDetectionStatus())
+            ofNullable(parcel == null ? null : parcel.getParcelContent().getDetectionStatus())
                 .map(
                     status ->
                         new Status()
@@ -34,7 +35,13 @@ public class DetectionTaskMapper {
                             .progression(StatusMapper.toProgressionEnum(status.getProgression()))
                             .creationDatetime(status.getCreationDatetime()))
                 .orElse(null))
-        .detectedTiles(detectedTiles.stream().map(this::toRest).toList());
+        .detectedTiles(
+            detectedTiles.stream()
+                .map(
+                    tile ->
+                        toRest(
+                            (app.bpartners.geojobs.repository.model.detection.DetectedTile) tile))
+                .toList());
   }
 
   private DetectedTile toRest(
