@@ -76,7 +76,6 @@ public class TilesDownloaderIT extends FacadeIT {
 
     var tilesDir = httpApiTilesDownloader.apply(a_parcel_from_lyon(zoom));
 
-    // TODO: check why initially excepted was 4
-    assertEquals(1, new File(tilesDir.getAbsolutePath() + "/" + zoom).listFiles().length);
+    assertEquals(4, new File(tilesDir.getAbsolutePath() + "/" + zoom).listFiles().length);
   }
 }

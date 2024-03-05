@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(value = "objects.detector.mock.activated", havingValue = "false")
+@ConditionalOnProperty(value = "objects.detector.mock.activated", havingValue = "true")
 public class MockedObjectsDetector
     extends FalliblyDurableMockedFunction<DetectionTask, DetectionResponse>
     implements ObjectsDetector {

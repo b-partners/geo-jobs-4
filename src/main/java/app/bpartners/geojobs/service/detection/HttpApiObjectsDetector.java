@@ -23,7 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
-@ConditionalOnProperty(value = "objects.detector.mock.activated", havingValue = "true")
+@ConditionalOnProperty(value = "objects.detector.mock.activated", havingValue = "false")
 @Slf4j
 public class HttpApiObjectsDetector implements ObjectsDetector {
   private final String tileDetectionBaseUrl;
