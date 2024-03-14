@@ -1,5 +1,8 @@
 package app.bpartners.geojobs.concurrency;
 
+import static app.bpartners.geojobs.concurrency.ThreadRenamer.getRandomSubThreadNamePrefixFrom;
+import static app.bpartners.geojobs.concurrency.ThreadRenamer.renameThread;
+import static java.lang.Thread.currentThread;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
 import app.bpartners.geojobs.PojaGenerated;
@@ -22,6 +25,18 @@ public class Workers<T> {
 
   @SneakyThrows
   public List<Future<T>> invokeAll(List<Callable<T>> callables) {
+    var parentThread = currentThread();
+    callables =
+        callables.stream()
+            .map(
+                c ->
+                    (Callable<T>)
+                        () -> {
+                          renameThread(
+                              currentThread(), getRandomSubThreadNamePrefixFrom(parentThread));
+                          return c.call();
+                        })
+            .toList();
     return executorService.invokeAll(callables);
   }
 }
