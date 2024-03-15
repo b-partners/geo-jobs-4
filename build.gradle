@@ -23,8 +23,8 @@ repositories {
 
 java {
     group = 'app.bpartners.geojobs'
-    sourceCompatibility = '17'
-    targetCompatibility = '17'
+    sourceCompatibility = '21'
+    targetCompatibility = '21'
 }
 
 configurations {
@@ -196,6 +196,7 @@ dependencies {
     testImplementation 'org.junit-pioneer:junit-pioneer:2.2.0'
 
 
+    implementation 'io.sentry:sentry-logback:7.6.0'
     implementation 'io.sentry:sentry-spring-boot-starter-jakarta:7.4.0'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 implementation 'app.bpartners:geo-jobs-gen:latest'
