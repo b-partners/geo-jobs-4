@@ -4,10 +4,12 @@ import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static org.hibernate.type.SqlTypes.NAMED_ENUM;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
@@ -26,7 +28,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class Status {
+@JsonIgnoreProperties({"taskId"})
+public class Status implements Serializable {
   @Id
   @GeneratedValue(strategy = IDENTITY)
   private String id;
