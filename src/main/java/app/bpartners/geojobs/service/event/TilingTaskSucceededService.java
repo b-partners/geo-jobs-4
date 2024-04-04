@@ -21,8 +21,7 @@ public class TilingTaskSucceededService implements Consumer<TilingTaskSucceeded>
   @Override
   public void accept(TilingTaskSucceeded tilingTaskSucceeded) {
     var task = tilingTaskSucceeded.getTask();
-    TilingTask savedTask = taskRepository.save(task);
-    log.info("[DEBUG] Saved Tile {}", savedTask.getParcel().getParcelContent().getFirstTile());
+    taskRepository.save(task);
     taskStatusService.succeed(task);
   }
 }
