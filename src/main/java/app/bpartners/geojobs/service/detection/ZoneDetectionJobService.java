@@ -20,6 +20,7 @@ import app.bpartners.geojobs.job.service.JobService;
 import app.bpartners.geojobs.model.exception.NotFoundException;
 import app.bpartners.geojobs.repository.DetectableObjectConfigurationRepository;
 import app.bpartners.geojobs.repository.DetectionTaskRepository;
+import app.bpartners.geojobs.repository.HumanDetectionJobRepository;
 import app.bpartners.geojobs.repository.TilingTaskRepository;
 import app.bpartners.geojobs.repository.model.detection.*;
 import app.bpartners.geojobs.repository.model.detection.DetectionTask;
@@ -32,13 +33,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
+@Slf4j
 public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetectionJob> {
   private final DetectionMapper detectionMapper;
   private final DetectableObjectConfigurationRepository objectConfigurationRepository;
   private final TilingTaskRepository tilingTaskRepository;
   private final StatusMapper<JobStatus> statusMapper;
+  private final HumanDetectionJobRepository humanDetectionJobRepository;
 
   public ZoneDetectionJobService(
       JpaRepository<ZoneDetectionJob, String> repository,
@@ -48,12 +50,14 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
       EventProducer eventProducer,
       DetectionMapper detectionMapper,
       DetectableObjectConfigurationRepository objectConfigurationRepository,
-      StatusMapper<JobStatus> statusMapper) {
+      StatusMapper<JobStatus> statusMapper,
+      HumanDetectionJobRepository humanDetectionJobRepository) {
     super(repository, jobStatusRepository, taskRepository, eventProducer, ZoneDetectionJob.class);
     this.tilingTaskRepository = tilingTaskRepository;
     this.detectionMapper = detectionMapper;
     this.objectConfigurationRepository = objectConfigurationRepository;
     this.statusMapper = statusMapper;
+    this.humanDetectionJobRepository = humanDetectionJobRepository;
   }
 
   public GeoJsonsUrl getGeoJsonsUrl(String jobId) {
@@ -111,6 +115,13 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
     repository.save(savedZDJ.toBuilder().id(randomUUID().toString()).detectionType(HUMAN).build());
   }
 
+  @Transactional
+  public HumanDetectionJob getHumanDetectionJobById(String jobId) {
+    return humanDetectionJobRepository
+        .findById(jobId)
+        .orElseThrow(() -> new NotFoundException("HumanDetectionJob(id=" + jobId + ") not found"));
+  }
+
   public ZoneDetectionJob saveWithTasks(
       List<TilingTask> tilingTasks, ZoneDetectionJob zoneDetectionJob) {
     List<DetectionTask> detectionTasks =
@@ -118,7 +129,6 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
             .map(
                 tilingTask -> {
                   var parcels = tilingTask.getParcels();
-                  log.info("[DEBUG] TilingTask Parcels {}", parcels);
                   var generatedTaskId = randomUUID().toString();
                   DetectionTask detectionTask = new DetectionTask();
                   detectionTask.setId(generatedTaskId);
@@ -133,7 +143,6 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
                               .taskId(generatedTaskId)
                               .build()));
                   detectionTask.setSubmissionInstant(now());
-                  log.info("[DEBUG] DetectionTask Parcels {}", detectionTask.getParcels());
                   return detectionTask;
                 })
             .toList();
