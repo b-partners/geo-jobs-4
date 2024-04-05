@@ -30,8 +30,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @Slf4j
+@Service
 public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetectionJob> {
   private final DetectionMapper detectionMapper;
   private final DetectableObjectConfigurationRepository objectConfigurationRepository;
@@ -171,6 +171,7 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
             .map(
                 tilingTask -> {
                   var parcels = tilingTask.getParcels();
+                  log.info("[DEBUG] TilingTask Parcels {}", parcels);
                   var generatedTaskId = randomUUID().toString();
                   DetectionTask detectionTask = new DetectionTask();
                   detectionTask.setId(generatedTaskId);
@@ -185,6 +186,7 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
                               .taskId(generatedTaskId)
                               .build()));
                   detectionTask.setSubmissionInstant(now());
+                  log.info("[DEBUG] DetectionTask Parcels {}", detectionTask.getParcels());
                   return detectionTask;
                 })
             .toList();
