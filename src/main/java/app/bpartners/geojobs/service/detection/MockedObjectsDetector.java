@@ -53,6 +53,8 @@ public class MockedObjectsDetector implements ObjectsDetector {
   @Override
   public DetectionResponse apply(DetectionTask task, List<DetectableType> detectableTypes) {
     double randomConfidence = Math.random();
-    return aMockedDetectionResponse(randomConfidence, DetectableType.ROOF);
+    return aMockedDetectionResponse(
+        randomConfidence,
+        detectableTypes.isEmpty() ? DetectableType.ROOF : detectableTypes.getFirst());
   }
 }
