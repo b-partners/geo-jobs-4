@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -21,6 +22,7 @@ public class HumanDetectionJobCreatedFailedService
   private static final int MAX_ATTEMPT = 50;
 
   @Override
+  @Transactional
   public void accept(HumanDetectionJobCreatedFailed event) {
     int attemptNb = event.getAttemptNb();
     if (attemptNb > 3) {

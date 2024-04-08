@@ -102,6 +102,7 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
     return repository.save(humanZDJ);
   }
 
+  @Transactional
   public ZoneDetectionJob getHumanZdjFromZdjId(String jobId) {
     var zoneDetectionJob =
         repository

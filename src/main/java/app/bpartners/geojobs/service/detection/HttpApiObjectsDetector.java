@@ -47,7 +47,14 @@ public class HttpApiObjectsDetector implements ObjectsDetector {
     var type = types.getFirst();
     var optionalBaseUrl =
         tileDetectionBaseUrls.stream()
-            .filter(tileDetectorUrl -> tileDetectorUrl.getObjectType().equals(type))
+            .filter(
+                tileDetectorUrl -> {
+                  boolean isTileDetector = tileDetectorUrl.getObjectType().equals(type);
+                  if (isTileDetector) {
+                    log.error("[DEBUG] Objects detector chosen {}", tileDetectorUrl);
+                  }
+                  return isTileDetector;
+                })
             .findAny();
     if (optionalBaseUrl.isEmpty()) {
       throw new ApiException(SERVER_EXCEPTION, "Unknown DetectableType " + type);
