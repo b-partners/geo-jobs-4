@@ -16,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -27,7 +26,6 @@ import org.hibernate.annotations.JdbcTypeCode;
 @SuperBuilder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @JsonIgnoreProperties({"taskId"})
 public class Status implements Serializable {
   @Id
@@ -61,6 +59,21 @@ public class Status implements Serializable {
     var checkedNewHealth = oldHealth.to(newHealth, errorMessage);
 
     return newStatus;
+  }
+
+  @Override
+  public String toString() {
+    return "Status{"
+        + "progression="
+        + progression
+        + ", health="
+        + health
+        + ", creationDatetime="
+        + creationDatetime
+        + ", message='"
+        + message
+        + '\''
+        + '}';
   }
 
   public enum ProgressionStatus {
