@@ -19,7 +19,6 @@ public class AnnotationBatchExtractor {
   private final PolygonExtractor polygonExtractor;
 
   public AnnotationBatch apply(DetectedTile detectedTile, String annotatorId, String taskId) {
-    log.error("[DEBUG] AnnotationBatchExtractor {}", detectedTile);
     return new AnnotationBatch()
         .id(randomUUID().toString())
         .creationDatetime(Instant.now())
@@ -31,7 +30,6 @@ public class AnnotationBatchExtractor {
 
   private Annotation extractAnnotation(
       DetectedObject detectedObject, String annotatorId, String taskId) {
-    log.error("[DEBUG] AnnotationBatchExtractor {}", detectedObject);
     return new Annotation()
         .id(randomUUID().toString())
         .userId(annotatorId)
