@@ -18,12 +18,15 @@ public class TilingFinishedMailer implements Consumer<ZoneTilingJob> {
   private final Mailer mailer;
   public static final String TILING_TEMPLATE_NAME = "zone_tiling";
   private final HTMLTemplateParser htmlTemplateParser;
+  private final String env = System.getenv("ENV");
 
   @SneakyThrows
   @Override
   public void accept(ZoneTilingJob job) {
     Context context = new Context();
-    context.setVariable("zone", job.getZoneName());
+    String zoneName = job.getZoneName();
+    context.setVariable("zone", zoneName);
+    context.setVariable("status", String.valueOf(job.getStatus()));
     String emailBody = htmlTemplateParser.apply(TILING_TEMPLATE_NAME, context);
 
     mailer.accept(
@@ -31,7 +34,13 @@ public class TilingFinishedMailer implements Consumer<ZoneTilingJob> {
             new InternetAddress(job.getEmailReceiver()),
             List.of(),
             List.of(),
-            "Résultat du pavage, jobId=" + job.getId(),
+            "[GEO-JOBS/"
+                + env
+                + "] Tâche de pavage [ID="
+                + job.getId()
+                + ", Zone="
+                + zoneName
+                + "] términée",
             emailBody,
             List.of()));
   }
