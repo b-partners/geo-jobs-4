@@ -61,7 +61,7 @@ public class DetectedTile implements Serializable {
         + ")";
   }
 
-  private DetectedObject getFirstObject() {
+  public DetectedObject getFirstObject() {
     try {
       return detectedObjects.getFirst();
     } catch (NoSuchElementException e) {

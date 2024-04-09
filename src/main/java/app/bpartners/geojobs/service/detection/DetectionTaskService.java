@@ -3,6 +3,7 @@ package app.bpartners.geojobs.service.detection;
 import app.bpartners.geojobs.repository.DetectableObjectConfigurationRepository;
 import app.bpartners.geojobs.repository.DetectedTileRepository;
 import app.bpartners.geojobs.repository.model.detection.DetectableObjectConfiguration;
+import app.bpartners.geojobs.repository.model.detection.DetectedObject;
 import app.bpartners.geojobs.repository.model.detection.DetectedTile;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -22,10 +23,10 @@ public class DetectionTaskService {
         objectConfigurationRepository.findAllByDetectionJobId(jobId);
     return detectedTiles.stream()
         .filter(
-            detectedTile ->
-                detectedTile.getDetectedObjects().stream()
-                    .anyMatch(
-                        detectedObject -> detectedObject.isInDoubt(detectableObjectConfigurations)))
+            detectedTile -> {
+              DetectedObject firstObject = detectedTile.getFirstObject();
+              return firstObject != null && firstObject.isInDoubt(detectableObjectConfigurations);
+            })
         .toList();
   }
 }
