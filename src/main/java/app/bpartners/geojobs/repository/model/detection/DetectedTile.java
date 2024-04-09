@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -45,4 +46,26 @@ public class DetectedTile implements Serializable {
 
   @Column(name = "human_detection_job_id")
   private String humanDetectionJobId;
+
+  public String describe() {
+    String detectedObject =
+        getFirstObject() == null ? null : getFirstObject().getDetectableObjectType().toString();
+    Double confidence = getFirstObject() == null ? null : getFirstObject().getComputedConfidence();
+    return "DetectedTile(id="
+        + id
+        + ",detectedObject="
+        + detectedObject
+        + ","
+        + "confidence="
+        + confidence
+        + ")";
+  }
+
+  private DetectedObject getFirstObject() {
+    try {
+      return detectedObjects.getFirst();
+    } catch (NoSuchElementException e) {
+      return null;
+    }
+  }
 }
