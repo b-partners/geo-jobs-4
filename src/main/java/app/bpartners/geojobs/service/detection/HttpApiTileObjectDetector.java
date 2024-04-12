@@ -2,14 +2,15 @@ package app.bpartners.geojobs.service.detection;
 
 import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
 import static app.bpartners.geojobs.repository.model.detection.DetectableType.*;
-import static app.bpartners.geojobs.service.detection.HttpApiObjectsDetector.TileDetectorUrl.getDetectorUrls;
+import static app.bpartners.geojobs.repository.model.detection.DetectableType.TREE;
+import static app.bpartners.geojobs.service.detection.HttpApiTileObjectDetector.TileDetectorUrl.getDetectorUrls;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.model.exception.ApiException;
 import app.bpartners.geojobs.model.exception.NotImplementedException;
+import app.bpartners.geojobs.repository.model.TileTask;
 import app.bpartners.geojobs.repository.model.detection.DetectableType;
-import app.bpartners.geojobs.repository.model.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.tiling.Tile;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +33,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @ConditionalOnProperty(value = "objects.detector.mock.activated", havingValue = "false")
 @AllArgsConstructor
 @Slf4j
-public class HttpApiObjectsDetector implements ObjectsDetector {
+public class HttpApiTileObjectDetector implements TileObjectDetector {
   private final ObjectMapper om;
   private final BucketComponent bucketComponent;
   private final List<TileDetectorUrl> tileDetectionBaseUrls = getDetectorUrls();
@@ -64,8 +65,8 @@ public class HttpApiObjectsDetector implements ObjectsDetector {
 
   @SneakyThrows
   @Override
-  public DetectionResponse apply(DetectionTask task, List<DetectableType> detectableTypes) {
-    Tile tile = task.getTile();
+  public DetectionResponse apply(TileTask tileTask, List<DetectableType> detectableTypes) {
+    Tile tile = tileTask.getTile();
     if (tile == null) {
       return null;
     }
@@ -78,7 +79,7 @@ public class HttpApiObjectsDetector implements ObjectsDetector {
 
     var payload =
         DetectionPayload.builder()
-            .projectName(task.getJobId())
+            .projectName(tileTask.getJobId())
             .fileName(file.getName())
             .base64ImgData(base64ImgData)
             .build();

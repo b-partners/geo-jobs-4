@@ -11,10 +11,11 @@ import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.model.exception.NotImplementedException;
 import app.bpartners.geojobs.repository.model.Parcel;
 import app.bpartners.geojobs.repository.model.ParcelContent;
+import app.bpartners.geojobs.repository.model.TileTask;
 import app.bpartners.geojobs.repository.model.detection.DetectableType;
 import app.bpartners.geojobs.repository.model.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.tiling.Tile;
-import app.bpartners.geojobs.service.detection.ObjectsDetector;
+import app.bpartners.geojobs.service.detection.TileObjectDetector;
 import java.io.File;
 import java.time.Instant;
 import java.util.List;
@@ -34,7 +35,7 @@ public class ObjectsDetectorIT extends FacadeIT {
           + File.separator
           + "image-to-detect.jpg";
   @MockBean BucketComponent bucketComponent;
-  @Autowired ObjectsDetector objectsDetector;
+  @Autowired TileObjectDetector objectsDetector;
 
   @Test
   void process_detection_ok() {
@@ -55,28 +56,31 @@ public class ObjectsDetectorIT extends FacadeIT {
                 detectionTask(), List.of(DetectableType.ROOF, DetectableType.PATHWAY)));
   }
 
-  public DetectionTask detectionTask() {
+  public TileTask detectionTask() {
     when(bucketComponent.download(any())).thenReturn(new File(FILE_NAME));
 
-    return DetectionTask.builder()
-        .id(String.valueOf(randomUUID()))
-        .jobId(String.valueOf(randomUUID()))
-        .submissionInstant(Instant.now())
-        .parcels(
-            List.of(
-                Parcel.builder()
-                    .id(randomUUID().toString())
-                    .parcelContent(
-                        ParcelContent.builder()
-                            .id(randomUUID().toString())
-                            .tiles(
-                                List.of(
-                                    Tile.builder()
-                                        .id(randomUUID().toString())
-                                        .bucketPath(randomUUID().toString())
-                                        .build()))
-                            .build())
-                    .build()))
-        .build();
+    var task =
+        DetectionTask.builder()
+            .id(String.valueOf(randomUUID()))
+            .jobId(String.valueOf(randomUUID()))
+            .submissionInstant(Instant.now())
+            .parcels(
+                List.of(
+                    Parcel.builder()
+                        .id(randomUUID().toString())
+                        .parcelContent(
+                            ParcelContent.builder()
+                                .id(randomUUID().toString())
+                                .tiles(
+                                    List.of(
+                                        Tile.builder()
+                                            .id(randomUUID().toString())
+                                            .bucketPath(randomUUID().toString())
+                                            .build()))
+                                .build())
+                        .build()))
+            .build();
+
+    return new TileTask(task.getId(), task.getJobId(), task.getTile());
   }
 }

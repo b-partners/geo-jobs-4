@@ -27,7 +27,7 @@ import app.bpartners.geojobs.repository.model.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.detection.ZoneDetectionJob;
 import app.bpartners.geojobs.repository.model.tiling.Tile;
 import app.bpartners.geojobs.service.detection.DetectionResponse;
-import app.bpartners.geojobs.service.detection.ObjectsDetector;
+import app.bpartners.geojobs.service.detection.TileObjectDetector;
 import app.bpartners.geojobs.service.detection.ZoneDetectionJobService;
 import java.io.File;
 import java.math.BigDecimal;
@@ -56,7 +56,7 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
 
   @Autowired DetectionTaskCreatedService subject;
 
-  @MockBean ObjectsDetector objectsDetector;
+  @MockBean TileObjectDetector objectsDetector;
 
   @MockBean BucketComponent bucketComponent;
 
