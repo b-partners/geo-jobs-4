@@ -171,6 +171,7 @@ class DetectionTaskCreatedServiceIT extends FacadeIT {
 
   @Test
   void process_detection() {
+    when(detectedTileRepository.save(any())).thenReturn(new DetectedTile());
     when(bucketComponent.download(any())).thenReturn(new File(FILE_NAME));
     when(objectsDetector.apply(any(), any())).thenReturn(detectionResponse());
     when(zoneDetectionJobService.findById(any())).thenReturn(zoneDetectionJob());

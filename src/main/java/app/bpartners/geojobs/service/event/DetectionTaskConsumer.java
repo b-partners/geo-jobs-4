@@ -44,7 +44,9 @@ public class DetectionTaskConsumer implements Consumer<DetectionTask> {
     DetectedTile detectedTile =
         DetectionMapper.toDetectedTile(
             response, associatedTile, detectedParcel.getId(), task.getJobId());
-    detectedTileRepository.save(detectedTile);
+    log.error("[DEBUG] DetectionTaskConsumer to save tile {}", detectedTile.describe());
+    var savedDetectedTile = detectedTileRepository.save(detectedTile);
+    log.error("[DEBUG] DetectionTaskConsumer saved tile {}", savedDetectedTile.describe());
   }
 
   public static DetectionTask withNewStatus(

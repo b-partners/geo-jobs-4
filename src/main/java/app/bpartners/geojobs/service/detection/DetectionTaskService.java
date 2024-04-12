@@ -24,7 +24,7 @@ public class DetectionTaskService {
     List<DetectableObjectConfiguration> detectableObjectConfigurations =
         objectConfigurationRepository.findAllByDetectionJobId(jobId);
     log.error(
-        "[DEBUG] DetectionTaskService ALL {}",
+        "[DEBUG] DetectionTaskService all detected tiles {}",
         detectedTiles.stream().map(DetectedTile::describe).toList());
     return detectedTiles.stream()
         .filter(

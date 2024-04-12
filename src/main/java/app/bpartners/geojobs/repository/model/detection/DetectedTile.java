@@ -58,12 +58,15 @@ public class DetectedTile implements Serializable {
         + ","
         + "confidence="
         + confidence
+        + ","
+        + "jobId="
+        + jobId
         + ")";
   }
 
   public DetectedObject getFirstObject() {
     try {
-      return detectedObjects.getFirst();
+      return detectedObjects == null ? null : detectedObjects.getFirst();
     } catch (NoSuchElementException e) {
       return null;
     }

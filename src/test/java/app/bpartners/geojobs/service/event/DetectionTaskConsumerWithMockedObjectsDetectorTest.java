@@ -1,11 +1,15 @@
 package app.bpartners.geojobs.service.event;
 
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import app.bpartners.geojobs.endpoint.rest.model.TileCoordinates;
+import app.bpartners.geojobs.repository.DetectedTileRepository;
 import app.bpartners.geojobs.repository.model.Parcel;
 import app.bpartners.geojobs.repository.model.ParcelContent;
+import app.bpartners.geojobs.repository.model.detection.DetectedTile;
 import app.bpartners.geojobs.repository.model.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.tiling.Tile;
 import app.bpartners.geojobs.service.detection.MockedObjectsDetector;
@@ -16,7 +20,11 @@ class DetectionTaskConsumerWithMockedObjectsDetectorTest {
 
   @Test
   void can_consume_with_no_error() {
-    var subject = new DetectionTaskConsumer(mock(), new MockedObjectsDetector(5_000, 0), mock());
+    DetectedTileRepository detectedTileRepositoryMock = mock();
+    when(detectedTileRepositoryMock.save(any())).thenReturn(new DetectedTile());
+    var subject =
+        new DetectionTaskConsumer(
+            detectedTileRepositoryMock, new MockedObjectsDetector(5_000, 0), mock());
     subject.accept(
         new DetectionTask()
             .toBuilder()
@@ -39,7 +47,11 @@ class DetectionTaskConsumerWithMockedObjectsDetectorTest {
 
   @Test
   void can_consume_with_some_errors() {
-    var subject = new DetectionTaskConsumer(mock(), new MockedObjectsDetector(2_000, 50), mock());
+    DetectedTileRepository detectedTileRepositoryMock = mock();
+    when(detectedTileRepositoryMock.save(any())).thenReturn(new DetectedTile());
+    var subject =
+        new DetectionTaskConsumer(
+            detectedTileRepositoryMock, new MockedObjectsDetector(2_000, 50), mock());
 
     try {
       for (int i = 0; i < 10; i++) {
