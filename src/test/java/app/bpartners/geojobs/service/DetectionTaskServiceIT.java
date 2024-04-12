@@ -29,24 +29,25 @@ public class DetectionTaskServiceIT extends FacadeIT {
   @Autowired private DetectionTaskRepository detectionTaskRepository;
   private static final double CONFIDENCE = 0.67;
 
-  public static DetectedTile detectedTile(String jobId, double confidence) {
+  private static DetectedTile detectedTile(
+      String jobId, String tileId, String parcelId, String detectedObjectId, double confidence) {
     return DetectedTile.builder()
-        .id("detectedTileId")
+        .id(tileId)
         .jobId(jobId)
-        .parcelId("parcelId")
+        .parcelId(parcelId)
         .detectedObjects(
             List.of(
                 DetectedObject.builder()
-                    .id("detectedObjectId")
+                    .id(detectedObjectId)
                     .computedConfidence(confidence)
-                    .detectedTileId("detectedTileId")
+                    .detectedTileId(tileId)
                     .feature(new Feature().id("featureId"))
                     .detectedObjectTypes(
                         List.of(
                             DetectableObjectType.builder()
-                                .id("detectableObjectTypeId")
+                                .id(detectedObjectId)
                                 .detectableType(DetectableType.ROOF)
-                                .objectId("detectedObjectId")
+                                .objectId(detectedObjectId)
                                 .build()))
                     .build()))
         .bucketPath("dummyPath")
@@ -55,19 +56,31 @@ public class DetectionTaskServiceIT extends FacadeIT {
         .build();
   }
 
+  public static DetectedTile detectedTile(String jobId, double confidence) {
+    return detectedTile(jobId, "detectedTileId", "parcelId", "detectableObjectTypeId", confidence);
+  }
+
   @BeforeEach
   void setUp() {
     jobRepository.save(ZoneDetectionJob.builder().id(JOB_ID).build());
     detectionTaskRepository.save(
         DetectionTask.builder()
             .id("detectionTaskId")
-            .parcels(List.of(Parcel.builder().id("parcelId").build()))
+            .parcels(
+                List.of(
+                    Parcel.builder().id("parcel1Id").build(),
+                    Parcel.builder().id("parcel2Id").build(),
+                    Parcel.builder().id("parcel3Id").build()))
             .build());
-    detectedTileRepository.save(detectedTile(JOB_ID, CONFIDENCE));
+    detectedTileRepository.saveAll(
+        List.of(
+            detectedTile(JOB_ID, "tile1Id", "parcel1Id", "detectedObjectId1", CONFIDENCE),
+            detectedTile(JOB_ID, "tile2Id", "parcel2Id", "detectedObjectId2", 0.70),
+            detectedTile(JOB_ID, "tile3Id", "parcel3Id", "detectedObjectId3", 0.71)));
     objectConfigurationRepository.save(
         DetectableObjectConfiguration.builder()
             .id("detectableObjectConfigurationId")
-            .confidence(1.0)
+            .confidence(0.70)
             .objectType(DetectableType.ROOF)
             .detectionJobId(JOB_ID)
             .build());
@@ -83,7 +96,8 @@ public class DetectionTaskServiceIT extends FacadeIT {
 
   @Test
   void read_in_doubt_tiles() {
-    List<DetectedTile> expected = List.of(detectedTile(JOB_ID, CONFIDENCE));
+    List<DetectedTile> expected =
+        List.of(detectedTile(JOB_ID, "tile1Id", "parcel1Id", "detectedObjectId1", CONFIDENCE));
 
     List<DetectedTile> actual = subject.findInDoubtTilesByJobId(JOB_ID);
 

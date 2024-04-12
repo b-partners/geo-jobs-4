@@ -59,6 +59,10 @@ public class AnnotationService {
       throws app.bpartners.gen.annotator.endpoint.rest.client.ApiException {
     String crupdateAnnotatedJobFolderPath = null;
     List<DetectedTile> inDoubtTiles = humanDetectionJob.getInDoubtTiles();
+    log.error(
+        "[DEBUG] AnnotationService InDoubtTiles [size={}, tiles={}]",
+        inDoubtTiles.size(),
+        inDoubtTiles.stream().map(DetectedTile::describe).toList());
     String annotationJobId = humanDetectionJob.getAnnotationJobId();
     List<AnnotatedTask> annotatedTasks =
         taskExtractor.apply(inDoubtTiles, annotatorUserInfoGetter.getUserId());

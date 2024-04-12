@@ -16,14 +16,8 @@ public class PolygonExtractor implements Function<DetectedObject, Polygon> {
   public Polygon apply(DetectedObject detectedObject) {
     return detectedObject.getFeature().getGeometry().getCoordinates().stream()
         .map(
-            multipolygonCoordinates -> {
-              log.warn(
-                  "[DEBUG] PolygonExtractor multipolygonCoordinates {}", multipolygonCoordinates);
-              Polygon polygon =
-                  new Polygon().points(extractMultipolygonPoints(multipolygonCoordinates).get(0));
-              log.error("[DEBUG] PolygonExtractor polygon {}", polygon);
-              return polygon;
-            })
+            multipolygonCoordinates ->
+                new Polygon().points(extractMultipolygonPoints(multipolygonCoordinates).get(0)))
         .toList()
         .get(0);
   }

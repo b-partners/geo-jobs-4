@@ -19,26 +19,37 @@ public class AnnotationBatchExtractor {
   private final PolygonExtractor polygonExtractor;
 
   public AnnotationBatch apply(DetectedTile detectedTile, String annotatorId, String taskId) {
-    log.error("[DEBUG] AnnotationBatchExtractor {}", detectedTile);
-    return new AnnotationBatch()
-        .id(randomUUID().toString())
-        .creationDatetime(Instant.now())
-        .annotations(
-            detectedTile.getDetectedObjects().stream()
-                .map(detectedObject -> extractAnnotation(detectedObject, annotatorId, taskId))
-                .toList());
+    AnnotationBatch annotations =
+        new AnnotationBatch()
+            .id(randomUUID().toString())
+            .creationDatetime(Instant.now())
+            .annotations(
+                detectedTile.getDetectedObjects().stream()
+                    .map(detectedObject -> extractAnnotation(detectedObject, annotatorId, taskId))
+                    .toList());
+    log.error(
+        "[DEBUG] AnnotationBatchExtractor Annotations [{}]",
+        annotations.getAnnotations().stream()
+            .map(
+                annotation ->
+                    "Annotation(id="
+                        + annotation.getId()
+                        + ", label="
+                        + annotation.getLabel()
+                        + ", polygonPointsSize="
+                        + annotation.getPolygon().getPoints().size()
+                        + ")")
+            .toList());
+    return annotations;
   }
 
   private Annotation extractAnnotation(
       DetectedObject detectedObject, String annotatorId, String taskId) {
-    log.error("[DEBUG] AnnotationBatchExtractor {}", detectedObject);
     return new Annotation()
         .id(randomUUID().toString())
         .userId(annotatorId)
         .taskId(taskId)
-        .label(
-            labelExtractor.apply(
-                detectedObject.getDetectedObjectTypes().get(0).getDetectableType()))
+        .label(labelExtractor.apply(detectedObject.getDetectableObjectType()))
         .polygon(polygonExtractor.apply(detectedObject));
   }
 }
