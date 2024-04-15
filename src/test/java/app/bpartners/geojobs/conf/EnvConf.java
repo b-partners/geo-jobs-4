@@ -13,7 +13,20 @@ public class EnvConf {
     registry.add(
         "tiles.downloader.api.url",
         () -> "https://p36gjgisjpttscydepu3suuupi0wkute.lambda-url.eu-west-3.on.aws/");
-    registry.add("tile.detection.api.urls", () -> "TODO: set urls as env list");
+    registry.add(
+        "tile.detection.api.urls",
+        () ->
+            "[ { \"objectType\": \"ROOF\", \"url\": \"https://roof-api.azurewebsites.net/api\" }, {"
+                + " \"objectType\": \"PATHWAY\", \"url\":"
+                + " \"https://pathway-api.azurewebsites.net/api\" }, { \"objectType\":"
+                + " \"SOLAR_PANEL\", \"url\": \"https://solarpanel-api.azurewebsites.net/api\" }, {"
+                + " \"objectType\": \"POOL\", \"url\": \"https://pool-api.azurewebsites.net/api\""
+                + " }, { \"objectType\": \"TREE\", \"url\":"
+                + " \"https://trees-api.azurewebsites.net/api\" }, { \"objectType\": \"SIDEWALK\","
+                + " \"url\": \"https://sidewalk-api.azurewebsites.net/api\" }, { \"objectType\":"
+                + " \"LINE\", \"url\": \"https://line-api.azurewebsites.net/api\" }, {"
+                + " \"objectType\": \"GREEN_SPACE\", \"url\":"
+                + " \"https://greenspace-api.azurewebsites.net/api\" } ]");
     registry.add("admin.api.key", () -> "the-admin-api-key");
     registry.add("annotator.api.key", () -> "the-admin-api-key");
     registry.add(

@@ -47,6 +47,15 @@ public class DetectableObjectTypeMapper {
       case SOLAR_PANEL -> {
         return SOLAR_PANEL;
       }
+      case SIDEWALK -> {
+        return SIDEWALK;
+      }
+      case LINE -> {
+        return LINE;
+      }
+      case GREEN_SPACE -> {
+        return GREEN_SPACE;
+      }
       default -> throw new NotImplementedException("Unknown detectable object type " + domain);
     }
   }

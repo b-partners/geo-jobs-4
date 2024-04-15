@@ -5,5 +5,8 @@ public enum DetectableType {
   SOLAR_PANEL,
   POOL,
   PATHWAY,
-  TREE
+  TREE,
+  SIDEWALK,
+  LINE,
+  GREEN_SPACE
 }

@@ -12,9 +12,8 @@ import app.bpartners.geojobs.repository.model.ParcelContent;
 import app.bpartners.geojobs.repository.model.detection.DetectedTile;
 import app.bpartners.geojobs.repository.model.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.tiling.Tile;
-import java.util.List;
-
 import app.bpartners.geojobs.service.detection.MockedTileObjectDetector;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class DetectionTaskConsumerWithMockedObjectsDetectorTest {
