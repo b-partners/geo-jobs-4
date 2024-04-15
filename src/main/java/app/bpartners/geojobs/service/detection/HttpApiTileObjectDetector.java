@@ -9,12 +9,10 @@ import app.bpartners.geojobs.model.exception.NotImplementedException;
 import app.bpartners.geojobs.repository.model.TileTask;
 import app.bpartners.geojobs.repository.model.detection.DetectableType;
 import app.bpartners.geojobs.repository.model.tiling.Tile;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
-import java.io.Serializable;
 import java.util.Base64;
 import java.util.List;
 import lombok.*;
@@ -118,17 +116,5 @@ public class HttpApiTileObjectDetector implements TileObjectDetector {
         responseEntity.getStatusCode().value(),
         responseEntity.getBody());
     throw new ApiException(SERVER_EXCEPTION, "Server error");
-  }
-
-  @Data
-  @Builder
-  @AllArgsConstructor
-  @NoArgsConstructor
-  static class TileDetectorUrl implements Serializable {
-    @JsonProperty("objectType")
-    private DetectableType objectType;
-
-    @JsonProperty("url")
-    private String url;
   }
 }

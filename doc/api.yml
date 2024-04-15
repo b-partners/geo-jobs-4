@@ -373,6 +373,9 @@ components:
         - POOL
         - PATHWAY
         - TREE
+        - SIDEWALK
+        - LINE
+        - GREEN_SPACE
 
     Parcel:
       properties:
