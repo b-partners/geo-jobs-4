@@ -6,8 +6,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.model.exception.ApiException;
 import app.bpartners.geojobs.model.exception.NotImplementedException;
+import app.bpartners.geojobs.repository.model.TileTask;
 import app.bpartners.geojobs.repository.model.detection.DetectableType;
-import app.bpartners.geojobs.repository.model.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.tiling.Tile;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,12 +32,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 @ConditionalOnProperty(value = "objects.detector.mock.activated", havingValue = "false")
 @Slf4j
-public class HttpApiObjectsDetector implements ObjectsDetector {
+public class HttpApiTileObjectDetector implements TileObjectDetector {
   private final ObjectMapper om;
   private final BucketComponent bucketComponent;
   private final String tileDetectionRawBaseUrls;
 
-  public HttpApiObjectsDetector(
+  public HttpApiTileObjectDetector(
       ObjectMapper om,
       BucketComponent bucketComponent,
       @Value("${tile.detection.api.urls}") String tileDetectionRawBaseUrls) {
@@ -82,8 +82,8 @@ public class HttpApiObjectsDetector implements ObjectsDetector {
 
   @SneakyThrows
   @Override
-  public DetectionResponse apply(DetectionTask task, List<DetectableType> detectableTypes) {
-    Tile tile = task.getTile();
+  public DetectionResponse apply(TileTask tileTask, List<DetectableType> detectableTypes) {
+    Tile tile = tileTask.getTile();
     if (tile == null) {
       return null;
     }
@@ -96,7 +96,7 @@ public class HttpApiObjectsDetector implements ObjectsDetector {
 
     var payload =
         DetectionPayload.builder()
-            .projectName(task.getJobId())
+            .projectName(tileTask.getJobId())
             .fileName(file.getName())
             .base64ImgData(base64ImgData)
             .build();
