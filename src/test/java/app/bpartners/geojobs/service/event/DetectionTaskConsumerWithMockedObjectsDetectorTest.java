@@ -12,6 +12,7 @@ import app.bpartners.geojobs.repository.model.ParcelContent;
 import app.bpartners.geojobs.repository.model.detection.DetectedTile;
 import app.bpartners.geojobs.repository.model.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.tiling.Tile;
+import app.bpartners.geojobs.service.detection.DetectionMapper;
 import app.bpartners.geojobs.service.detection.MockedTileObjectDetector;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -21,10 +22,17 @@ class DetectionTaskConsumerWithMockedObjectsDetectorTest {
   @Test
   void can_consume_with_no_error() {
     DetectedTileRepository detectedTileRepositoryMock = mock();
+    DetectionMapper detectionMapperMock = mock();
     when(detectedTileRepositoryMock.save(any())).thenReturn(new DetectedTile());
+    when(detectionMapperMock.toDetectedTile(any(), any(), any(), any()))
+        .thenReturn(new DetectedTile());
     var subject =
         new DetectionTaskConsumer(
-            detectedTileRepositoryMock, new MockedTileObjectDetector(), mock());
+            detectedTileRepositoryMock,
+            new MockedTileObjectDetector(),
+            mock(),
+            detectionMapperMock);
+
     subject.accept(
         new DetectionTask()
             .toBuilder()
@@ -51,7 +59,7 @@ class DetectionTaskConsumerWithMockedObjectsDetectorTest {
     when(detectedTileRepositoryMock.save(any())).thenReturn(new DetectedTile());
     var subject =
         new DetectionTaskConsumer(
-            detectedTileRepositoryMock, new MockedTileObjectDetector(), mock());
+            detectedTileRepositoryMock, new MockedTileObjectDetector(), mock(), mock());
 
     try {
       for (int i = 0; i < 10; i++) {
