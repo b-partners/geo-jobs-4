@@ -83,7 +83,7 @@ public class AnnotationService {
     Instant now = Instant.now();
     log.error(
         "[DEBUG] AnnotationService : AnnotationJob(id={}) with labels (count={}, values={}) and"
-            + " tasks (count={}, values={})",
+            + " tasks (count={})",
         annotationJobId,
         labels.size(),
         labels,
