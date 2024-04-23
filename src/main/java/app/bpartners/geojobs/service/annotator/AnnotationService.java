@@ -6,7 +6,6 @@ import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.S
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.gen.annotator.endpoint.rest.api.AdminApi;
-import app.bpartners.gen.annotator.endpoint.rest.api.AnnotatedJobsApi;
 import app.bpartners.gen.annotator.endpoint.rest.api.JobsApi;
 import app.bpartners.gen.annotator.endpoint.rest.client.ApiException;
 import app.bpartners.gen.annotator.endpoint.rest.model.*;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Service;
 public class AnnotationService {
   public static final int DEFAULT_IMAGES_HEIGHT = 1024;
   public static final int DEFAULT_IMAGES_WIDTH = 1024;
-  private final AnnotatedJobsApi annotatedJobsApi;
   private final JobsApi jobsApi;
   private final TaskExtractor taskExtractor;
   private final LabelExtractor labelExtractor;
@@ -42,7 +40,6 @@ public class AnnotationService {
       AnnotatorUserInfoGetter annotatorUserInfoGetter,
       BucketComponent bucketComponent,
       EventProducer eventProducer) {
-    this.annotatedJobsApi = new AnnotatedJobsApi(annotatorApiConf.newApiClientWithApiKey());
     this.jobsApi = new JobsApi(annotatorApiConf.newApiClientWithApiKey());
     this.adminApi = new AdminApi(annotatorApiConf.newApiClientWithApiKey());
     this.taskExtractor = taskExtractor;
@@ -64,7 +61,7 @@ public class AnnotationService {
       throws app.bpartners.gen.annotator.endpoint.rest.client.ApiException {
     String crupdateAnnotatedJobFolderPath = null;
     List<DetectedTile> inDoubtTiles = humanDetectionJob.getInDoubtTiles();
-    log.error(
+    log.info(
         "[DEBUG] AnnotationService InDoubtTiles [size={}, tiles={}]",
         inDoubtTiles.size(),
         inDoubtTiles.stream().map(DetectedTile::describe).toList());
@@ -81,7 +78,7 @@ public class AnnotationService {
                     .color("#DFFF00"))
             : extractLabelsFromTasks;
     Instant now = Instant.now();
-    log.error(
+    log.info(
         "[DEBUG] AnnotationService : AnnotationJob(id={}) with labels (count={}, values={}) and"
             + " tasks (count={})",
         annotationJobId,
@@ -90,9 +87,9 @@ public class AnnotationService {
         annotatedTasks.size(),
         annotatedTasks);
     Job createdAnnotationJob =
-        annotatedJobsApi.crupdateAnnotatedJob(
+        jobsApi.saveJob(
             annotationJobId,
-            new CrupdateAnnotatedJob()
+            new CrupdateJob()
                 .id(annotationJobId)
                 .name("geo-jobs" + now)
                 .bucketName(bucketComponent.getBucketName())
