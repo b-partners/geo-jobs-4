@@ -20,8 +20,9 @@ public class CreateAnnotatedTaskExtractedService implements Consumer<CreateAnnot
     var annotatedTask = createAnnotatedTaskExtracted.getCreateAnnotatedTask();
     try {
       annotationService.addAnnotationTask(jobId, annotatedTask);
+      log.error("[DEBUG] AnnotatedTask(id={}) sent to annotator with jobId = {}", annotatedTask.getId(), jobId);
     } catch (Exception e) {
-      log.info(
+      log.error(
           "[DEBUG] Error when adding annotation task CreateAnnotatedTask(id={})",
           annotatedTask.getId());
       // TODO: add retryer CreateAnnotatedTaskExtractedFailed
