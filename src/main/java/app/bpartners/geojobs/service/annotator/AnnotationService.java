@@ -78,14 +78,13 @@ public class AnnotationService {
                     .color("#DFFF00"))
             : extractLabelsFromTasks;
     Instant now = Instant.now();
-    log.info(
+    log.error(
         "[DEBUG] AnnotationService : AnnotationJob(id={}) with labels (count={}, values={}) and"
             + " tasks (count={})",
         annotationJobId,
         labels.size(),
         labels,
-        annotatedTasks.size(),
-        annotatedTasks);
+        annotatedTasks.size());
     Job createdAnnotationJob =
         jobsApi.saveJob(
             annotationJobId,
