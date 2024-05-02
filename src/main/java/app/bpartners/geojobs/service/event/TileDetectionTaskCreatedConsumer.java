@@ -1,7 +1,11 @@
 package app.bpartners.geojobs.service.event;
 
+import static java.time.Instant.now;
+
 import app.bpartners.geojobs.endpoint.event.gen.TileDetectionTaskCreated;
+import app.bpartners.geojobs.job.model.Status;
 import app.bpartners.geojobs.repository.DetectedTileRepository;
+import app.bpartners.geojobs.repository.model.TileDetectionTask;
 import app.bpartners.geojobs.repository.model.detection.DetectedTile;
 import app.bpartners.geojobs.service.detection.DetectionMapper;
 import app.bpartners.geojobs.service.detection.DetectionResponse;
@@ -30,8 +34,24 @@ public class TileDetectionTaskCreatedConsumer implements Consumer<TileDetectionT
             tileDetectionTask.getTile(),
             tileDetectionTask.getParcelId(),
             tileDetectionTask.getJobId());
-    log.info("[DEBUG] DetectionTaskConsumer to save tile {}", detectedTile.describe());
+    log.info("[DEBUG] TileDetectionTaskCreatedConsumer to save tile {}", detectedTile.describe());
     var savedDetectedTile = detectedTileRepository.save(detectedTile);
-    log.info("[DEBUG] DetectionTaskConsumer saved tile {}", savedDetectedTile.describe());
+    log.info(
+        "[DEBUG] TileDetectionTaskCreatedConsumer saved tile {}", savedDetectedTile.describe());
+  }
+
+  public static TileDetectionTask withNewStatus(
+      TileDetectionTask task,
+      Status.ProgressionStatus progression,
+      Status.HealthStatus health,
+      String message) {
+    return (TileDetectionTask)
+        task.hasNewStatus(
+            Status.builder()
+                .progression(progression)
+                .health(health)
+                .creationDatetime(now())
+                .message(message)
+                .build());
   }
 }
