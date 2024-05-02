@@ -10,6 +10,7 @@ import app.bpartners.geojobs.endpoint.event.gen.TileDetectionTaskCreated;
 import app.bpartners.geojobs.job.model.Status;
 import app.bpartners.geojobs.job.model.TaskStatus;
 import app.bpartners.geojobs.repository.DetectableObjectConfigurationRepository;
+import app.bpartners.geojobs.repository.TileDetectionTaskRepository;
 import app.bpartners.geojobs.repository.model.TileDetectionTask;
 import app.bpartners.geojobs.repository.model.detection.DetectableObjectConfiguration;
 import app.bpartners.geojobs.repository.model.detection.DetectionTask;
@@ -28,6 +29,7 @@ public class DetectionTaskConsumer implements Consumer<DetectionTask> {
   private final DetectableObjectConfigurationRepository objectConfigurationRepository;
   private final KeyPredicateFunction keyPredicateFunction;
   private final EventProducer eventProducer;
+  private final TileDetectionTaskRepository tileDetectionTaskRepository;
 
   @Override
   public void accept(DetectionTask task) {
@@ -48,28 +50,31 @@ public class DetectionTaskConsumer implements Consumer<DetectionTask> {
     var detectableObjectConf = objectConfigurationRepository.findAllByDetectionJobId(jobId);
     var detectableTypes =
         detectableObjectConf.stream().map(DetectableObjectConfiguration::getObjectType).toList();
-    task.getTiles().stream()
-        .filter(keyPredicateFunction.apply(Tile::getBucketPath))
-        .toList()
-        .forEach(
-            tile -> {
-              String tileDetectionTaskId = randomUUID().toString();
-              String parcelId = task.getParcel().getId();
-              List<TaskStatus> status =
-                  List.of(
-                      TaskStatus.builder()
-                          .health(UNKNOWN)
-                          .progression(PENDING)
-                          .creationDatetime(now())
-                          .taskId(tileDetectionTaskId)
-                          .build());
-              eventProducer.accept(
-                  List.of(
-                      new TileDetectionTaskCreated(
-                          new TileDetectionTask(
-                              tileDetectionTaskId, detectionTaskId, parcelId, jobId, tile, status),
-                          detectableTypes)));
-            });
+    var savedTileDetectionTasks =
+        tileDetectionTaskRepository.saveAll(
+            task.getTiles().stream()
+                .filter(keyPredicateFunction.apply(Tile::getBucketPath))
+                .map(
+                    tile -> {
+                      String tileDetectionTaskId = randomUUID().toString();
+                      String parcelId = task.getParcel().getId();
+                      List<TaskStatus> status =
+                          List.of(
+                              TaskStatus.builder()
+                                  .health(UNKNOWN)
+                                  .progression(PENDING)
+                                  .creationDatetime(now())
+                                  .taskId(tileDetectionTaskId)
+                                  .build());
+                      return new TileDetectionTask(
+                          tileDetectionTaskId, detectionTaskId, parcelId, jobId, tile, status);
+                    })
+                .toList());
+    savedTileDetectionTasks.forEach(
+        tileDetectionTask -> {
+          eventProducer.accept(
+              List.of(new TileDetectionTaskCreated(tileDetectionTask, detectableTypes)));
+        });
   }
 
   public static DetectionTask withNewStatus(

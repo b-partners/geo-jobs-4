@@ -15,6 +15,7 @@ import app.bpartners.geojobs.job.model.TaskStatus;
 import app.bpartners.geojobs.repository.*;
 import app.bpartners.geojobs.repository.model.Parcel;
 import app.bpartners.geojobs.repository.model.ParcelContent;
+import app.bpartners.geojobs.repository.model.TileDetectionTask;
 import app.bpartners.geojobs.repository.model.detection.*;
 import app.bpartners.geojobs.repository.model.tiling.Tile;
 import app.bpartners.geojobs.service.detection.DetectionMapper;
@@ -37,6 +38,7 @@ public class DetectionTaskConsumerIT extends FacadeIT {
   @MockBean TileObjectDetector objectDetector;
   @MockBean DetectionMapper detectionMapper;
   @MockBean EventProducer eventProducer;
+  @MockBean TileDetectionTaskRepository tileDetectionTaskRepository;
   @Autowired DetectionTaskConsumer subject;
   @Autowired DetectableObjectConfigurationRepository objectConfigurationRepository;
   @Autowired DetectionTaskRepository detectionTaskRepository;
@@ -75,6 +77,7 @@ public class DetectionTaskConsumerIT extends FacadeIT {
   void setUp() {
     when(objectDetector.apply(any(), any())).thenReturn(DetectionResponse.builder().build());
     when(detectionMapper.toDetectedTile(any(), any(), any(), any())).thenReturn(someDetectedTile());
+    when(tileDetectionTaskRepository.saveAll(any())).thenReturn(List.of(new TileDetectionTask()));
     jobRepository.save(ZoneDetectionJob.builder().id(JOB_ID).build());
     parcelRepository.saveAll(getParcels());
     detectionTaskRepository.save(detectionTask());
