@@ -9,6 +9,7 @@ import app.bpartners.geojobs.model.exception.NotImplementedException;
 import app.bpartners.geojobs.repository.DetectedTileRepository;
 import app.bpartners.geojobs.repository.model.Parcel;
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,11 +20,23 @@ public class DetectionTaskMapper {
   private final DetectedTileRepository detectedTileRepository;
 
   public DetectedParcel toRest(String jobId, Parcel parcel) {
-    var detectedTiles =
+    List<app.bpartners.geojobs.repository.model.detection.DetectedTile> detectedTiles =
         parcel == null ? List.of() : detectedTileRepository.findAllByParcelId(parcel.getId());
+    var lastDetectedTileCreationDatetime =
+        detectedTiles.stream()
+            .max(
+                Comparator.comparing(
+                    app.bpartners.geojobs.repository.model.detection.DetectedTile
+                        ::getCreationDatetime))
+            .orElse(
+                app.bpartners.geojobs.repository.model.detection.DetectedTile.builder()
+                    .creationDatetime(now())
+                    .build())
+            .getCreationDatetime();
     return new DetectedParcel()
         .id(randomUUID().toString()) // TODO DetectedParcel must be persisted
-        .creationDatetime(now()) // TODO change when DetectedParcel is persisted
+        .creationDatetime(
+            lastDetectedTileCreationDatetime) // TODO change when DetectedParcel is persisted
         .detectionJobIb(jobId)
         .parcelId(parcel == null ? null : parcel.getId())
         .status(

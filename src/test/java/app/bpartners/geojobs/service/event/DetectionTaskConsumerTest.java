@@ -32,5 +32,9 @@ class DetectionTaskConsumerTest {
                                 .parcelContent(ParcelContent.builder().tiles(List.of()).build())
                                 .build()))
                     .build()));
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> subject.accept(DetectionTask.builder().parcels(List.of()).build()));
   }
 }

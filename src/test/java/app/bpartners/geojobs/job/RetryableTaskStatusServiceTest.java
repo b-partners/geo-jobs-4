@@ -35,6 +35,11 @@ class RetryableTaskStatusServiceTest {
       public JobType getJobType() {
         return null;
       }
+
+      @Override
+      public Task semanticClone() {
+        return null;
+      }
     };
   }
 }

@@ -6,25 +6,27 @@ import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PENDING;
 import static app.bpartners.geojobs.repository.model.GeoJobType.DETECTION;
 import static app.bpartners.geojobs.service.DetectionTaskServiceIT.detectedTile;
 import static java.util.UUID.randomUUID;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import app.bpartners.geojobs.conf.FacadeIT;
+import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.job.model.TaskStatus;
-import app.bpartners.geojobs.repository.DetectableObjectConfigurationRepository;
-import app.bpartners.geojobs.repository.DetectedTileRepository;
-import app.bpartners.geojobs.repository.DetectionTaskRepository;
-import app.bpartners.geojobs.repository.ZoneDetectionJobRepository;
+import app.bpartners.geojobs.repository.*;
 import app.bpartners.geojobs.repository.model.Parcel;
+import app.bpartners.geojobs.repository.model.ParcelContent;
+import app.bpartners.geojobs.repository.model.TileDetectionTask;
 import app.bpartners.geojobs.repository.model.detection.*;
+import app.bpartners.geojobs.repository.model.tiling.Tile;
 import app.bpartners.geojobs.service.detection.DetectionMapper;
 import app.bpartners.geojobs.service.detection.DetectionResponse;
 import app.bpartners.geojobs.service.detection.TileObjectDetector;
 import java.time.Instant;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,34 +37,50 @@ public class DetectionTaskConsumerIT extends FacadeIT {
   public static final String DETECTION_TASK_ID = "detection_task1";
   @MockBean TileObjectDetector objectDetector;
   @MockBean DetectionMapper detectionMapper;
+  @MockBean EventProducer eventProducer;
+  @MockBean TileDetectionTaskRepository tileDetectionTaskRepository;
   @Autowired DetectionTaskConsumer subject;
   @Autowired DetectableObjectConfigurationRepository objectConfigurationRepository;
   @Autowired DetectionTaskRepository detectionTaskRepository;
   @Autowired ZoneDetectionJobRepository jobRepository;
   @Autowired DetectedTileRepository detectedTileRepository;
+  @Autowired ParcelRepository parcelRepository;
+
+  private static DetectionTask detectionTask() {
+    List<Parcel> parcels = getParcels();
+    return DetectionTask.builder()
+        .id(DETECTION_TASK_ID)
+        .jobId(JOB_ID)
+        .parcels(parcels)
+        .statusHistory(
+            List.of(
+                TaskStatus.builder()
+                    .id(randomUUID().toString())
+                    .progression(PENDING)
+                    .jobType(DETECTION)
+                    .health(UNKNOWN)
+                    .build()))
+        .submissionInstant(Instant.now())
+        .build();
+  }
+
+  @NotNull
+  private static List<Parcel> getParcels() {
+    return List.of(
+        Parcel.builder()
+            .id("parcel1Id")
+            .parcelContent(ParcelContent.builder().tiles(List.of(new Tile())).build())
+            .build());
+  }
 
   @BeforeEach
   void setUp() {
     when(objectDetector.apply(any(), any())).thenReturn(DetectionResponse.builder().build());
     when(detectionMapper.toDetectedTile(any(), any(), any(), any())).thenReturn(someDetectedTile());
+    when(tileDetectionTaskRepository.saveAll(any())).thenReturn(List.of(new TileDetectionTask()));
     jobRepository.save(ZoneDetectionJob.builder().id(JOB_ID).build());
-    detectionTaskRepository.save(
-        DetectionTask.builder()
-            .id(DETECTION_TASK_ID)
-            .parcels(
-                List.of(
-                    Parcel.builder().id("parcel1Id").build(),
-                    Parcel.builder().id("parcel2Id").build()))
-            .statusHistory(
-                List.of(
-                    TaskStatus.builder()
-                        .id(randomUUID().toString())
-                        .progression(PENDING)
-                        .jobType(DETECTION)
-                        .health(UNKNOWN)
-                        .build()))
-            .submissionInstant(Instant.now())
-            .build());
+    parcelRepository.saveAll(getParcels());
+    detectionTaskRepository.save(detectionTask());
     objectConfigurationRepository.save(
         DetectableObjectConfiguration.builder()
             .id("detectableObjectConfigurationId1")
@@ -74,15 +92,11 @@ public class DetectionTaskConsumerIT extends FacadeIT {
 
   @Test
   void accept_ok() {
-    var before = detectedTileRepository.findAllByJobId(JOB_ID);
-
     subject.accept(someDetectionTask(JOB_ID, DETECTION_TASK_ID));
 
-    var actual = detectedTileRepository.findAllByJobId(JOB_ID);
-    assertTrue(before.isEmpty());
-    assertEquals(
-        List.of(someDetectedTile()),
-        actual.stream().peek(tile -> tile.setCreationDatetime(null)).toList());
+    var eventsCaptor = ArgumentCaptor.forClass(List.class);
+    verify(eventProducer, times(detectionTask().getParcels().size()))
+        .accept(eventsCaptor.capture());
   }
 
   private static DetectedTile someDetectedTile() {
