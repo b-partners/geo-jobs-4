@@ -13,7 +13,6 @@ import app.bpartners.geojobs.job.model.TaskStatus;
 import app.bpartners.geojobs.job.service.RetryableTaskStatusService;
 import app.bpartners.geojobs.repository.model.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.detection.ZoneDetectionJob;
-import app.bpartners.geojobs.service.DetectionTaskStatusChangedService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
