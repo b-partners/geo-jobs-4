@@ -90,12 +90,11 @@ public class Status implements Serializable {
           case PROCESSING, FINISHED -> newProgression;
         };
         case FINISHED -> switch (newProgression) {
-          case PROCESSING -> throw new IllegalArgumentException(errorMessage);
-          case FINISHED -> newProgression;
-          case PENDING -> switch (newHealth) {
+          case PROCESSING, PENDING -> switch (newHealth) {
             case RETRYING -> newProgression;
             case FAILED, SUCCEEDED, UNKNOWN -> throw new IllegalArgumentException(errorMessage);
           };
+          case FINISHED -> newProgression;
         };
       };
     }
@@ -111,8 +110,8 @@ public class Status implements Serializable {
       return switch (this) {
         case UNKNOWN -> newHealth;
         case RETRYING -> switch (newHealth) {
-          case UNKNOWN -> newHealth;
-          case RETRYING, SUCCEEDED, FAILED -> throw new IllegalArgumentException(errorMessage);
+          case UNKNOWN, RETRYING -> newHealth;
+          case SUCCEEDED, FAILED -> throw new IllegalArgumentException(errorMessage);
         };
         case SUCCEEDED -> switch (newHealth) {
           case SUCCEEDED -> newHealth;
