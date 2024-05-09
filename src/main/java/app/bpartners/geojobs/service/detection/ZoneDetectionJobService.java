@@ -74,13 +74,22 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
             .orElseThrow(
                 () -> new NotFoundException("ZoneDetectionJob(id=" + jobId + ") not found"));
     List<DetectionTask> detectionTasks = taskRepository.findAllByJobId(jobId);
+    /*
+    TODO: set again when PROCESSING UNKNOWN must not be retried
     if (!detectionTasks.stream()
         .allMatch(task -> task.getStatus().getProgression().equals(FINISHED))) {
       throw new BadRequestException("Only job with all finished tasks can be retry");
-    }
+    }*/
     List<DetectionTask> failedTasks =
         detectionTasks.stream()
-            .filter(task -> task.getStatus().getHealth().equals(FAILED))
+            .filter(
+                task -> {
+                  TaskStatus taskStatus = task.getStatus();
+                  return (taskStatus.getProgression().equals(FINISHED)
+                          && taskStatus.getHealth().equals(FAILED))
+                      || (taskStatus.getProgression().equals(PROCESSING)
+                          && taskStatus.getHealth().equals(UNKNOWN));
+                })
             .toList();
     if (failedTasks.isEmpty()) {
       throw new BadRequestException(

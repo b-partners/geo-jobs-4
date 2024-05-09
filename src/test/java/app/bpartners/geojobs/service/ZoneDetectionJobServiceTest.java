@@ -109,7 +109,6 @@ public class ZoneDetectionJobServiceTest {
                                 .build()))
                     .build()));
 
-    assertThrows(BadRequestException.class, () -> subject.retryFailedTask(JOB_ID));
     assertThrows(BadRequestException.class, () -> subject.retryFailedTask(JOB2_ID));
   }
 
