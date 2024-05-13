@@ -77,13 +77,13 @@ class ZoneDetectionJobSucceededServiceIT extends FacadeIT {
         List.of(
             DetectableObjectConfiguration.builder()
                 .id("detectableObjectConfigurationId")
-                .confidence(0.7)
+                .confidence(0.8)
                 .objectType(DetectableType.ROOF)
                 .detectionJobId(SUCCEEDED_JOB_ID)
                 .build(),
             DetectableObjectConfiguration.builder()
                 .id("detectableObjectConfigurationId2")
-                .confidence(0.7)
+                .confidence(0.8)
                 .objectType(DetectableType.ROOF)
                 .detectionJobId(SUCCEEDED_JOB_ID_2)
                 .build()));

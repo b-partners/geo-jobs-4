@@ -41,12 +41,11 @@ public class ZoneDetectionJobSucceededService implements Consumer<ZoneDetectionJ
     String succeededJobId = event.getSucceededJobId();
     String humanDetectionJobId = randomUUID().toString();
     String annotationJobId = randomUUID().toString();
-    // Note that only SUCCEEDED TileDetectionTask become DetectedTile
-    List<DetectedTile> detectedTiles =
-        detectedTileRepository.findAllByJobId(succeededJobId).stream()
+    List<DetectedTile> inDoubtTiles =
+        detectionTaskService.findInDoubtTilesByJobId(succeededJobId).stream()
             .peek(detectedTile -> detectedTile.setHumanDetectionJobId(humanDetectionJobId))
             .toList();
-    if (detectedTiles.isEmpty()) {
+    if (inDoubtTiles.isEmpty()) {
       var zoneDetectionJob =
           jobRepository
               .findById(humanZDJId)
@@ -67,12 +66,12 @@ public class ZoneDetectionJobSucceededService implements Consumer<ZoneDetectionJ
             HumanDetectionJob.builder()
                 .id(humanDetectionJobId)
                 .annotationJobId(annotationJobId)
-                .detectedTiles(detectedTiles)
+                .detectedTiles(inDoubtTiles)
                 .zoneDetectionJobId(humanZDJId)
                 .build());
 
-    savedHumanDetectionJob.setDetectedTiles(detectedTiles); // TODO: check if still necessary
-    detectedTileRepository.saveAll(detectedTiles); // TODO: check if still necessary
+    savedHumanDetectionJob.setDetectedTiles(inDoubtTiles); // TODO: check if still necessary
+    detectedTileRepository.saveAll(inDoubtTiles); // TODO: check if still necessary
     try {
       annotationService.createAnnotationJob(savedHumanDetectionJob);
     } catch (Exception e) {
