@@ -1,7 +1,6 @@
 package app.bpartners.geojobs.service.event;
 
-import static app.bpartners.geojobs.job.model.Status.HealthStatus.FAILED;
-import static app.bpartners.geojobs.job.model.Status.HealthStatus.UNKNOWN;
+import static app.bpartners.geojobs.job.model.Status.HealthStatus.*;
 import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.FINISHED;
 import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PENDING;
 import static java.time.Instant.now;
@@ -86,8 +85,8 @@ public class DetectionTaskConsumer implements Consumer<DetectionTask> {
         existingTileDetections.stream()
             .filter(
                 tileDetectionTask ->
-                    tileDetectionTask.getStatus().getProgression().equals(FINISHED)
-                        && tileDetectionTask.getStatus().getHealth().equals(FAILED))
+                    !(tileDetectionTask.getStatus().getProgression().equals(FINISHED)
+                        && tileDetectionTask.getStatus().getHealth().equals(SUCCEEDED)))
             .toList();
     failedDetectionTasks.forEach(
         tileDetectionTask -> {
