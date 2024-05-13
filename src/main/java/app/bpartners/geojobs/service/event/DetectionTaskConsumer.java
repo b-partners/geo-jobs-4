@@ -81,6 +81,10 @@ public class DetectionTaskConsumer implements Consumer<DetectionTask> {
           });
       return;
     }
+    log.error(
+        "[DEBUG] TileDetectionTasks retrieved count = {} for task(id={})",
+        existingTileDetections.size(),
+        task.getId());
     var failedDetectionTasks =
         existingTileDetections.stream()
             .filter(
@@ -88,6 +92,10 @@ public class DetectionTaskConsumer implements Consumer<DetectionTask> {
                     !(tileDetectionTask.getStatus().getProgression().equals(FINISHED)
                         && tileDetectionTask.getStatus().getHealth().equals(SUCCEEDED)))
             .toList();
+    log.error(
+        "[DEBUG] Failed tileDetectionTasks retrieved count = {} for task(id={})",
+        failedDetectionTasks.size(),
+        task.getId());
     failedDetectionTasks.forEach(
         tileDetectionTask -> {
           eventProducer.accept(
