@@ -1,7 +1,6 @@
 package app.bpartners.geojobs.service.event;
 
-import static app.bpartners.geojobs.job.model.Status.HealthStatus.FAILED;
-import static app.bpartners.geojobs.job.model.Status.HealthStatus.UNKNOWN;
+import static app.bpartners.geojobs.job.model.Status.HealthStatus.*;
 import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.FINISHED;
 import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.PENDING;
 import static java.time.Instant.now;
@@ -82,13 +81,21 @@ public class DetectionTaskConsumer implements Consumer<DetectionTask> {
           });
       return;
     }
+    log.error(
+        "[DEBUG] TileDetectionTasks retrieved count = {} for task(id={})",
+        existingTileDetections.size(),
+        task.getId());
     var failedDetectionTasks =
         existingTileDetections.stream()
             .filter(
                 tileDetectionTask ->
-                    tileDetectionTask.getStatus().getProgression().equals(FINISHED)
-                        && tileDetectionTask.getStatus().getHealth().equals(FAILED))
+                    !(tileDetectionTask.getStatus().getProgression().equals(FINISHED)
+                        && tileDetectionTask.getStatus().getHealth().equals(SUCCEEDED)))
             .toList();
+    log.error(
+        "[DEBUG] Failed tileDetectionTasks retrieved count = {} for task(id={})",
+        failedDetectionTasks.size(),
+        task.getId());
     failedDetectionTasks.forEach(
         tileDetectionTask -> {
           eventProducer.accept(

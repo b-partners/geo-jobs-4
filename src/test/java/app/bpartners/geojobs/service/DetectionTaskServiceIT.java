@@ -21,13 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(isolation = Isolation.SERIALIZABLE)
 public class DetectionTaskServiceIT extends FacadeIT {
   public static final String JOB_ID = "jobId";
+  public static final double MIN_CONFIDENCE = 0.70;
   @Autowired private DetectionTaskService subject;
   @Autowired private ZoneDetectionJobRepository jobRepository;
   @Autowired private DetectedTileRepository detectedTileRepository;
   @Autowired private DetectableObjectConfigurationRepository objectConfigurationRepository;
   @Autowired private DetectionTaskRepository detectionTaskRepository;
   @Autowired private ParcelRepository parcelRepository;
-  private static final double CONFIDENCE = 0.67;
+  private static final double UNDER_MIN_CONFIDENCE = 0.67;
 
   public static DetectedTile detectedTile(
       String jobId, String tileId, String parcelId, String detectedObjectId, double confidence) {
@@ -65,13 +66,13 @@ public class DetectionTaskServiceIT extends FacadeIT {
         DetectionTask.builder().id("detectionTaskId").parcels(parcels).build());
     detectedTileRepository.saveAll(
         List.of(
-            detectedTile(JOB_ID, "tile1Id", "parcel1Id", "detectedObjectId1", CONFIDENCE),
+            detectedTile(JOB_ID, "tile1Id", "parcel1Id", "detectedObjectId1", UNDER_MIN_CONFIDENCE),
             detectedTile(JOB_ID, "tile2Id", "parcel2Id", "detectedObjectId2", 0.70),
             detectedTile(JOB_ID, "tile3Id", "parcel3Id", "detectedObjectId3", 0.71)));
     objectConfigurationRepository.save(
         DetectableObjectConfiguration.builder()
             .id("detectableObjectConfigurationId")
-            .confidence(0.70)
+            .confidence(MIN_CONFIDENCE)
             .objectType(DetectableType.ROOF)
             .detectionJobId(JOB_ID)
             .build());
@@ -97,7 +98,9 @@ public class DetectionTaskServiceIT extends FacadeIT {
   @Test
   void read_in_doubt_tiles() {
     List<DetectedTile> expected =
-        List.of(detectedTile(JOB_ID, "tile1Id", "parcel1Id", "detectedObjectId1", CONFIDENCE));
+        List.of(
+            detectedTile(JOB_ID, "tile1Id", "parcel1Id", "detectedObjectId1", UNDER_MIN_CONFIDENCE),
+            detectedTile(JOB_ID, "tile2Id", "parcel2Id", "detectedObjectId2", MIN_CONFIDENCE));
 
     List<DetectedTile> actual = subject.findInDoubtTilesByJobId(JOB_ID);
 

@@ -80,24 +80,22 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
         .allMatch(task -> task.getStatus().getProgression().equals(FINISHED))) {
       throw new BadRequestException("Only job with all finished tasks can be retry");
     }*/
-    List<DetectionTask> failedTasks =
+    List<DetectionTask> unfinishedTasks =
         detectionTasks.stream()
             .filter(
                 task -> {
                   TaskStatus taskStatus = task.getStatus();
-                  return (taskStatus.getProgression().equals(FINISHED)
-                          && taskStatus.getHealth().equals(FAILED))
-                      || (taskStatus.getProgression().equals(PROCESSING)
-                          && taskStatus.getHealth().equals(UNKNOWN));
+                  return !(taskStatus.getProgression().equals(FINISHED)
+                      && taskStatus.getHealth().equals(SUCCEEDED));
                 })
             .toList();
-    if (failedTasks.isEmpty()) {
+    if (unfinishedTasks.isEmpty()) {
       throw new BadRequestException(
           "All tilling tasks of job(id=" + jobId + ") are already SUCCEEDED");
     }
     List<DetectionTask> savedFailedTasks =
         taskRepository.saveAll(
-            failedTasks.stream()
+            unfinishedTasks.stream()
                 .peek(
                     failedTask -> {
                       List<TaskStatus> newStatus = new ArrayList<>(failedTask.getStatusHistory());
