@@ -55,7 +55,7 @@ public class DetectedObject implements Serializable {
     return optionalConfiguration.isPresent()
         && optionalConfiguration.get().getConfidence() != null
         && computedConfidence != null
-        && optionalConfiguration.get().getConfidence() > computedConfidence;
+        && optionalConfiguration.get().getConfidence() >= computedConfidence;
   }
 
   public DetectableType getDetectableObjectType() {
