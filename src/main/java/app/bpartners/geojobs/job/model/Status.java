@@ -114,8 +114,8 @@ public class Status implements Serializable {
           case SUCCEEDED, FAILED -> throw new IllegalArgumentException(errorMessage);
         };
         case SUCCEEDED -> switch (newHealth) {
-          case SUCCEEDED -> newHealth;
-          case UNKNOWN, FAILED, RETRYING -> throw new IllegalArgumentException(errorMessage);
+          case SUCCEEDED, RETRYING -> newHealth;
+          case UNKNOWN, FAILED -> throw new IllegalArgumentException(errorMessage);
         };
         case FAILED -> switch (newHealth) {
           case FAILED, RETRYING -> newHealth;
