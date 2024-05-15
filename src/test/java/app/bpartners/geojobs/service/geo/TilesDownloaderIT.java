@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -70,12 +71,177 @@ public class TilesDownloaderIT extends FacadeIT {
         .build();
   }
 
+  private ParcelContent a_parcel_from_cannes(int zoom)
+      throws MalformedURLException, JsonProcessingException {
+    return ParcelContent.builder()
+        .id(randomUUID().toString())
+        .geoServerUrl(
+            new URL(
+                "https://cartolive.ville-cannes.fr/server/services/cache/Ortho_2020_5cm/MapServer/WMSServer"))
+        .geoServerParameter(
+            om.readValue(
+                """
+                                {
+                                    "service": "WMS",
+                                    "request": "GetMap",
+                                    "layers": "0",
+                                    "styles": "",
+                                    "format": "image/jpeg",
+                                    "version": "1.0.0",
+                                    "transparent": true,
+                                    "width": 1024,
+                                    "height": 1024,
+                                    "srs": "EPSG:3857"
+                                }""",
+                GeoServerParameter.class))
+        .feature(
+            om.readValue(
+                    """
+                                            {
+                                                        "type": "Feature",
+                                                        "properties": {
+                                                            "objectid": 1,
+                                                            "id": "5",
+                                                            "nom": "ILE SAINTE MARGUERITE",
+                                                            "st_area_sh": 1707496.1756,
+                                                            "st_length_": 10585.3241542,
+                                                            "id_2": 554296,
+                                                            "CLUSTER_ID": 106836,
+                                                            "CLUSTER_SIZE": 13456
+                                                        },
+                                                        "geometry": {
+                                                            "type": "MultiPolygon",
+                                                            "coordinates": [
+                                                                [
+                                                                    [
+                                                                        [
+                                                                            7.045882619211542,
+                                                                            43.521610520321282
+                                                                        ],
+                                                                        [
+                                                                            7.045767866949203,
+                                                                            43.522601262994414
+                                                                        ],
+                                                                        [
+                                                                            7.046714126455757,
+                                                                            43.523044528054776
+                                                                        ],
+                                                                        [
+                                                                            7.047385803063189,
+                                                                            43.5224909227992
+                                                                        ],
+                                                                        [
+                                                                            7.047177077554504,
+                                                                            43.521325416265029
+                                                                        ],
+                                                                        [
+                                                                            7.045882619211542,
+                                                                            43.521610520321282
+                                                                        ]
+                                                                    ]
+                                                                ]
+                                                            ]
+                                                        }
+                                                    }""",
+                    Feature.class)
+                .zoom(zoom)
+                .id("feature_1_id"))
+        .build();
+  }
+
+  private ParcelContent a_parcel_from_cannes_proxy(int zoom)
+      throws MalformedURLException, JsonProcessingException {
+    return ParcelContent.builder()
+        .id(randomUUID().toString())
+        .geoServerUrl(new URL("http://35.181.83.111:80/geoserver/cite/wms"))
+        .geoServerParameter(
+            om.readValue(
+                """
+                                {
+                                    "service": "WMS",
+                                    "request": "GetMap",
+                                    "layers": "cite:cannes_2020",
+                                    "styles": "",
+                                    "format": "image/jpeg",
+                                    "version": "1.1.0",
+                                    "transparent": true,
+                                    "width": 1024,
+                                    "height": 1024,
+                                    "srs": "EPSG:4326"
+                                }""",
+                GeoServerParameter.class))
+        .feature(
+            om.readValue(
+                    """
+                                            {
+                                                        "type": "Feature",
+                                                        "properties": {
+                                                            "objectid": 1,
+                                                            "id": "5",
+                                                            "nom": "ILE SAINTE MARGUERITE",
+                                                            "st_area_sh": 1707496.1756,
+                                                            "st_length_": 10585.3241542,
+                                                            "id_2": 554296,
+                                                            "CLUSTER_ID": 106836,
+                                                            "CLUSTER_SIZE": 13456
+                                                        },
+                                                        "geometry": {
+                                                            "type": "MultiPolygon",
+                                                            "coordinates": [
+                                                                [
+                                                                    [
+                                                                        [
+                                                                            7.045882619211542,
+                                                                            43.521610520321282
+                                                                        ],
+                                                                        [
+                                                                            7.045767866949203,
+                                                                            43.522601262994414
+                                                                        ],
+                                                                        [
+                                                                            7.046714126455757,
+                                                                            43.523044528054776
+                                                                        ],
+                                                                        [
+                                                                            7.047385803063189,
+                                                                            43.5224909227992
+                                                                        ],
+                                                                        [
+                                                                            7.047177077554504,
+                                                                            43.521325416265029
+                                                                        ],
+                                                                        [
+                                                                            7.045882619211542,
+                                                                            43.521610520321282
+                                                                        ]
+                                                                    ]
+                                                                ]
+                                                            ]
+                                                        }
+                                                    }""",
+                    Feature.class)
+                .zoom(zoom)
+                .id("feature_1_id"))
+        .build();
+  }
+
   @Test
-  public void download_tiles_ok() throws IOException {
+  public void download_tiles_lyon_ok() throws IOException {
     var zoom = 20;
 
     var tilesDir = httpApiTilesDownloader.apply(a_parcel_from_lyon(zoom));
 
     assertEquals(4, new File(tilesDir.getAbsolutePath() + "/" + zoom).listFiles().length);
+  }
+
+  // TODO: run locally only
+  @Disabled
+  @Test
+  public void download_tiles_cannes_ok() throws IOException {
+    var zoom = 20;
+
+    var tilesDir = httpApiTilesDownloader.apply(a_parcel_from_cannes_proxy(zoom));
+
+    assertEquals(13, new File(tilesDir.getAbsolutePath() + "/" + zoom).listFiles().length);
   }
 }

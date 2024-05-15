@@ -19,7 +19,6 @@ import app.bpartners.geojobs.service.detection.TileObjectDetector;
 import java.io.File;
 import java.time.Instant;
 import java.util.List;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
