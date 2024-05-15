@@ -97,52 +97,52 @@ public class TilesDownloaderIT extends FacadeIT {
         .feature(
             om.readValue(
                     """
-                                            {
-                                                        "type": "Feature",
-                                                        "properties": {
-                                                            "objectid": 1,
-                                                            "id": "5",
-                                                            "nom": "ILE SAINTE MARGUERITE",
-                                                            "st_area_sh": 1707496.1756,
-                                                            "st_length_": 10585.3241542,
-                                                            "id_2": 554296,
-                                                            "CLUSTER_ID": 106836,
-                                                            "CLUSTER_SIZE": 13456
-                                                        },
-                                                        "geometry": {
-                                                            "type": "MultiPolygon",
-                                                            "coordinates": [
-                                                                [
-                                                                    [
-                                                                        [
-                                                                            7.045882619211542,
-                                                                            43.521610520321282
-                                                                        ],
-                                                                        [
-                                                                            7.045767866949203,
-                                                                            43.522601262994414
-                                                                        ],
-                                                                        [
-                                                                            7.046714126455757,
-                                                                            43.523044528054776
-                                                                        ],
-                                                                        [
-                                                                            7.047385803063189,
-                                                                            43.5224909227992
-                                                                        ],
-                                                                        [
-                                                                            7.047177077554504,
-                                                                            43.521325416265029
-                                                                        ],
-                                                                        [
-                                                                            7.045882619211542,
-                                                                            43.521610520321282
-                                                                        ]
-                                                                    ]
-                                                                ]
-                                                            ]
-                                                        }
-                                                    }""",
+                            {
+            "type": "Feature",
+            "properties": {
+                "id": 79589,
+                "CLUSTER_ID": 75394,
+                "CLUSTER_SI": 529,
+                "objectid": 1,
+                "id_2": "5",
+                "nom": "ILE SAINTE MARGUERITE",
+                "st_area_sh": 1707496.1756,
+                "st_length_": 10585.3241542
+            },
+            "geometry": {
+                "type": "MultiPolygon",
+                "coordinates": [
+                    [
+                        [
+                            [
+                                7.053824189976548,
+                                43.519987765025689
+                            ],
+                            [
+                                7.053391928619927,
+                                43.520444122594547
+                            ],
+                            [
+                                7.053925229491217,
+                                43.520622151393155
+                            ],
+                            [
+                                7.054267541263264,
+                                43.520400341083466
+                            ],
+                            [
+                                7.054065923731642,
+                                43.519992299731342
+                            ],
+                            [
+                                7.053824189976548,
+                                43.519987765025689
+                            ]
+                        ]
+                    ]
+                ]
+            }
+        }""",
                     Feature.class)
                 .zoom(zoom)
                 .id("feature_1_id"))
@@ -173,55 +173,55 @@ public class TilesDownloaderIT extends FacadeIT {
         .feature(
             om.readValue(
                     """
-                                            {
-                                                        "type": "Feature",
-                                                        "properties": {
-                                                            "objectid": 1,
-                                                            "id": "5",
-                                                            "nom": "ILE SAINTE MARGUERITE",
-                                                            "st_area_sh": 1707496.1756,
-                                                            "st_length_": 10585.3241542,
-                                                            "id_2": 554296,
-                                                            "CLUSTER_ID": 106836,
-                                                            "CLUSTER_SIZE": 13456
-                                                        },
-                                                        "geometry": {
-                                                            "type": "MultiPolygon",
-                                                            "coordinates": [
-                                                                [
-                                                                    [
-                                                                        [
-                                                                            7.045882619211542,
-                                                                            43.521610520321282
-                                                                        ],
-                                                                        [
-                                                                            7.045767866949203,
-                                                                            43.522601262994414
-                                                                        ],
-                                                                        [
-                                                                            7.046714126455757,
-                                                                            43.523044528054776
-                                                                        ],
-                                                                        [
-                                                                            7.047385803063189,
-                                                                            43.5224909227992
-                                                                        ],
-                                                                        [
-                                                                            7.047177077554504,
-                                                                            43.521325416265029
-                                                                        ],
-                                                                        [
-                                                                            7.045882619211542,
-                                                                            43.521610520321282
-                                                                        ]
-                                                                    ]
-                                                                ]
-                                                            ]
-                                                        }
-                                                    }""",
+                            {
+            "type": "Feature",
+            "properties": {
+                "id": 79589,
+                "CLUSTER_ID": 75394,
+                "CLUSTER_SI": 529,
+                "objectid": 1,
+                "id_2": "5",
+                "nom": "ILE SAINTE MARGUERITE",
+                "st_area_sh": 1707496.1756,
+                "st_length_": 10585.3241542
+            },
+            "geometry": {
+                "type": "MultiPolygon",
+                "coordinates": [
+                    [
+                        [
+                            [
+                                7.053824189976548,
+                                43.519987765025689
+                            ],
+                            [
+                                7.053391928619927,
+                                43.520444122594547
+                            ],
+                            [
+                                7.053925229491217,
+                                43.520622151393155
+                            ],
+                            [
+                                7.054267541263264,
+                                43.520400341083466
+                            ],
+                            [
+                                7.054065923731642,
+                                43.519992299731342
+                            ],
+                            [
+                                7.053824189976548,
+                                43.519987765025689
+                            ]
+                        ]
+                    ]
+                ]
+            }
+        }""",
                     Feature.class)
                 .zoom(zoom)
-                .id("feature_1_id"))
+                .id(randomUUID().toString()))
         .build();
   }
 
@@ -240,8 +240,8 @@ public class TilesDownloaderIT extends FacadeIT {
   public void download_tiles_cannes_ok() throws IOException {
     var zoom = 20;
 
-    var tilesDir = httpApiTilesDownloader.apply(a_parcel_from_cannes_proxy(zoom));
+    var tilesDir = httpApiTilesDownloader.apply(a_parcel_from_cannes(zoom));
 
-    assertEquals(13, new File(tilesDir.getAbsolutePath() + "/" + zoom).listFiles().length);
+    assertEquals(4, new File(tilesDir.getAbsolutePath() + "/" + zoom).listFiles().length);
   }
 }
