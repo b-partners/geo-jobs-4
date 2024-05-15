@@ -73,7 +73,12 @@ public class TilingTask extends Task implements Serializable {
   }
 
   public TilingTask duplicate(
-      String taskId, String jobId, String parcelId, String parcelContentId) {
+      String taskId,
+      String jobId,
+      String parcelId,
+      String parcelContentId,
+      boolean hasSameStatuses,
+      boolean hasSameTile) {
     return TilingTask.builder()
         .id(taskId)
         .jobId(jobId)
@@ -81,11 +86,14 @@ public class TilingTask extends Task implements Serializable {
             parcels == null
                 ? null
                 : parcels.stream()
-                    .map(parcel -> parcel.duplicate(parcelId, parcelContentId))
+                    .map(parcel -> parcel.duplicate(parcelId, parcelContentId, hasSameTile))
                     .toList())
         .statusHistory(
             this.getStatusHistory().stream()
-                .map(status -> status.duplicate(randomUUID().toString(), taskId))
+                .map(
+                    status ->
+                        status.duplicate(
+                            hasSameStatuses ? status.getId() : randomUUID().toString(), taskId))
                 .toList())
         .submissionInstant(this.getSubmissionInstant())
         .build();

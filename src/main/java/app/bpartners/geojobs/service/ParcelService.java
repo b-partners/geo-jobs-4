@@ -31,12 +31,17 @@ public class ParcelService {
       List<TilingTask> duplicatedTilingTasks =
           tilingTaskRepository.findAllByJobId(jobId).stream()
               .map(
-                  task ->
-                      task.duplicate(
-                          task.getId(),
-                          task.getJobId(),
-                          task.getParcelId(),
-                          task.getParcelContentId()))
+                  task -> {
+                    boolean hasSameStatuses = true;
+                    boolean hasSameTile = true;
+                    return task.duplicate(
+                        task.getId(),
+                        task.getJobId(),
+                        task.getParcelId(),
+                        task.getParcelContentId(),
+                        hasSameStatuses,
+                        hasSameTile);
+                  })
               .toList();
       return duplicatedTilingTasks.stream()
           .map(

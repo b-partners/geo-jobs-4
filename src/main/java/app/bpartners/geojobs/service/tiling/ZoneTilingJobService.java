@@ -241,8 +241,15 @@ public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> 
                   var newTaskId = randomUUID().toString();
                   var newParcelId = randomUUID().toString();
                   var newParcelContentId = randomUUID().toString();
+                  boolean hasSameStatuses = false;
+                  boolean hasSameTile = false;
                   return task.duplicate(
-                      newTaskId, duplicatedJobId, newParcelId, newParcelContentId);
+                      newTaskId,
+                      duplicatedJobId,
+                      newParcelId,
+                      newParcelContentId,
+                      hasSameStatuses,
+                      hasSameTile);
                 })
             .toList();
     ZoneTilingJob jobToDuplicate = job.duplicate(duplicatedJobId);

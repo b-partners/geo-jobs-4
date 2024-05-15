@@ -1,6 +1,5 @@
 package app.bpartners.geojobs.repository.model;
 
-import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 import static org.hibernate.type.SqlTypes.JSON;
 
@@ -64,12 +63,15 @@ public class ParcelContent implements Serializable {
     return chosenTile;
   }
 
-  public ParcelContent duplicate(String parcelContentId) {
+  public ParcelContent duplicate(String parcelContentId, boolean hasSameTile) {
     return ParcelContent.builder()
         .id(parcelContentId)
-        .tiles(tiles.stream().map(tile -> tile.duplicate(randomUUID().toString())).toList())
+        .tiles(
+            tiles.stream()
+                .map(tile -> tile.duplicate(hasSameTile ? tile.getId() : randomUUID().toString()))
+                .toList())
         .feature(feature)
-        .creationDatetime(now())
+        .creationDatetime(this.creationDatetime)
         .geoServerParameter(geoServerParameter)
         .geoServerUrl(geoServerUrl)
         .tilingStatus(null)

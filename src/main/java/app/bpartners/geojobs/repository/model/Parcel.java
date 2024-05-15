@@ -22,10 +22,10 @@ public class Parcel implements Serializable {
   @JdbcTypeCode(JSON)
   private ParcelContent parcelContent;
 
-  public Parcel duplicate(String parcelId, String parcelContentId) {
+  public Parcel duplicate(String parcelId, String parcelContentId, boolean hasSameTile) {
     return Parcel.builder()
         .id(parcelId)
-        .parcelContent(parcelContent.duplicate(parcelContentId))
+        .parcelContent(parcelContent.duplicate(parcelContentId, hasSameTile))
         .build();
   }
 }
