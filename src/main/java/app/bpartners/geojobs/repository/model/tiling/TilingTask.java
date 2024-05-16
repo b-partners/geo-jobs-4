@@ -89,12 +89,11 @@ public class TilingTask extends Task implements Serializable {
                     .map(parcel -> parcel.duplicate(parcelId, parcelContentId, hasSameTile))
                     .toList())
         .statusHistory(
-            this.getStatusHistory().stream()
-                .map(
-                    status ->
-                        status.duplicate(
-                            hasSameStatuses ? status.getId() : randomUUID().toString(), taskId))
-                .toList())
+            List.of(
+                this.getStatus()
+                    .duplicate(
+                        hasSameStatuses ? this.getStatus().getId() : randomUUID().toString(),
+                        taskId)))
         .submissionInstant(this.getSubmissionInstant())
         .build();
   }
