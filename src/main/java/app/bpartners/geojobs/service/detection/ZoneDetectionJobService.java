@@ -28,6 +28,7 @@ import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import app.bpartners.geojobs.service.annotator.AnnotationService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,7 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
   private final HumanDetectionJobRepository humanDetectionJobRepository;
   private final AnnotationService annotationService;
   private final ZoneDetectionJobRepository zoneDetectionJobRepository;
+  private final TileDetectionTaskRepository tileDetectionTaskRepository;
 
   public ZoneDetectionJobService(
       JpaRepository<ZoneDetectionJob, String> repository,
@@ -55,7 +57,8 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
       StatusMapper<JobStatus> statusMapper,
       HumanDetectionJobRepository humanDetectionJobRepository,
       AnnotationService annotationService,
-      ZoneDetectionJobRepository zoneDetectionJobRepository) {
+      ZoneDetectionJobRepository zoneDetectionJobRepository,
+      TileDetectionTaskRepository tileDetectionTaskRepository) {
     super(repository, jobStatusRepository, taskRepository, eventProducer, ZoneDetectionJob.class);
     this.tilingTaskRepository = tilingTaskRepository;
     this.detectionMapper = detectionMapper;
@@ -64,6 +67,7 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
     this.humanDetectionJobRepository = humanDetectionJobRepository;
     this.annotationService = annotationService;
     this.zoneDetectionJobRepository = zoneDetectionJobRepository;
+    this.tileDetectionTaskRepository = tileDetectionTaskRepository;
   }
 
   @Transactional
@@ -74,21 +78,31 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
             .orElseThrow(
                 () -> new NotFoundException("ZoneDetectionJob(id=" + jobId + ") not found"));
     List<DetectionTask> detectionTasks = taskRepository.findAllByJobId(jobId);
-    /*
-    TODO: set again when PROCESSING UNKNOWN must not be retried
-    if (!detectionTasks.stream()
-        .allMatch(task -> task.getStatus().getProgression().equals(FINISHED))) {
-      throw new BadRequestException("Only job with all finished tasks can be retry");
-    }*/
-    List<DetectionTask> unfinishedTasks =
-        detectionTasks.stream()
-            .filter(
-                task -> {
-                  TaskStatus taskStatus = task.getStatus();
-                  return !(taskStatus.getProgression().equals(FINISHED)
-                      && taskStatus.getHealth().equals(SUCCEEDED));
-                })
-            .toList();
+
+    List<DetectionTask> unfinishedTasks = new ArrayList<>();
+    List<DetectionTask> finishedWithBadStatus = new ArrayList<>();
+    detectionTasks.forEach(
+        task -> {
+          var tileDetectionTasks = tileDetectionTaskRepository.findAllByParentTaskId(task.getId());
+          boolean computedStatusIsSucceeded =
+              tileDetectionTasks.stream()
+                  .allMatch(
+                      tileDetectionTask ->
+                          tileDetectionTask.getStatus().getProgression().equals(FINISHED)
+                              && tileDetectionTask.getStatus().getHealth().equals(SUCCEEDED));
+          if (!computedStatusIsSucceeded) unfinishedTasks.add(task);
+          var taskStatus = task.getStatus();
+          boolean savedStatusIsSucceeded =
+              taskStatus.getProgression().equals(FINISHED)
+                  && taskStatus.getHealth().equals(SUCCEEDED);
+          if (computedStatusIsSucceeded && !savedStatusIsSucceeded) finishedWithBadStatus.add(task);
+        });
+
+    var optionalFinishedJob = computeFromDetectionBadStatuses(finishedWithBadStatus, job);
+    if (optionalFinishedJob.isPresent()) {
+      return optionalFinishedJob.get();
+    }
+
     if (unfinishedTasks.isEmpty()) {
       throw new BadRequestException(
           "All tilling tasks of job(id=" + jobId + ") are already SUCCEEDED");
@@ -123,6 +137,33 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
             .creationDatetime(now())
             .build());
     return repository.save(job);
+  }
+
+  private Optional<ZoneDetectionJob> computeFromDetectionBadStatuses(
+      List<DetectionTask> finishedWithBadStatus, ZoneDetectionJob initialJob) {
+    if (finishedWithBadStatus.isEmpty()) return Optional.empty();
+    finishedWithBadStatus.forEach(
+        task -> {
+          List<TaskStatus> newStatus = new ArrayList<>(task.getStatusHistory());
+          newStatus.add(
+              TaskStatus.builder()
+                  .id(randomUUID().toString())
+                  .taskId(task.getId())
+                  .jobType(DETECTION)
+                  .progression(FINISHED)
+                  .health(SUCCEEDED)
+                  .creationDatetime(now())
+                  .build());
+          task.setStatusHistory(newStatus);
+          taskRepository.save(task);
+        });
+    // This method recompute job new status and send StatusChanged event
+    ZoneDetectionJob newFinishedJob = this.recomputeStatus(initialJob);
+    if (newFinishedJob.getStatus().getProgression().equals(FINISHED)
+        && newFinishedJob.getStatus().getHealth().equals(SUCCEEDED)) {
+      return Optional.of(newFinishedJob);
+    }
+    return Optional.empty();
   }
 
   public GeoJsonsUrl getGeoJsonsUrl(String jobId) {

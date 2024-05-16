@@ -1,13 +1,14 @@
 package app.bpartners.geojobs.endpoint.rest.controller;
 
+import static app.bpartners.geojobs.endpoint.rest.model.SuccessStatus.NOT_SUCCEEDED;
+import static app.bpartners.geojobs.endpoint.rest.model.SuccessStatus.SUCCEEDED;
 import static java.util.stream.Collectors.toList;
 
+import app.bpartners.geojobs.endpoint.rest.controller.mapper.TaskStatisticMapper;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.TilingTaskMapper;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.ZoneTilingJobMapper;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.ZoomMapper;
-import app.bpartners.geojobs.endpoint.rest.model.CreateZoneTilingJob;
-import app.bpartners.geojobs.endpoint.rest.model.Parcel;
-import app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob;
+import app.bpartners.geojobs.endpoint.rest.model.*;
 import app.bpartners.geojobs.model.BoundedPageSize;
 import app.bpartners.geojobs.model.PageFromOne;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
@@ -29,12 +30,35 @@ public class ZoneTilingController {
   private final ZoneTilingJobMapper mapper;
   private final ZoomMapper zoomMapper;
   private final TilingTaskMapper tilingTaskMapper;
+  private final TaskStatisticMapper taskStatisticMapper;
+
+  @GetMapping("/tilingJobs/{id}/taskStatistics")
+  public TaskStatistic getTilingTaskStatistics(@PathVariable String id) {
+    return taskStatisticMapper.toRest(service.computeTaskStatistics(id));
+  }
 
   @PostMapping("/tilingJobs")
   public ZoneTilingJob tileZone(@RequestBody CreateZoneTilingJob createJob) {
     var job = mapper.toDomain(createJob);
     var tilingTasks = getTilingTasks(createJob, job.getId());
     return mapper.toRest(service.create(job, tilingTasks), tilingTasks);
+  }
+
+  @PostMapping("/tilingJobs/{id}/taskFiltering")
+  public List<FilteredTilingJob> filterTilingTasks(@PathVariable String id) {
+    var filteredTilingJob = service.dispatchTasksBySuccessStatus(id);
+    return List.of(
+        new FilteredTilingJob()
+            .status(SUCCEEDED)
+            .job(mapper.toRest(filteredTilingJob.getSucceededJob(), List.of())),
+        new FilteredTilingJob()
+            .status(NOT_SUCCEEDED)
+            .job(mapper.toRest(filteredTilingJob.getNotSucceededJob(), List.of())));
+  }
+
+  @PostMapping("/tilingJobs/{id}/duplications")
+  public ZoneTilingJob duplicateTilingJob(@PathVariable String id) {
+    return mapper.toRest(service.duplicate(id), List.of());
   }
 
   @PutMapping("/tilingJobs/{id}/retry")

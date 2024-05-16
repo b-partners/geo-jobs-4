@@ -26,4 +26,27 @@ public class ZoneTilingJob extends Job {
   public Job semanticClone() {
     return this.toBuilder().statusHistory(new ArrayList<>(getStatusHistory())).build();
   }
+
+  public ZoneTilingJob duplicate(String jobId) {
+    return ZoneTilingJob.builder()
+        .id(jobId)
+        .zoneName(this.zoneName)
+        .emailReceiver(this.emailReceiver)
+        .statusHistory(this.getStatusHistory())
+        .submissionInstant(this.getSubmissionInstant())
+        .build();
+  }
+
+  public String describe() {
+    return "ZoneTilingJob{"
+        + "id='"
+        + id
+        + '\''
+        + ", zoneName='"
+        + zoneName
+        + '\''
+        + ", submissionInstant="
+        + submissionInstant
+        + '}';
+  }
 }

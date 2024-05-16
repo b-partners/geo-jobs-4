@@ -38,4 +38,16 @@ public class TaskStatus extends Status implements Serializable {
         .creationDatetime(status.getCreationDatetime())
         .build();
   }
+
+  public TaskStatus duplicate(String id, String taskId) {
+    return TaskStatus.builder()
+        .id(id)
+        .taskId(taskId)
+        .jobType(this.getJobType())
+        .progression(this.getProgression())
+        .health(this.getHealth())
+        .message(this.getMessage())
+        .creationDatetime(this.getCreationDatetime())
+        .build();
+  }
 }
