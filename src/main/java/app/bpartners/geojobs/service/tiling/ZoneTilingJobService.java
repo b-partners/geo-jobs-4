@@ -22,6 +22,7 @@ import app.bpartners.geojobs.job.repository.TaskRepository;
 import app.bpartners.geojobs.job.service.JobService;
 import app.bpartners.geojobs.model.exception.BadRequestException;
 import app.bpartners.geojobs.model.exception.NotFoundException;
+import app.bpartners.geojobs.repository.model.FilteredTilingJob;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
 import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import app.bpartners.geojobs.service.detection.ZoneDetectionJobService;
@@ -37,19 +38,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> {
   private final ZoneDetectionJobService detectionJobService;
+  private final TilingFilteredMailer tilingFilteredMailer;
 
   public ZoneTilingJobService(
       JpaRepository<ZoneTilingJob, String> repository,
       JobStatusRepository jobStatusRepository,
       TaskRepository<TilingTask> taskRepository,
       EventProducer eventProducer,
-      ZoneDetectionJobService detectionJobService) {
+      ZoneDetectionJobService detectionJobService,
+      TilingFilteredMailer tilingFilteredMailer) {
     super(repository, jobStatusRepository, taskRepository, eventProducer, ZoneTilingJob.class);
     this.detectionJobService = detectionJobService;
+    this.tilingFilteredMailer = tilingFilteredMailer;
   }
 
   @Transactional
-  public List<ZoneTilingJob> dispatchTasksBySuccessStatus(String jobId) {
+  public FilteredTilingJob dispatchTasksBySuccessStatus(String jobId) {
     ZoneTilingJob job = getZoneTilingJob(jobId);
     if (job.isSucceeded()) {
       throw new BadRequestException(
@@ -88,7 +92,10 @@ public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> 
                 .health(UNKNOWN)
                 .creationDatetime(now())
                 .build());
-    return List.of(succeededJob, notSucceededJob);
+    FilteredTilingJob filteredTilingJob =
+        new FilteredTilingJob(jobId, succeededJob, notSucceededJob);
+    tilingFilteredMailer.accept(filteredTilingJob);
+    return filteredTilingJob;
   }
 
   @Transactional

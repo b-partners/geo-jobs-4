@@ -46,13 +46,14 @@ public class ZoneTilingController {
 
   @PostMapping("/tilingJobs/{id}/taskFiltering")
   public List<FilteredTilingJob> filterTilingTasks(@PathVariable String id) {
-    return service.dispatchTasksBySuccessStatus(id).stream()
-        .map(
-            job ->
-                new FilteredTilingJob()
-                    .status(job.isSucceeded() ? SUCCEEDED : NOT_SUCCEEDED)
-                    .job(mapper.toRest(job, List.of())))
-        .toList();
+    var filteredTilingJob = service.dispatchTasksBySuccessStatus(id);
+    return List.of(
+        new FilteredTilingJob()
+            .status(SUCCEEDED)
+            .job(mapper.toRest(filteredTilingJob.getSucceededJob(), List.of())),
+        new FilteredTilingJob()
+            .status(NOT_SUCCEEDED)
+            .job(mapper.toRest(filteredTilingJob.getNotSucceededJob(), List.of())));
   }
 
   @PostMapping("/tilingJobs/{id}/duplications")

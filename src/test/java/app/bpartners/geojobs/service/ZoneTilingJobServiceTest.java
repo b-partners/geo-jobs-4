@@ -20,6 +20,7 @@ import app.bpartners.geojobs.job.repository.JobStatusRepository;
 import app.bpartners.geojobs.job.repository.TaskRepository;
 import app.bpartners.geojobs.model.exception.BadRequestException;
 import app.bpartners.geojobs.model.exception.NotFoundException;
+import app.bpartners.geojobs.repository.model.FilteredTilingJob;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
 import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import app.bpartners.geojobs.service.detection.ZoneDetectionJobService;
@@ -53,7 +54,8 @@ public class ZoneTilingJobServiceTest {
           jobStatusRepositoryMock,
           taskRepositoryMock,
           eventProducerMock,
-          detectionJobServiceMock);
+          detectionJobServiceMock,
+          mock());
 
   @Test
   void dispatch_task_by_success_status_ko() {
@@ -107,19 +109,10 @@ public class ZoneTilingJobServiceTest {
                 taskWithStatus(FINISHED, FAILED),
                 taskWithStatus(PROCESSING, UNKNOWN)));
 
-    List<ZoneTilingJob> filteredZoneTilingJobs = subject.dispatchTasksBySuccessStatus(JOB_4_ID);
+    FilteredTilingJob filteredZoneTilingJobs = subject.dispatchTasksBySuccessStatus(JOB_4_ID);
 
-    var succeededJob =
-        filteredZoneTilingJobs.stream()
-            .filter(ZoneTilingJob::isSucceeded)
-            .findFirst()
-            .orElseThrow();
-    var notSucceededJob =
-        filteredZoneTilingJobs.stream()
-            .filter(task -> !task.isSucceeded())
-            .findFirst()
-            .orElseThrow();
-    assertEquals(2, filteredZoneTilingJobs.size());
+    var succeededJob = filteredZoneTilingJobs.getSucceededJob();
+    var notSucceededJob = filteredZoneTilingJobs.getNotSucceededJob();
     assertEquals(FINISHED, succeededJob.getStatus().getProgression());
     assertEquals(SUCCEEDED, succeededJob.getStatus().getHealth());
     assertEquals(PENDING, notSucceededJob.getStatus().getProgression());
