@@ -36,4 +36,17 @@ public class ZoneTilingJob extends Job {
         .submissionInstant(this.getSubmissionInstant())
         .build();
   }
+
+  public String describe() {
+    return "ZoneTilingJob{"
+        + "id='"
+        + id
+        + '\''
+        + ", zoneName='"
+        + zoneName
+        + '\''
+        + ", submissionInstant="
+        + submissionInstant
+        + '}';
+  }
 }
