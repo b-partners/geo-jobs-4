@@ -5,7 +5,7 @@ aurora_min_capacity: 16
 aurora_scale_point: 60
 aurora_sleep: 900
 aws_account_id: 'null'
-cli_version: 12.7.1
+cli_version: 12.8.1
 codeartifact_domain_name: 'null'
 codeartifact_repository_name: 'null'
 custom_java_deps: poja-custom-java-deps.txt
@@ -14,7 +14,7 @@ custom_java_repositories: poja-custom-java-repositories.txt
 database_non_root_password: /geo-jobs/${Env}/db/user/password
 database_non_root_username: /geo-jobs/${Env}/db/user/username
 frontal_memory: 512
-frontal_reserved_concurrent_executions_nb: 250
+frontal_reserved_concurrent_executions_nb: null
 jacoco_min_coverage: '0.7'
 java_facade_it: FacadeIT
 package_full_name: app.bpartners.geojobs
@@ -30,7 +30,7 @@ ssm_subnet2_id: /bpartners-imagery/private/subnet2/id
 ts_client_api_url_env_var_name: ''
 ts_client_default_openapi_server_url: ''
 with_codeql: 'true'
-with_database: postgres
+with_database: aurora-postgres
 with_gen_clients: 'true'
 with_own_vpc: 'true'
 with_publish_to_npm_registry: 'false'
@@ -40,4 +40,4 @@ with_sonar: 'false'
 with_swagger_ui: 'false'
 worker_batch: 1
 worker_memory: 512
-worker_reserved_concurrent_executions_nb: null
+worker_reserved_concurrent_executions_nb: 250
