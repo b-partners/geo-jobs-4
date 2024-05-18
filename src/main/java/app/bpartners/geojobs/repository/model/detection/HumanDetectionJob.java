@@ -20,7 +20,7 @@ public class HumanDetectionJob {
   @JoinColumn(referencedColumnName = "id")
   private String zoneDetectionJobId;
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = EAGER)
+  @OneToMany(fetch = EAGER)
   @JoinColumn(name = "human_detection_job_id")
   private List<DetectedTile> detectedTiles;
 
