@@ -3,6 +3,8 @@ package app.bpartners.geojobs.service.annotator;
 import static app.bpartners.gen.annotator.endpoint.rest.model.JobStatus.*;
 import static app.bpartners.gen.annotator.endpoint.rest.model.JobType.REVIEWING;
 import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
+import static app.bpartners.geojobs.repository.model.detection.DetectableType.POOL;
+import static java.util.UUID.randomUUID;
 
 import app.bpartners.gen.annotator.endpoint.rest.api.AdminApi;
 import app.bpartners.gen.annotator.endpoint.rest.api.JobsApi;
@@ -12,9 +14,8 @@ import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.CreateAnnotatedTaskExtracted;
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.repository.DetectableObjectConfigurationRepository;
-import app.bpartners.geojobs.repository.model.detection.DetectableObjectConfiguration;
-import app.bpartners.geojobs.repository.model.detection.DetectedTile;
-import app.bpartners.geojobs.repository.model.detection.HumanDetectionJob;
+import app.bpartners.geojobs.repository.ZoneDetectionJobRepository;
+import app.bpartners.geojobs.repository.model.detection.*;
 import java.time.Instant;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -25,12 +26,14 @@ import org.springframework.stereotype.Service;
 public class AnnotationService {
   public static final int DEFAULT_IMAGES_HEIGHT = 1024;
   public static final int DEFAULT_IMAGES_WIDTH = 1024;
+  public static final double DEFAULT_CONFIDENCE = 1.0;
   private final JobsApi jobsApi;
   private final TaskExtractor taskExtractor;
   private final LabelConverter labelConverter;
   private final LabelExtractor labelExtractor;
   private final AnnotatorUserInfoGetter annotatorUserInfoGetter;
   private final DetectableObjectConfigurationRepository detectableObjectRepository;
+  private final ZoneDetectionJobRepository zoneDetectionJobRepository;
   private final BucketComponent bucketComponent;
   private final EventProducer eventProducer;
   private final AdminApi adminApi;
@@ -42,6 +45,7 @@ public class AnnotationService {
       LabelExtractor labelExtractor,
       AnnotatorUserInfoGetter annotatorUserInfoGetter,
       DetectableObjectConfigurationRepository detectableObjectRepository,
+      ZoneDetectionJobRepository zoneDetectionJobRepository,
       BucketComponent bucketComponent,
       EventProducer eventProducer) {
     this.jobsApi = new JobsApi(annotatorApiConf.newApiClientWithApiKey());
@@ -51,6 +55,7 @@ public class AnnotationService {
     this.labelExtractor = labelExtractor;
     this.annotatorUserInfoGetter = annotatorUserInfoGetter;
     this.detectableObjectRepository = detectableObjectRepository;
+    this.zoneDetectionJobRepository = zoneDetectionJobRepository;
     this.bucketComponent = bucketComponent;
     this.eventProducer = eventProducer;
   }
@@ -72,9 +77,24 @@ public class AnnotationService {
         inDoubtTiles.size(),
         inDoubtTiles.stream().map(DetectedTile::describe).toList());
     String annotationJobId = humanDetectionJob.getAnnotationJobId();
+    String zoneDetectionJobId = humanDetectionJob.getZoneDetectionJobId();
     List<DetectableObjectConfiguration> detectableObjects =
-        detectableObjectRepository.findAllByDetectionJobId(
-            humanDetectionJob.getZoneDetectionJobId());
+        detectableObjectRepository.findAllByDetectionJobId(zoneDetectionJobId);
+    if (detectableObjects.isEmpty()) {
+      // TODO: switch dynamically default zones values
+      var zoneDetectionJob = zoneDetectionJobRepository.findById(zoneDetectionJobId).orElseThrow();
+      if (zoneDetectionJob.getZoneName().equals("cannes")) {
+        DetectableObjectConfiguration newObjectConf =
+            DetectableObjectConfiguration.builder()
+                .objectType(POOL)
+                .confidence(DEFAULT_CONFIDENCE)
+                .id(randomUUID().toString())
+                .detectionJobId(zoneDetectionJobId)
+                .build();
+        var savedNewConf = detectableObjectRepository.save(newObjectConf);
+        detectableObjects.add(savedNewConf);
+      }
+    }
     List<Label> expectedLabels =
         detectableObjects.stream()
             .map(object -> labelConverter.apply(object.getObjectType()))

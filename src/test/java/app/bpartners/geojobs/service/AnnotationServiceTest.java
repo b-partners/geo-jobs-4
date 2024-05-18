@@ -69,6 +69,7 @@ public class AnnotationServiceTest {
             mock(),
             detectableObjectRepositoryMock,
             mock(),
+            mock(),
             eventProducerMock);
     var jobsApi = jobsApiMockedConstruction.constructed().getFirst();
     when(jobsApi.saveJob(any(), any())).thenReturn(new Job().id("annotatorJobId"));

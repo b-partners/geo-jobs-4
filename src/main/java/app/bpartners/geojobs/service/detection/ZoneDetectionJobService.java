@@ -29,6 +29,7 @@ import app.bpartners.geojobs.service.annotator.AnnotationService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -188,17 +189,43 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
 
   public ZoneDetectionJob checkHumanDetectionJobStatus(String jobId) {
     var humanZDJ = getHumanZdjFromZdjId(jobId);
-    var humanDetectionJob =
-        humanDetectionJobRepository.findByZoneDetectionJobId(humanZDJ.getId()).orElse(null);
-    if (humanDetectionJob == null) return humanZDJ;
-    var annotationJobStatus =
-        annotationService.getAnnotationJobById(humanDetectionJob.getAnnotationJobId()).getStatus();
+    var humanDetectionJobs = humanDetectionJobRepository.findByZoneDetectionJobId(humanZDJ.getId());
+    if (humanDetectionJobs.isEmpty()) return humanZDJ;
+
+    var firstHumanDetectionJob = humanDetectionJobs.getFirst();
+    var lastHumanDetectionJob = humanDetectionJobs.getLast();
+    var firstAnnotationJobStatus =
+        annotationService
+            .getAnnotationJobById(firstHumanDetectionJob.getAnnotationJobId())
+            .getStatus();
+    Status.ProgressionStatus firstProgressionStatus =
+        detectionMapper.getProgressionStatus(firstAnnotationJobStatus);
+    Status.HealthStatus firstHealthStatus =
+        detectionMapper.getHealthStatus(firstAnnotationJobStatus);
+    var lastAnnotationJobStatus =
+        annotationService
+            .getAnnotationJobById(lastHumanDetectionJob.getAnnotationJobId())
+            .getStatus();
+    Status.ProgressionStatus lastProgressionStatus =
+        detectionMapper.getProgressionStatus(lastAnnotationJobStatus);
+    Status.HealthStatus lastHealthStatus = detectionMapper.getHealthStatus(lastAnnotationJobStatus);
+
+    Status.ProgressionStatus humanZDJProgression;
+    Status.HealthStatus humanZDJHealth;
+    if (firstProgressionStatus.equals(lastProgressionStatus)
+        && firstHealthStatus.equals(lastHealthStatus)) {
+      humanZDJProgression = firstProgressionStatus;
+      humanZDJHealth = firstHealthStatus;
+    } else {
+      humanZDJProgression = PENDING; // TODO: check when processing
+      humanZDJHealth = UNKNOWN;
+    }
 
     humanZDJ.hasNewStatus(
         Status.builder()
             .id(randomUUID().toString())
-            .progression(detectionMapper.getProgressionStatus(annotationJobStatus))
-            .health(detectionMapper.getHealthStatus(annotationJobStatus))
+            .progression(humanZDJProgression)
+            .health(humanZDJHealth)
             .creationDatetime(now())
             .build());
     return repository.save(humanZDJ);
@@ -238,9 +265,18 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
 
   @Transactional
   public ZoneDetectionJob fireTasks(
-      String jobId, List<DetectableObjectConfiguration> objectConfigurations) {
+      String jobId, List<DetectableObjectConfiguration> objectConfigurationsFromMachineZDJ) {
     var job = findById(jobId);
-    objectConfigurationRepository.saveAll(objectConfigurations);
+    var humanZDJ = this.getHumanZdjFromZdjId(jobId);
+    var humanZDJId = humanZDJ.getId();
+    var objectConfigurationsFromHumanZDJ =
+        objectConfigurationsFromMachineZDJ.stream()
+            .map(objectConf -> objectConf.duplicate(randomUUID().toString(), humanZDJId))
+            .toList();
+    objectConfigurationRepository.saveAll(
+        Stream.of(objectConfigurationsFromMachineZDJ, objectConfigurationsFromHumanZDJ)
+            .flatMap(List::stream)
+            .toList());
     getTasks(job).forEach(task -> eventProducer.accept(List.of(new DetectionTaskCreated(task))));
     return job;
   }
@@ -282,10 +318,11 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
                   detectionTask.setStatusHistory(
                       List.of(
                           TaskStatus.builder()
+                              .id(randomUUID().toString())
+                              .taskId(generatedTaskId)
                               .health(UNKNOWN)
                               .progression(PENDING)
                               .creationDatetime(now())
-                              .taskId(generatedTaskId)
                               .build()));
                   detectionTask.setSubmissionInstant(now());
                   return detectionTask;

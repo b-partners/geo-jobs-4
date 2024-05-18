@@ -31,4 +31,13 @@ public class DetectableObjectConfiguration {
   private DetectableType objectType;
 
   private Double confidence;
+
+  public DetectableObjectConfiguration duplicate(String id, String detectionJobId) {
+    return DetectableObjectConfiguration.builder()
+        .id(id)
+        .detectionJobId(detectionJobId)
+        .objectType(this.getObjectType())
+        .confidence(this.confidence)
+        .build();
+  }
 }
