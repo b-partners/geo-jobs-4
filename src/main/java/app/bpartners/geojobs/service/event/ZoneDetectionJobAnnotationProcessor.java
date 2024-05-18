@@ -46,6 +46,7 @@ public class ZoneDetectionJobAnnotationProcessor {
     List<DetectedTile> tilesWithoutObject =
         detectedTiles.stream()
             .filter(detectedTile -> detectedTile.getDetectedObjects().isEmpty())
+            .peek(detectedTile -> detectedTile.setHumanDetectionJobId(inDoubtHumanDetectionJobId))
             .toList();
     if (inDoubtTiles.isEmpty() && !tilesWithoutObject.isEmpty()) {
       log.error(
