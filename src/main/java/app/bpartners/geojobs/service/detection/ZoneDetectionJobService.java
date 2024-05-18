@@ -29,6 +29,7 @@ import app.bpartners.geojobs.service.annotator.AnnotationService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -264,9 +265,18 @@ public class ZoneDetectionJobService extends JobService<DetectionTask, ZoneDetec
 
   @Transactional
   public ZoneDetectionJob fireTasks(
-      String jobId, List<DetectableObjectConfiguration> objectConfigurations) {
+      String jobId, List<DetectableObjectConfiguration> objectConfigurationsFromMachineZDJ) {
     var job = findById(jobId);
-    objectConfigurationRepository.saveAll(objectConfigurations);
+    var humanZDJ = this.getHumanZdjFromZdjId(jobId);
+    var humanZDJId = humanZDJ.getId();
+    var objectConfigurationsFromHumanZDJ =
+        objectConfigurationsFromMachineZDJ.stream()
+            .map(objectConf -> objectConf.duplicate(randomUUID().toString(), humanZDJId))
+            .toList();
+    objectConfigurationRepository.saveAll(
+        Stream.of(objectConfigurationsFromMachineZDJ, objectConfigurationsFromHumanZDJ)
+            .flatMap(List::stream)
+            .toList());
     getTasks(job).forEach(task -> eventProducer.accept(List.of(new DetectionTaskCreated(task))));
     return job;
   }

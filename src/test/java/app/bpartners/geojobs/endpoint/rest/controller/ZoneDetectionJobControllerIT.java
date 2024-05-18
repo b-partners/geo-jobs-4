@@ -90,7 +90,13 @@ public class ZoneDetectionJobControllerIT extends FacadeIT {
   @NotNull
   private static List<app.bpartners.geojobs.repository.model.detection.ZoneDetectionJob>
       someDetectionJobs() {
-    return List.of(aZDJ(JOB1_ID, randomUUID().toString()), aZDJ(JOB2_ID, randomUUID().toString()));
+    String tilingJobId1 = randomUUID().toString();
+    String tilingJobId2 = randomUUID().toString();
+    return List.of(
+        aZDJ(JOB1_ID, tilingJobId1),
+        aZDJ(JOB2_ID, tilingJobId2),
+        aZDJ(randomUUID().toString(), tilingJobId1).toBuilder().detectionType(HUMAN).build(),
+        aZDJ(randomUUID().toString(), tilingJobId2).toBuilder().detectionType(HUMAN).build());
   }
 
   public static DetectionTask someDetectionTask(
@@ -317,7 +323,7 @@ public class ZoneDetectionJobControllerIT extends FacadeIT {
             new PageFromOne(PageFromOne.MIN_PAGE), new BoundedPageSize(BoundedPageSize.MAX_SIZE));
 
     assertNotNull(actual);
-    assertEquals(2, actual.size());
+    assertEquals(4, actual.size());
     assertEquals(expected, actual);
   }
 
