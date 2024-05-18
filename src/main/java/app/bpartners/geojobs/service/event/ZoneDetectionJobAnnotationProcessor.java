@@ -1,9 +1,11 @@
 package app.bpartners.geojobs.service.event;
 
+import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.gen.HumanDetectionJobCreatedFailed;
+import app.bpartners.geojobs.model.exception.ApiException;
 import app.bpartners.geojobs.repository.DetectedTileRepository;
 import app.bpartners.geojobs.repository.HumanDetectionJobRepository;
 import app.bpartners.geojobs.repository.model.detection.DetectedTile;
@@ -82,24 +84,26 @@ public class ZoneDetectionJobAnnotationProcessor {
     try {
       annotationService.createAnnotationJob(savedHumanDetectionJob);
     } catch (Exception e) {
+      log.error("Exception occurred when creating annotationJob {}", e.getMessage());
       eventProducer.accept(
           List.of(
               HumanDetectionJobCreatedFailed.builder()
                   .humanDetectionJobId(savedHumanDetectionJob.getId())
                   .attemptNb(1)
                   .build()));
-      return null;
+      throw new ApiException(SERVER_EXCEPTION, e);
     }
     try {
       annotationService.createAnnotationJob(savedHumanDetectionJobWithoutTile);
     } catch (Exception e) {
+      log.error("Exception occurred when creating annotationJob {}", e.getMessage());
       eventProducer.accept(
           List.of(
               HumanDetectionJobCreatedFailed.builder()
                   .humanDetectionJobId(savedHumanDetectionJobWithoutTile.getId())
                   .attemptNb(1)
                   .build()));
-      return null;
+      throw new ApiException(SERVER_EXCEPTION, e);
     }
     log.info(
         "HumanDetectionJob {} created, annotations sent to bpartners-annotation-api",
