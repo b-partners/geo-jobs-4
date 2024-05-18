@@ -53,9 +53,10 @@ public class ZoneDetectionJobAnnotationProcessor {
     if (inDoubtTiles.isEmpty() && !tilesWithoutObject.isEmpty()) {
       log.error(
           "Any in doubt tiles detected from ZoneDetectionJob(id={})."
-              + " {} tiles without detected objects are still sent.",
+              + " {} tiles without detected objects are still sent, values are [{}]",
           zoneDetectionJobId,
-          tilesWithoutObject.size());
+          tilesWithoutObject.size(),
+          tilesWithoutObject.stream().map(DetectedTile::describe).toList());
     }
     HumanDetectionJob savedHumanDetectionJob =
         humanDetectionJobRepository.save(
@@ -77,6 +78,10 @@ public class ZoneDetectionJobAnnotationProcessor {
     savedHumanDetectionJob.setDetectedTiles(inDoubtTiles); // TODO: check if still necessary
     savedHumanDetectionJobWithoutTile.setDetectedTiles(
         tilesWithoutObject); // TODO: check if still necessary
+    log.info(
+        "[DEBUG] savedHumanZDJWithObjects.size={} and savedHumanZDJWithObjects.size={}",
+        savedHumanDetectionJob.getDetectedTiles().size(),
+        savedHumanDetectionJobWithoutTile.getDetectedTiles().size());
     detectedTileRepository.saveAll(
         Stream.of(inDoubtTiles, tilesWithoutObject)
             .flatMap(List::stream)

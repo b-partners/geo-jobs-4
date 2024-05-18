@@ -81,7 +81,7 @@ public class AnnotationService {
     List<DetectableObjectConfiguration> detectableObjects =
         detectableObjectRepository.findAllByDetectionJobId(zoneDetectionJobId);
     if (detectableObjects.isEmpty()) {
-      //TODO: switch dynamically default zones values
+      // TODO: switch dynamically default zones values
       var zoneDetectionJob = zoneDetectionJobRepository.findById(zoneDetectionJobId).orElseThrow();
       if (zoneDetectionJob.getZoneName().equals("cannes")) {
         DetectableObjectConfiguration newObjectConf =
