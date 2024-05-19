@@ -27,6 +27,7 @@ public class AnnotationService {
   public static final int DEFAULT_IMAGES_HEIGHT = 1024;
   public static final int DEFAULT_IMAGES_WIDTH = 1024;
   public static final double DEFAULT_CONFIDENCE = 1.0;
+  public static final String CANNES_ZONE_NAME = "cannes";
   private final JobsApi jobsApi;
   private final TaskExtractor taskExtractor;
   private final LabelConverter labelConverter;
@@ -83,7 +84,7 @@ public class AnnotationService {
     if (detectableObjects.isEmpty()) {
       // TODO: switch dynamically default zones values
       var zoneDetectionJob = zoneDetectionJobRepository.findById(zoneDetectionJobId).orElseThrow();
-      if (zoneDetectionJob.getZoneName().equals("cannes")) {
+      if (zoneDetectionJob.getZoneName().equals(CANNES_ZONE_NAME)) {
         DetectableObjectConfiguration newObjectConf =
             DetectableObjectConfiguration.builder()
                 .objectType(POOL)
