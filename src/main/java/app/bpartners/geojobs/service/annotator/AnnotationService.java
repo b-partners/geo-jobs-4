@@ -72,7 +72,7 @@ public class AnnotationService {
   }
 
   public void createAnnotationJob(HumanDetectionJob humanDetectionJob)
-      throws app.bpartners.gen.annotator.endpoint.rest.client.ApiException {
+      throws ApiException {
     String crupdateAnnotatedJobFolderPath = null;
     List<DetectedTile> inDoubtTiles = humanDetectionJob.getDetectedTiles();
     log.info(
@@ -106,6 +106,13 @@ public class AnnotationService {
                         .build();
         var savedNewConf = detectableObjectRepository.save(newObjectConf);
         detectableObjects.add(savedNewConf);
+      } else {
+        detectableObjects.add(DetectableObjectConfiguration.builder()
+                .objectType(POOL) //TODO: add UNKNOWN for default
+                .confidence(DEFAULT_CONFIDENCE)
+                .id(randomUUID().toString())
+                .detectionJobId(zoneDetectionJobId)
+                .build());
       }
     }
     List<Label> expectedLabels =
