@@ -3,6 +3,7 @@ package app.bpartners.geojobs.service.annotator;
 import static app.bpartners.gen.annotator.endpoint.rest.model.JobStatus.*;
 import static app.bpartners.gen.annotator.endpoint.rest.model.JobType.REVIEWING;
 import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
+import static app.bpartners.geojobs.repository.model.detection.DetectableType.PATHWAY;
 import static app.bpartners.geojobs.repository.model.detection.DetectableType.POOL;
 import static java.util.UUID.randomUUID;
 
@@ -28,6 +29,7 @@ public class AnnotationService {
   public static final int DEFAULT_IMAGES_WIDTH = 1024;
   public static final double DEFAULT_CONFIDENCE = 1.0;
   public static final String CANNES_ZONE_NAME = "cannes";
+  public static final String CHALON_ZONE_NAME = "chalon";
   private final JobsApi jobsApi;
   private final TaskExtractor taskExtractor;
   private final LabelConverter labelConverter;
@@ -92,6 +94,16 @@ public class AnnotationService {
                 .id(randomUUID().toString())
                 .detectionJobId(zoneDetectionJobId)
                 .build();
+        var savedNewConf = detectableObjectRepository.save(newObjectConf);
+        detectableObjects.add(savedNewConf);
+      } else if (zoneDetectionJob.getZoneName().equals(CHALON_ZONE_NAME)) {
+        DetectableObjectConfiguration newObjectConf =
+                DetectableObjectConfiguration.builder()
+                        .objectType(PATHWAY)
+                        .confidence(DEFAULT_CONFIDENCE)
+                        .id(randomUUID().toString())
+                        .detectionJobId(zoneDetectionJobId)
+                        .build();
         var savedNewConf = detectableObjectRepository.save(newObjectConf);
         detectableObjects.add(savedNewConf);
       }
