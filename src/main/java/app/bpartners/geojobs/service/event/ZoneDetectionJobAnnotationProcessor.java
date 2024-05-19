@@ -1,6 +1,7 @@
 package app.bpartners.geojobs.service.event;
 
 import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
+import static java.time.LocalTime.now;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.endpoint.event.EventProducer;
@@ -13,6 +14,7 @@ import app.bpartners.geojobs.repository.model.detection.HumanDetectionJob;
 import app.bpartners.geojobs.service.annotator.AnnotationService;
 import app.bpartners.geojobs.service.detection.DetectionTaskService;
 import app.bpartners.geojobs.service.detection.ZoneDetectionJobService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Slf4j
 public class ZoneDetectionJobAnnotationProcessor {
+  public static final double MIN_CONFIDENCE_TRUE_POSITIVE = 0.95;
   private final AnnotationService annotationService;
   private final DetectionTaskService detectionTaskService;
   private final DetectedTileRepository detectedTileRepository;
@@ -32,10 +35,12 @@ public class ZoneDetectionJobAnnotationProcessor {
   private final ZoneDetectionJobService zoneDetectionJobService;
 
   public AnnotationJobIds accept(String zoneDetectionJobId) {
-    String humanDetectionJobId = randomUUID().toString();
+    String humanZDJTruePositiveId = randomUUID().toString();
+    String humanZDJFalsePositiveId = randomUUID().toString();
     String inDoubtHumanDetectionJobId = randomUUID().toString();
     String annotationJobWithoutObjectsId = randomUUID().toString();
-    String annotationJobWithObjectsId = randomUUID().toString();
+    String annotationJobWithObjectsIdTruePositive = randomUUID().toString();
+    String annotationJobWithObjectsIdFalsePositive = randomUUID().toString();
 
     var humanJob = zoneDetectionJobService.getHumanZdjFromZdjId(zoneDetectionJobId);
     var humanZDJId = humanJob.getId();
@@ -43,7 +48,7 @@ public class ZoneDetectionJobAnnotationProcessor {
     List<DetectedTile> detectedTiles = detectedTileRepository.findAllByJobId(zoneDetectionJobId);
     List<DetectedTile> inDoubtTiles =
         detectionTaskService.findInDoubtTilesByJobId(zoneDetectionJobId, detectedTiles).stream()
-            .peek(detectedTile -> detectedTile.setHumanDetectionJobId(humanDetectionJobId))
+            .peek(detectedTile -> detectedTile.setHumanDetectionJobId(humanZDJFalsePositiveId))
             .toList();
     List<DetectedTile> tilesWithoutObject =
         detectedTiles.stream()
@@ -58,12 +63,31 @@ public class ZoneDetectionJobAnnotationProcessor {
           tilesWithoutObject.size(),
           tilesWithoutObject.stream().map(DetectedTile::describe).toList());
     }
-    HumanDetectionJob savedHumanDetectionJob =
+    var truePositiveDetectedTiles =
+        inDoubtTiles.stream()
+            .filter(
+                detectedTile ->
+                    detectedTile.getDetectedObjects().stream()
+                        .anyMatch(
+                            tile -> tile.getComputedConfidence() >= MIN_CONFIDENCE_TRUE_POSITIVE))
+            .peek(detectedTile -> detectedTile.setHumanDetectionJobId(humanZDJTruePositiveId))
+            .toList();
+    var falsePositiveTiles = new ArrayList<>(inDoubtTiles);
+    falsePositiveTiles.removeAll(truePositiveDetectedTiles);
+    HumanDetectionJob savedHumanZDJTruePositive =
         humanDetectionJobRepository.save(
             HumanDetectionJob.builder()
-                .id(humanDetectionJobId)
-                .annotationJobId(annotationJobWithObjectsId)
-                .detectedTiles(inDoubtTiles)
+                .id(humanZDJTruePositiveId)
+                .annotationJobId(annotationJobWithObjectsIdTruePositive)
+                .detectedTiles(truePositiveDetectedTiles)
+                .zoneDetectionJobId(humanZDJId)
+                .build());
+    HumanDetectionJob savedHumanZDJFalsePositive =
+        humanDetectionJobRepository.save(
+            HumanDetectionJob.builder()
+                .id(humanZDJFalsePositiveId)
+                .annotationJobId(annotationJobWithObjectsIdFalsePositive)
+                .detectedTiles(falsePositiveTiles)
                 .zoneDetectionJobId(humanZDJId)
                 .build());
     HumanDetectionJob savedHumanDetectionJobWithoutTile =
@@ -75,31 +99,78 @@ public class ZoneDetectionJobAnnotationProcessor {
                 .zoneDetectionJobId(humanZDJId)
                 .build());
 
-    savedHumanDetectionJob.setDetectedTiles(inDoubtTiles); // TODO: check if still necessary
+    savedHumanZDJTruePositive.setDetectedTiles(
+        truePositiveDetectedTiles); // TODO: check if still necessary
+    savedHumanZDJFalsePositive.setDetectedTiles(
+        falsePositiveTiles); // TODO: check if still necessary
     savedHumanDetectionJobWithoutTile.setDetectedTiles(
         tilesWithoutObject); // TODO: check if still necessary
-    log.info(
-        "[DEBUG] savedHumanZDJWithObjects.size={} and savedHumanZDJWithObjects.size={}",
-        savedHumanDetectionJob.getDetectedTiles().size(),
-        savedHumanDetectionJobWithoutTile.getDetectedTiles().size());
+
     detectedTileRepository.saveAll(
-        Stream.of(inDoubtTiles, tilesWithoutObject)
+        Stream.of(truePositiveDetectedTiles, falsePositiveTiles, tilesWithoutObject)
             .flatMap(List::stream)
             .toList()); // TODO: check if still necessary
     try {
-      annotationService.createAnnotationJob(savedHumanDetectionJob);
+      if (!truePositiveDetectedTiles.isEmpty()) {
+        annotationService.createAnnotationJob(
+            savedHumanZDJTruePositive,
+            humanJob.getZoneName()
+                + " - "
+                + truePositiveDetectedTiles.size()
+                + " tiles with potential true positive objects"
+                + " "
+                + now());
+      } else {
+        log.error(
+            "No potential true positive objects found from ZDJ(id=" + zoneDetectionJobId + ")");
+      }
     } catch (Exception e) {
       log.error("Exception occurred when creating annotationJob {}", e.getMessage());
       eventProducer.accept(
           List.of(
               HumanDetectionJobCreatedFailed.builder()
-                  .humanDetectionJobId(savedHumanDetectionJob.getId())
+                  .humanDetectionJobId(savedHumanZDJFalsePositive.getId())
                   .attemptNb(1)
                   .build()));
       throw new ApiException(SERVER_EXCEPTION, e);
     }
     try {
-      annotationService.createAnnotationJob(savedHumanDetectionJobWithoutTile);
+      if (!falsePositiveTiles.isEmpty()) {
+        annotationService.createAnnotationJob(
+            savedHumanZDJFalsePositive,
+            humanJob.getZoneName()
+                + " - "
+                + truePositiveDetectedTiles.size()
+                + " tiles with potential false positive objects"
+                + " "
+                + now());
+      } else {
+        log.error(
+            "No potential false positive objects found from ZDJ(id=" + zoneDetectionJobId + ")");
+      }
+    } catch (Exception e) {
+      log.error("Exception occurred when creating annotationJob {}", e.getMessage());
+      eventProducer.accept(
+          List.of(
+              HumanDetectionJobCreatedFailed.builder()
+                  .humanDetectionJobId(savedHumanZDJFalsePositive.getId())
+                  .attemptNb(1)
+                  .build()));
+      throw new ApiException(SERVER_EXCEPTION, e);
+    }
+    try {
+      if (!tilesWithoutObject.isEmpty()) {
+        annotationService.createAnnotationJob(
+            savedHumanDetectionJobWithoutTile,
+            humanJob.getZoneName()
+                + " - "
+                + truePositiveDetectedTiles.size()
+                + " tiles without objects"
+                + " "
+                + now());
+      } else {
+        log.error("No tiles without objects found from ZDJ(id=" + zoneDetectionJobId + ")");
+      }
     } catch (Exception e) {
       log.error("Exception occurred when creating annotationJob {}", e.getMessage());
       eventProducer.accept(
@@ -112,14 +183,18 @@ public class ZoneDetectionJobAnnotationProcessor {
     }
     log.info(
         "HumanDetectionJob {} created, annotations sent to bpartners-annotation-api",
-        savedHumanDetectionJob);
-    return new AnnotationJobIds(annotationJobWithObjectsId, annotationJobWithoutObjectsId);
+        savedHumanZDJFalsePositive);
+    return new AnnotationJobIds(
+        annotationJobWithObjectsIdTruePositive,
+        annotationJobWithObjectsIdFalsePositive,
+        annotationJobWithoutObjectsId);
   }
 
   @AllArgsConstructor
   @Data
   public static class AnnotationJobIds {
-    private String jobWithDetectedObjectsId;
+    private String jobWithDetectedTruePositiveId;
+    private String jobWithDetectedFalsePositiveId;
     private String jobWithoutDetectedObjectsId;
   }
 }
