@@ -89,9 +89,9 @@ public class AnnotationService {
       if (zoneDetectionJob.getZoneName().equals(CANNES_ZONE_NAME)) {
         DetectableObjectConfiguration newObjectConf =
             DetectableObjectConfiguration.builder()
+                .id(randomUUID().toString())
                 .objectType(POOL)
                 .confidence(DEFAULT_CONFIDENCE)
-                .id(randomUUID().toString())
                 .detectionJobId(zoneDetectionJobId)
                 .build();
         var savedNewConf = detectableObjectRepository.save(newObjectConf);
@@ -99,18 +99,18 @@ public class AnnotationService {
       } else if (zoneDetectionJob.getZoneName().equals(CHALON_ZONE_NAME)) {
         DetectableObjectConfiguration newObjectConf =
                 DetectableObjectConfiguration.builder()
+                        .id(randomUUID().toString())
                         .objectType(PATHWAY)
                         .confidence(DEFAULT_CONFIDENCE)
-                        .id(randomUUID().toString())
                         .detectionJobId(zoneDetectionJobId)
                         .build();
         var savedNewConf = detectableObjectRepository.save(newObjectConf);
         detectableObjects.add(savedNewConf);
       } else {
         detectableObjects.add(DetectableObjectConfiguration.builder()
+                .id(randomUUID().toString())
                 .objectType(POOL) //TODO: add UNKNOWN for default
                 .confidence(DEFAULT_CONFIDENCE)
-                .id(randomUUID().toString())
                 .detectionJobId(zoneDetectionJobId)
                 .build());
       }
