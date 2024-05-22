@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Service
@@ -38,6 +39,7 @@ public class ImportedZoneTilingJobSavedService implements Consumer<ImportedZoneT
   private final TilingTaskRepository tilingTaskRepository;
 
   @Override
+  @Transactional
   public void accept(ImportedZoneTilingJobSaved importedZoneTilingJobSaved) {
     var job = tilingJobService.findById(importedZoneTilingJobSaved.getJobId());
     var bucketPath = importedZoneTilingJobSaved.getBucketPathKey();
