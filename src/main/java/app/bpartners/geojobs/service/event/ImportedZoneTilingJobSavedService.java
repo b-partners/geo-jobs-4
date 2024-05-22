@@ -25,11 +25,13 @@ import java.util.List;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ImportedZoneTilingJobSavedService implements Consumer<ImportedZoneTilingJobSaved> {
   private final BucketCustomizedComponent bucketCustomizedComponent;
   private final ZoneTilingJobService tilingJobService;
@@ -42,12 +44,22 @@ public class ImportedZoneTilingJobSavedService implements Consumer<ImportedZoneT
     var geoServerParameter = importedZoneTilingJobSaved.getGeoServerParameter();
     var geoServerUrlValue = importedZoneTilingJobSaved.getGeoServerUrl();
     var s3Objects = bucketCustomizedComponent.listObjects(bucketPath);
+    log.info("[DEBUG] S3 objects size {}", s3Objects.size());
     var tilingTasks =
         s3Objects.stream()
             .map(s3Object -> getFinishedTasks(s3Object, job, geoServerParameter, geoServerUrlValue))
             .toList();
-    tilingTaskRepository.saveAll(tilingTasks);
-    tilingJobService.recomputeStatus(job);
+    log.info(
+        "[DEBUG] TilingTasks size {}, values {}",
+        tilingTasks.size(),
+        tilingTasks.stream().map(TilingTask::describe).toList());
+    var savedTilingTasks = tilingTaskRepository.saveAll(tilingTasks);
+    log.info(
+        "[DEBUG] Saved TilingTasks size {}, values {}",
+        savedTilingTasks.size(),
+        savedTilingTasks.stream().map(TilingTask::describe).toList());
+    var savedJob = tilingJobService.recomputeStatus(job);
+    log.info("[DEBUG] Saved ZoneTilingJob {}", savedJob);
   }
 
   @SneakyThrows

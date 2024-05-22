@@ -112,4 +112,14 @@ public class TilingTask extends Task implements Serializable {
   public int hashCode() {
     return Objects.hash(parcels, getJobId(), getStatusHistory());
   }
+
+  public String describe() {
+    return "TilingTask(id="
+        + this.getId()
+        + ", tiles.size="
+        + getParcelContent().getTiles().size()
+        + ", status="
+        + getStatus()
+        + ")";
+  }
 }
