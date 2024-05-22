@@ -20,11 +20,11 @@ import app.bpartners.geojobs.repository.model.tiling.Tile;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
 import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import app.bpartners.geojobs.service.tiling.ZoneTilingJobService;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.model.S3Object;
@@ -62,52 +62,55 @@ public class ImportedZoneTilingJobSavedService implements Consumer<ImportedZoneT
     log.info("[DEBUG] Saved ZoneTilingJob {}", savedJob);
   }
 
-  @SneakyThrows
   private TilingTask getFinishedTasks(
       S3Object s3Object,
       ZoneTilingJob job,
       GeoServerParameter geoServerParameter,
       String geoServerUrlValue) {
-    String jobId = job.getId();
-    URL geoServerUrl = new URL(geoServerUrlValue);
-    String taskId = randomUUID().toString();
-    String bucketPathKey = s3Object.key();
-    return TilingTask.builder()
-        .id(taskId)
-        .jobId(jobId)
-        .statusHistory(
-            List.of(
-                TaskStatus.builder()
-                    .id(randomUUID().toString())
-                    .taskId(taskId)
-                    .jobType(TILING)
-                    .health(SUCCEEDED)
-                    .progression(FINISHED)
-                    .creationDatetime(now())
-                    .build()))
-        .submissionInstant(now())
-        .parcels(
-            List.of(
-                Parcel.builder()
-                    .id(randomUUID().toString())
-                    .parcelContent(
-                        ParcelContent.builder()
-                            .id(randomUUID().toString())
-                            .feature(null) // TODO: distinct for each parcels
-                            .creationDatetime(now())
-                            .geoServerParameter(geoServerParameter)
-                            .geoServerUrl(geoServerUrl)
-                            .tiles(
-                                List.of(
-                                    Tile.builder()
-                                        .id(randomUUID().toString())
-                                        .bucketPath(bucketPathKey)
-                                        .coordinates(fromBucketPathKey(bucketPathKey))
-                                        .creationDatetime(now())
-                                        .build()))
-                            .build())
-                    .build()))
-        .build();
+    try {
+      String jobId = job.getId();
+      URL geoServerUrl = new URL(geoServerUrlValue);
+      String taskId = randomUUID().toString();
+      String bucketPathKey = s3Object.key();
+      return TilingTask.builder()
+          .id(taskId)
+          .jobId(jobId)
+          .statusHistory(
+              List.of(
+                  TaskStatus.builder()
+                      .id(randomUUID().toString())
+                      .taskId(taskId)
+                      .jobType(TILING)
+                      .health(SUCCEEDED)
+                      .progression(FINISHED)
+                      .creationDatetime(now())
+                      .build()))
+          .submissionInstant(now())
+          .parcels(
+              List.of(
+                  Parcel.builder()
+                      .id(randomUUID().toString())
+                      .parcelContent(
+                          ParcelContent.builder()
+                              .id(randomUUID().toString())
+                              .feature(null) // TODO: distinct for each parcels
+                              .creationDatetime(now())
+                              .geoServerParameter(geoServerParameter)
+                              .geoServerUrl(geoServerUrl)
+                              .tiles(
+                                  List.of(
+                                      Tile.builder()
+                                          .id(randomUUID().toString())
+                                          .bucketPath(bucketPathKey)
+                                          .coordinates(fromBucketPathKey(bucketPathKey))
+                                          .creationDatetime(now())
+                                          .build()))
+                              .build())
+                      .build()))
+          .build();
+    } catch (MalformedURLException e) {
+      throw new ApiException(SERVER_EXCEPTION, e);
+    }
   }
 
   public TileCoordinates fromBucketPathKey(String bucketPathKey) {
