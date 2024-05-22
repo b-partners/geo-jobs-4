@@ -122,9 +122,12 @@ public class ImportedZoneTilingJobSavedService implements Consumer<ImportedZoneT
           SERVER_EXCEPTION,
           "Unable to convert bucketPathKey " + bucketPathKey + " to TilesCoordinates");
     }
+    String xValue = bucketPathValues[2];
+    String yValue = bucketPathValues[3].split(".jpg")[0];
+    String zValue = bucketPathValues[1];
     return new TileCoordinates()
-        .x(Integer.valueOf(bucketPathValues[2]))
-        .y(Integer.valueOf(bucketPathValues[3]))
-        .z(Integer.valueOf(bucketPathValues[1]));
+        .x(Integer.valueOf(xValue))
+        .y(Integer.valueOf(yValue))
+        .z(Integer.valueOf(zValue));
   }
 }

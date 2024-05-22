@@ -13,12 +13,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -29,6 +24,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @Setter
 @ToString
 @MappedSuperclass
+@EqualsAndHashCode
 public abstract class Job implements Serializable, Statusable<JobStatus> {
   @Id protected String id;
   protected String zoneName;
