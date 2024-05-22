@@ -43,11 +43,8 @@ public class ZoneTilingJobMapper {
 
   public app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob toRest(
       ZoneTilingJob domain, List<TilingTask> tilingTaskList) {
-    var parcel0 =
-        parcelService
-            .getParcelsByJobId(domain.getId())
-            // TODO: only need one
-            .get(0);
+    var parcels = parcelService.getParcelsByJobId(domain.getId());
+    var parcel0 = parcels.isEmpty() ? null : parcels.get(0); // only need one
     var parcelContent = parcel0 == null ? null : parcel0.getParcelContent();
 
     return new app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob()
