@@ -34,7 +34,8 @@ public class ImportedZoneTilingJobSavedServiceTest {
   @Test
   void accept_ok() {
     String jobId = "jobId";
-    String dummyBucketPath = "dummyBucketPath";
+    String dummyBucketName = "dummyBucketName";
+    String dummyBucketPrefix = "dummyBucketPrefix";
     GeoServerParameter geoServerParameter = new GeoServerParameter();
     String dummyGeoServerUrl = "https://dummyGeoServerUrl.com";
     List<S3Object> s3Objects =
@@ -56,11 +57,12 @@ public class ImportedZoneTilingJobSavedServiceTest {
                             .build()))
                 .build());
 
-    when(bucketCustomizedComponentMock.listObjects(dummyBucketPath)).thenReturn(s3Objects);
+    when(bucketCustomizedComponentMock.listObjects(dummyBucketName, dummyBucketPrefix))
+        .thenReturn(s3Objects);
 
     subject.accept(
         new ImportedZoneTilingJobSaved(
-            jobId, dummyBucketPath, geoServerParameter, dummyGeoServerUrl));
+            jobId, dummyBucketName, dummyBucketPrefix, geoServerParameter, dummyGeoServerUrl));
 
     var listCaptor = ArgumentCaptor.forClass(List.class);
     verify(tilingTaskRepositoryMock, times(1)).saveAll(listCaptor.capture());

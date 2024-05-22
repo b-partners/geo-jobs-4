@@ -20,7 +20,7 @@ public class BucketCustomizedComponentIT extends FacadeIT {
   void list_objects_ok() {
     List<S3Object> actual = subject.listObjects("cannes-draft");
 
-    assertEquals(3, actual.size());
+    assertEquals(6, actual.size());
     assertTrue(
         actual.stream()
             .anyMatch(s3Object -> s3Object.key().equals("draft_layer/20/544785/383260.jpg")));
@@ -30,5 +30,41 @@ public class BucketCustomizedComponentIT extends FacadeIT {
     assertTrue(
         actual.stream()
             .anyMatch(s3Object -> s3Object.key().equals("draft_layer/20/544785/383262.jpg")));
+    assertTrue(
+        actual.stream()
+            .anyMatch(s3Object -> s3Object.key().equals("draft_copy/20/544785/383260.jpg")));
+    assertTrue(
+        actual.stream()
+            .anyMatch(s3Object -> s3Object.key().equals("draft_copy/20/544785/383261.jpg")));
+    assertTrue(
+        actual.stream()
+            .anyMatch(s3Object -> s3Object.key().equals("draft_copy/20/544785/383262.jpg")));
+  }
+
+  @Test
+  void list_objects_with_prefix_ok() {
+    List<S3Object> actual = subject.listObjects("cannes-draft", "draft_layer");
+    List<S3Object> actual2 = subject.listObjects("cannes-draft", "draft_copy");
+
+    assertEquals(3, actual.size());
+    assertEquals(3, actual2.size());
+    assertTrue(
+        actual.stream()
+            .anyMatch(s3Object -> s3Object.key().equals("draft_layer/20/544785/383260.jpg")));
+    assertTrue(
+        actual.stream()
+            .anyMatch(s3Object -> s3Object.key().equals("draft_layer/20/544785/383261.jpg")));
+    assertTrue(
+        actual.stream()
+            .anyMatch(s3Object -> s3Object.key().equals("draft_layer/20/544785/383262.jpg")));
+    assertTrue(
+        actual2.stream()
+            .anyMatch(s3Object -> s3Object.key().equals("draft_copy/20/544785/383260.jpg")));
+    assertTrue(
+        actual2.stream()
+            .anyMatch(s3Object -> s3Object.key().equals("draft_copy/20/544785/383261.jpg")));
+    assertTrue(
+        actual2.stream()
+            .anyMatch(s3Object -> s3Object.key().equals("draft_copy/20/544785/383262.jpg")));
   }
 }

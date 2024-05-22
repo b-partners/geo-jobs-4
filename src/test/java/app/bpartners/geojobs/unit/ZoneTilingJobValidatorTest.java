@@ -17,7 +17,8 @@ public class ZoneTilingJobValidatorTest {
             subject.accept(
                 new ImportZoneTilingJob()
                     .createZoneTilingJob(new CreateZoneTilingJob())
-                    .s3BucketPath("dummy")));
+                    .bucketName("dummy")
+                    .bucketPathPrefix("dummy")));
   }
 
   @Test
@@ -26,17 +27,16 @@ public class ZoneTilingJobValidatorTest {
         BadRequestException.class,
         () ->
             subject.accept(
-                new ImportZoneTilingJob().createZoneTilingJob(null).s3BucketPath("dummy")));
+                new ImportZoneTilingJob().createZoneTilingJob(null).bucketName("dummy")));
     Assertions.assertThrows(
         BadRequestException.class,
-        () ->
-            subject.accept(new ImportZoneTilingJob().createZoneTilingJob(null).s3BucketPath(null)));
+        () -> subject.accept(new ImportZoneTilingJob().createZoneTilingJob(null).bucketName(null)));
     Assertions.assertThrows(
         BadRequestException.class,
         () ->
             subject.accept(
                 new ImportZoneTilingJob()
                     .createZoneTilingJob(new CreateZoneTilingJob())
-                    .s3BucketPath(null)));
+                    .bucketName(null)));
   }
 }

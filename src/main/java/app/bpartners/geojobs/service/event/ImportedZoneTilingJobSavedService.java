@@ -42,10 +42,11 @@ public class ImportedZoneTilingJobSavedService implements Consumer<ImportedZoneT
   @Transactional
   public void accept(ImportedZoneTilingJobSaved importedZoneTilingJobSaved) {
     var job = tilingJobService.findById(importedZoneTilingJobSaved.getJobId());
-    var bucketPath = importedZoneTilingJobSaved.getBucketPathKey();
+    var bucketName = importedZoneTilingJobSaved.getBucketName();
+    var bucketPathPrefix = importedZoneTilingJobSaved.getBucketPathPrefix();
     var geoServerParameter = importedZoneTilingJobSaved.getGeoServerParameter();
     var geoServerUrlValue = importedZoneTilingJobSaved.getGeoServerUrl();
-    var s3Objects = bucketCustomizedComponent.listObjects(bucketPath);
+    var s3Objects = bucketCustomizedComponent.listObjects(bucketName, bucketPathPrefix);
     log.info("[DEBUG] S3 objects size {}", s3Objects.size());
     var tilingTasks =
         s3Objects.stream()

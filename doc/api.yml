@@ -508,7 +508,9 @@ components:
         createZoneTilingJob:
           $ref: '#/components/schemas/CreateZoneTilingJob'
         #TODO: must be oneOf but for now, only from S3 bucket is implemented
-        s3BucketPath:
+        bucketName:
+          type: string
+        bucketPathPrefix:
           type: string
     ZoneTilingJob:
       allOf:

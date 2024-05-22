@@ -12,8 +12,11 @@ public class ZoneTilingJobValidator {
     if (rest.getCreateZoneTilingJob() == null) {
       stringBuilder.append("createZoneTilingJob is mandatory. ");
     }
-    if (rest.getS3BucketPath() == null) {
-      stringBuilder.append("s3BucketPath is mandatory. ");
+    if (rest.getBucketName() == null) {
+      stringBuilder.append("bucketName is mandatory. ");
+    }
+    if (rest.getBucketPathPrefix() == null) {
+      stringBuilder.append("bucketPathPrefix is mandatory. ");
     }
     String exceptionMsg = stringBuilder.toString();
     if (!exceptionMsg.isEmpty()) {

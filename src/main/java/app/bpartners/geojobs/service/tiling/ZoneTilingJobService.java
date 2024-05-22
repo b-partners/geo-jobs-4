@@ -56,7 +56,8 @@ public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> 
 
   public ZoneTilingJob importFromBucket(
       ZoneTilingJob job,
-      String bucketPath,
+      String bucketName,
+      String bucketPathPrefix,
       GeoServerParameter geoServerParameter,
       String geoServerUrl) {
     var createdJob = repository.save(job);
@@ -64,7 +65,8 @@ public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> 
         List.of(
             ImportedZoneTilingJobSaved.builder()
                 .jobId(createdJob.getId())
-                .bucketPathKey(bucketPath)
+                .bucketName(bucketName)
+                .bucketPathPrefix(bucketPathPrefix)
                 .geoServerParameter(geoServerParameter)
                 .geoServerUrl(geoServerUrl)
                 .build()));

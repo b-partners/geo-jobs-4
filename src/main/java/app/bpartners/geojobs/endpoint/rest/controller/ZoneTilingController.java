@@ -38,11 +38,14 @@ public class ZoneTilingController {
   public ZoneTilingJob importZTJ(@RequestBody ImportZoneTilingJob importZoneTilingJob) {
     zoneTilingJobValidator.accept(importZoneTilingJob);
     var job = mapper.toDomain(importZoneTilingJob.getCreateZoneTilingJob());
-    var bucketPath = importZoneTilingJob.getS3BucketPath();
+    var bucketName = importZoneTilingJob.getBucketName();
+    var bucketPathPrefix = importZoneTilingJob.getBucketPathPrefix();
     var geoServerParameter = importZoneTilingJob.getCreateZoneTilingJob().getGeoServerParameter();
     var geoServerUrl = importZoneTilingJob.getCreateZoneTilingJob().getGeoServerUrl();
     return mapper.toRest(
-        service.importFromBucket(job, bucketPath, geoServerParameter, geoServerUrl), List.of());
+        service.importFromBucket(
+            job, bucketName, bucketPathPrefix, geoServerParameter, geoServerUrl),
+        List.of());
   }
 
   @GetMapping("/tilingJobs/{id}/taskStatistics")

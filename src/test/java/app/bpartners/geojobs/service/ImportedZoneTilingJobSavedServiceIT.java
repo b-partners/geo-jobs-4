@@ -63,7 +63,8 @@ public class ImportedZoneTilingJobSavedServiceIT extends FacadeIT {
   @Disabled("TODO: run in local only, add AWS credentials and edit EventConf.aws.region")
   @Test
   void accept_ok() {
-    String dummyBucketPath = "cannes-draft";
+    String dummyBucketName = "cannes-draft";
+    String dummyBucketPathPrefix = "draft_layer";
     GeoServerParameter geoServerParameter = new GeoServerParameter();
     String dummyGeoServerUrl = "https://dummyGeoServerUrl.com";
     List<TilingTask> tasksBefore = tilingTaskRepository.findAllByJobId(JOB_ID);
@@ -71,7 +72,7 @@ public class ImportedZoneTilingJobSavedServiceIT extends FacadeIT {
 
     subject.accept(
         new ImportedZoneTilingJobSaved(
-            JOB_ID, dummyBucketPath, geoServerParameter, dummyGeoServerUrl));
+            JOB_ID, dummyBucketName, dummyBucketPathPrefix, geoServerParameter, dummyGeoServerUrl));
 
     List<TilingTask> tasksActual = tilingTaskRepository.findAllByJobId(JOB_ID);
     ZoneTilingJob jobActual = tilingJobRepository.findById(JOB_ID).orElseThrow();

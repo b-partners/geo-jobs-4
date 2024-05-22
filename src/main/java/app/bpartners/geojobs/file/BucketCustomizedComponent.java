@@ -16,4 +16,11 @@ public class BucketCustomizedComponent {
     var s3Client = bucketConf.getS3Client();
     return s3Client.listObjects(ListObjectsRequest.builder().bucket(bucketPath).build()).contents();
   }
+
+  public List<S3Object> listObjects(String bucket, String prefix) {
+    var s3Client = bucketConf.getS3Client();
+    return s3Client
+        .listObjects(ListObjectsRequest.builder().bucket(bucket).prefix(prefix).build())
+        .contents();
+  }
 }

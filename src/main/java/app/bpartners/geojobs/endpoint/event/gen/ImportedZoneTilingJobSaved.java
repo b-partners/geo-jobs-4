@@ -13,7 +13,8 @@ import lombok.*;
 @ToString
 public class ImportedZoneTilingJobSaved {
   private String jobId;
-  private String bucketPathKey;
+  private String bucketName;
+  private String bucketPathPrefix;
   private GeoServerParameter geoServerParameter;
   private String geoServerUrl;
 }
