@@ -3,7 +3,7 @@ package app.bpartners.geojobs.service.detection;
 import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-import app.bpartners.geojobs.file.BucketComponent;
+import app.bpartners.geojobs.file.BucketCustomizedComponent;
 import app.bpartners.geojobs.model.exception.ApiException;
 import app.bpartners.geojobs.model.exception.NotImplementedException;
 import app.bpartners.geojobs.repository.model.TileDetectionTask;
@@ -32,12 +32,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 public class HttpApiTileObjectDetector implements TileObjectDetector {
   private final ObjectMapper om;
-  private final BucketComponent bucketComponent;
+  private final BucketCustomizedComponent bucketComponent;
   private final String tileDetectionRawBaseUrls;
 
   public HttpApiTileObjectDetector(
       ObjectMapper om,
-      BucketComponent bucketComponent,
+      BucketCustomizedComponent bucketComponent,
       @Value("${tile.detection.api.urls}") String tileDetectionRawBaseUrls) {
     this.om = om;
     this.bucketComponent = bucketComponent;
@@ -83,7 +83,7 @@ public class HttpApiTileObjectDetector implements TileObjectDetector {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(APPLICATION_JSON);
 
-    File file = bucketComponent.download(tile.getBucketPath());
+    File file = bucketComponent.download("cannes-qgis-tiles", tile.getBucketPath());
     String base64ImgData = Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(file));
 
     var payload =
