@@ -3,13 +3,12 @@ package app.bpartners.geojobs.file;
 import static java.io.File.createTempFile;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-import software.amazon.awssdk.services.s3.model.S3Object;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.transfer.s3.model.DownloadFileRequest;
 import software.amazon.awssdk.transfer.s3.model.FileDownload;
 
@@ -26,9 +25,21 @@ public class BucketCustomizedComponent {
 
   public List<S3Object> listObjects(String bucket, String prefix) {
     var s3Client = bucketConf.getS3Client();
-    return s3Client
-        .listObjects(ListObjectsRequest.builder().bucket(bucket).prefix(prefix).build())
-        .contents();
+    String continuationToken = null;
+    List<S3Object> allS3Objects = new ArrayList<>();
+    do {
+      ListObjectsV2Request listObjectsV2Request =
+          ListObjectsV2Request.builder()
+              .bucket(bucket)
+              .prefix(prefix)
+              .continuationToken(continuationToken)
+              .build();
+      ListObjectsV2Response listObjectsV2Response = s3Client.listObjectsV2(listObjectsV2Request);
+      allS3Objects.addAll(listObjectsV2Response.contents());
+      continuationToken = listObjectsV2Response.nextContinuationToken();
+    } while (continuationToken != null);
+
+    return allS3Objects;
   }
 
   @SneakyThrows
