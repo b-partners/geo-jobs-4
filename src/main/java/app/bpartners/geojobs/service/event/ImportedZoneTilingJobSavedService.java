@@ -22,6 +22,7 @@ import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import app.bpartners.geojobs.service.tiling.ZoneTilingJobService;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
@@ -46,7 +47,9 @@ public class ImportedZoneTilingJobSavedService implements Consumer<ImportedZoneT
     var bucketPathPrefix = importedZoneTilingJobSaved.getBucketPathPrefix();
     var geoServerParameter = importedZoneTilingJobSaved.getGeoServerParameter();
     var geoServerUrlValue = importedZoneTilingJobSaved.getGeoServerUrl();
-    var s3Objects = bucketCustomizedComponent.listObjects(bucketName, bucketPathPrefix);
+    List<S3Object> s3Objects =
+        getS3Objects(importedZoneTilingJobSaved, bucketName, bucketPathPrefix);
+
     log.info("[DEBUG] S3 objects size {}", s3Objects.size());
     var tilingTasks =
         s3Objects.stream()
@@ -63,6 +66,21 @@ public class ImportedZoneTilingJobSavedService implements Consumer<ImportedZoneT
         savedTilingTasks.stream().map(TilingTask::describe).toList());
     var savedJob = tilingJobService.recomputeStatus(job);
     log.info("[DEBUG] Saved ZoneTilingJob {}", savedJob);
+  }
+
+  private List<S3Object> getS3Objects(
+      ImportedZoneTilingJobSaved importedZoneTilingJobSaved,
+      String bucketName,
+      String bucketPathPrefix) {
+    var defaultS3Objects = bucketCustomizedComponent.listObjects(bucketName, bucketPathPrefix);
+    long startFrom =
+        importedZoneTilingJobSaved.getStartFrom() == null
+            ? 0L
+            : importedZoneTilingJobSaved.getStartFrom();
+    if (startFrom != 0 && defaultS3Objects.size() > startFrom) {
+      return new ArrayList<>(defaultS3Objects.subList((int) startFrom, defaultS3Objects.size()));
+    }
+    return defaultS3Objects;
   }
 
   private TilingTask getFinishedTasks(

@@ -72,6 +72,7 @@ public class ZoneTilingJobServiceTest {
     String bucketName = "bucketName";
     String bucketPathPrefix = "bucketPathPrefix";
     String geoServerUrlDummy = "geoServerUrlDummy";
+    Long startFrom = 0L;
     GeoServerParameter geoServerParameter = new GeoServerParameter();
     ZoneTilingJob job =
         ZoneTilingJob.builder()
@@ -87,10 +88,9 @@ public class ZoneTilingJobServiceTest {
                         .jobId(importedJobId)
                         .build()))
             .build();
-
     ZoneTilingJob actual =
         subject.importFromBucket(
-            job, bucketName, bucketPathPrefix, geoServerParameter, geoServerUrlDummy);
+            job, bucketName, bucketPathPrefix, geoServerParameter, geoServerUrlDummy, startFrom);
 
     var eventCaptor = ArgumentCaptor.forClass(List.class);
     verify(eventProducerMock, times(1)).accept(eventCaptor.capture());
@@ -102,6 +102,7 @@ public class ZoneTilingJobServiceTest {
     assertEquals(geoServerUrlDummy, importedZoneTilingJobSaved.getGeoServerUrl());
     assertEquals(bucketName, importedZoneTilingJobSaved.getBucketName());
     assertEquals(bucketPathPrefix, importedZoneTilingJobSaved.getBucketPathPrefix());
+    assertEquals(startFrom, importedZoneTilingJobSaved.getStartFrom());
     assertEquals(job, actual);
   }
 

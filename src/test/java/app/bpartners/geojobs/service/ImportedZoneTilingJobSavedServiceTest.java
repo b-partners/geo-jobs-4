@@ -33,6 +33,7 @@ public class ImportedZoneTilingJobSavedServiceTest {
 
   @Test
   void accept_ok() {
+    Long startFrom = 0L;
     String jobId = "jobId";
     String dummyBucketName = "dummyBucketName";
     String dummyBucketPrefix = "dummyBucketPrefix";
@@ -62,7 +63,12 @@ public class ImportedZoneTilingJobSavedServiceTest {
 
     subject.accept(
         new ImportedZoneTilingJobSaved(
-            jobId, dummyBucketName, dummyBucketPrefix, geoServerParameter, dummyGeoServerUrl));
+            startFrom,
+            jobId,
+            dummyBucketName,
+            dummyBucketPrefix,
+            geoServerParameter,
+            dummyGeoServerUrl));
 
     var listCaptor = ArgumentCaptor.forClass(List.class);
     verify(tilingTaskRepositoryMock, times(1)).saveAll(listCaptor.capture());
