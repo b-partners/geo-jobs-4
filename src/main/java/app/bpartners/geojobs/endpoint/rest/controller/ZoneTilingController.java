@@ -43,9 +43,10 @@ public class ZoneTilingController {
     var geoServerParameter = importZoneTilingJob.getCreateZoneTilingJob().getGeoServerParameter();
     var geoServerUrl = importZoneTilingJob.getCreateZoneTilingJob().getGeoServerUrl();
     var startFrom = importZoneTilingJob.getStartFrom().longValue();
+    var endAt = importZoneTilingJob.getEndAt().longValue();
     return mapper.toRest(
         service.importFromBucket(
-            job, bucketName, bucketPathPrefix, geoServerParameter, geoServerUrl, startFrom),
+            job, bucketName, bucketPathPrefix, geoServerParameter, geoServerUrl, startFrom, endAt),
         List.of());
   }
 

@@ -514,6 +514,8 @@ components:
           type: string
         startFrom:
           type: number
+        endAt:
+          type: number
     ZoneTilingJob:
       allOf:
         - $ref: "#/components/schemas/CreateZoneTilingJob"

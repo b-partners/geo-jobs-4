@@ -60,12 +60,14 @@ public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> 
       String bucketPathPrefix,
       GeoServerParameter geoServerParameter,
       String geoServerUrl,
-      Long startFrom) {
+      Long startFrom,
+      Long endAt) {
     var createdJob = repository.save(job);
     eventProducer.accept(
         List.of(
             ImportedZoneTilingJobSaved.builder()
                 .startFrom(startFrom)
+                .endAt(endAt)
                 .jobId(createdJob.getId())
                 .bucketName(bucketName)
                 .bucketPathPrefix(bucketPathPrefix)

@@ -73,12 +73,12 @@ public class ImportedZoneTilingJobSavedService implements Consumer<ImportedZoneT
       String bucketName,
       String bucketPathPrefix) {
     var defaultS3Objects = bucketCustomizedComponent.listObjects(bucketName, bucketPathPrefix);
-    long startFrom =
-        importedZoneTilingJobSaved.getStartFrom() == null
-            ? 0L
-            : importedZoneTilingJobSaved.getStartFrom();
-    if (startFrom != 0 && defaultS3Objects.size() > startFrom) {
-      return new ArrayList<>(defaultS3Objects.subList((int) startFrom, defaultS3Objects.size()));
+    var startFromValue = importedZoneTilingJobSaved.getStartFrom();
+    var endAtValue = importedZoneTilingJobSaved.getEndAt();
+    long startFrom = startFromValue == null ? 0L : startFromValue;
+    long endAt = endAtValue == null ? defaultS3Objects.size() : endAtValue;
+    if (defaultS3Objects.size() > startFrom || endAt < defaultS3Objects.size()) {
+      return new ArrayList<>(defaultS3Objects.subList((int) startFrom, (int) endAt));
     }
     return defaultS3Objects;
   }
