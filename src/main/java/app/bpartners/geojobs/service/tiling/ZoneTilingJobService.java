@@ -24,6 +24,7 @@ import app.bpartners.geojobs.job.repository.TaskRepository;
 import app.bpartners.geojobs.job.service.JobService;
 import app.bpartners.geojobs.model.exception.BadRequestException;
 import app.bpartners.geojobs.model.exception.NotFoundException;
+import app.bpartners.geojobs.repository.model.DuplicatedTilingJob;
 import app.bpartners.geojobs.repository.model.FilteredTilingJob;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
 import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
@@ -41,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> {
   private final ZoneDetectionJobService detectionJobService;
   private final TilingFilteredMailer tilingFilteredMailer;
+  private final TilingJobDuplicatedMailer tilingJobDuplicatedMailer;
 
   public ZoneTilingJobService(
       JpaRepository<ZoneTilingJob, String> repository,
@@ -48,10 +50,12 @@ public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> 
       TaskRepository<TilingTask> taskRepository,
       EventProducer eventProducer,
       ZoneDetectionJobService detectionJobService,
-      TilingFilteredMailer tilingFilteredMailer) {
+      TilingFilteredMailer tilingFilteredMailer,
+      TilingJobDuplicatedMailer tilingJobDuplicatedMailer) {
     super(repository, jobStatusRepository, taskRepository, eventProducer, ZoneTilingJob.class);
     this.detectionJobService = detectionJobService;
     this.tilingFilteredMailer = tilingFilteredMailer;
+    this.tilingJobDuplicatedMailer = tilingJobDuplicatedMailer;
   }
 
   public ZoneTilingJob importFromBucket(
@@ -253,11 +257,14 @@ public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> 
   @Transactional
   public ZoneTilingJob duplicate(String jobId) {
     String duplicatedJobId = randomUUID().toString();
-    ZoneTilingJob zoneTilingJob = getZoneTilingJob(jobId);
+    ZoneTilingJob originalJob = getZoneTilingJob(jobId);
     List<TilingTask> tilingTasks = taskRepository.findAllByJobId(jobId);
     boolean saveZDJ = true;
     JobStatus newStatus = null;
-    return duplicateWithNewStatus(duplicatedJobId, zoneTilingJob, tilingTasks, saveZDJ, newStatus);
+    ZoneTilingJob duplicatedJob =
+        duplicateWithNewStatus(duplicatedJobId, originalJob, tilingTasks, saveZDJ, newStatus);
+    tilingJobDuplicatedMailer.accept(new DuplicatedTilingJob(originalJob, duplicatedJob));
+    return duplicatedJob;
   }
 
   public ZoneTilingJob duplicateWithNewStatus(

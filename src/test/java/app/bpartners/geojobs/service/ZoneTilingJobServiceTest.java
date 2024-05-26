@@ -57,6 +57,7 @@ public class ZoneTilingJobServiceTest {
           taskRepositoryMock,
           eventProducerMock,
           detectionJobServiceMock,
+          mock(),
           mock());
 
   @Test

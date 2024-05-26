@@ -9,8 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.only;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import app.bpartners.geojobs.conf.FacadeIT;
 import app.bpartners.geojobs.endpoint.event.EventProducer;
@@ -30,6 +29,7 @@ import app.bpartners.geojobs.repository.model.ParcelContent;
 import app.bpartners.geojobs.repository.model.tiling.Tile;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
 import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
+import app.bpartners.geojobs.service.tiling.TilingJobDuplicatedMailer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -55,6 +55,7 @@ class ZoneTilingJobControllerIT extends FacadeIT {
   @Autowired ObjectMapper om;
   @Autowired ZoneTilingJobMapper tilingJobMapper;
   @Autowired ZoneDetectionJobRepository detectionJobRepository;
+  @MockBean TilingJobDuplicatedMailer tilingJobDuplicatedMailerMock;
 
   @BeforeEach
   void setUp() {
@@ -140,6 +141,7 @@ class ZoneTilingJobControllerIT extends FacadeIT {
         associatedDetectionJobs.stream().anyMatch(job -> job.getDetectionType().equals(HUMAN)));
     assertTrue(
         associatedDetectionJobs.stream().anyMatch(job -> job.getDetectionType().equals(MACHINE)));
+    verify(tilingJobDuplicatedMailerMock, times(1)).accept(any());
     taskRepository.deleteAllById(duplicatedTasks.stream().map(TilingTask::getId).toList());
     zoneTilingJobRepository.deleteById(actual.getId());
   }
