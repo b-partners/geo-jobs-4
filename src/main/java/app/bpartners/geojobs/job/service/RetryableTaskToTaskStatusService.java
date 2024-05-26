@@ -20,15 +20,15 @@ public class RetryableTaskToTaskStatusService<
   private final int maxRetry;
 
   public T_CHILD process(T_CHILD task) {
-    return retry(taskStatusService::process, task, 0);
+    return taskStatusService.process(task);
   }
 
   public T_CHILD succeed(T_CHILD task) {
-    return retry(taskStatusService::succeed, task, 0);
+    return taskStatusService.succeed(task);
   }
 
   public T_CHILD fail(T_CHILD task) {
-    return retry(taskStatusService::fail, task, 0);
+    return taskStatusService.fail(task);
   }
 
   @SneakyThrows
