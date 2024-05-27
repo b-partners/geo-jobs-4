@@ -510,7 +510,9 @@ components:
           type: string
         jobType:
           $ref: '#/components/schemas/JobType'
-        annotationWithObjectJobId:
+        annotationWithObjectTruePositive:
+          type: string
+        annotationWithObjectFalsePositive:
           type: string
         annotationWithoutObjectJobId:
           type: string

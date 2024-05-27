@@ -31,7 +31,8 @@ public class JobAnnotationService {
 
     return new AnnotationJobProcessing()
         .jobId(jobId)
-        .annotationWithObjectJobId(annotationJobIds.getJobWithDetectedObjectsId())
+        .annotationWithObjectTruePositive(annotationJobIds.getJobWithDetectedTruePositiveId())
+        .annotationWithObjectFalsePositive(annotationJobIds.getJobWithDetectedFalsePositiveId())
         .annotationWithoutObjectJobId(annotationJobIds.getJobWithoutDetectedObjectsId())
         .jobType(JobType.DETECTION) // TODO: only DETECTION is handle but must be computed
         .creationDatetime(Instant.now());

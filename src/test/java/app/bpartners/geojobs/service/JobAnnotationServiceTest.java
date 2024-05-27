@@ -42,11 +42,11 @@ public class JobAnnotationServiceTest {
     when(jobAnnotationProcessorMock.accept(DETECTION_JOB_ID))
         .thenReturn(
             new ZoneDetectionJobAnnotationProcessor.AnnotationJobIds(
-                JOB_WITH_DETECTED_OBJECTS_ID, JOB_WITHOUT_DETECTED_OBJECTS_ID));
+                JOB_WITH_DETECTED_OBJECTS_ID, null, JOB_WITHOUT_DETECTED_OBJECTS_ID));
 
     AnnotationJobProcessing actual = subject.processAnnotationJob(DETECTION_JOB_ID);
 
-    assertEquals(JOB_WITH_DETECTED_OBJECTS_ID, actual.getAnnotationWithObjectJobId());
+    assertEquals(JOB_WITH_DETECTED_OBJECTS_ID, actual.getAnnotationWithObjectTruePositive());
     assertEquals(JOB_WITHOUT_DETECTED_OBJECTS_ID, actual.getAnnotationWithoutObjectJobId());
     assertEquals(DETECTION_JOB_ID, actual.getJobId());
   }

@@ -3,7 +3,9 @@ package app.bpartners.geojobs.service.annotator;
 import static app.bpartners.gen.annotator.endpoint.rest.model.JobStatus.*;
 import static app.bpartners.gen.annotator.endpoint.rest.model.JobType.REVIEWING;
 import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
+import static app.bpartners.geojobs.repository.model.detection.DetectableType.PATHWAY;
 import static app.bpartners.geojobs.repository.model.detection.DetectableType.POOL;
+import static java.time.LocalTime.now;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.gen.annotator.endpoint.rest.api.AdminApi;
@@ -27,6 +29,8 @@ public class AnnotationService {
   public static final int DEFAULT_IMAGES_HEIGHT = 1024;
   public static final int DEFAULT_IMAGES_WIDTH = 1024;
   public static final double DEFAULT_CONFIDENCE = 1.0;
+  public static final String CANNES_ZONE_NAME = "cannes";
+  public static final String CHALON_ZONE_NAME = "chalon";
   private final JobsApi jobsApi;
   private final TaskExtractor taskExtractor;
   private final LabelConverter labelConverter;
@@ -68,9 +72,9 @@ public class AnnotationService {
     }
   }
 
-  public void createAnnotationJob(HumanDetectionJob humanDetectionJob)
-      throws app.bpartners.gen.annotator.endpoint.rest.client.ApiException {
-    String crupdateAnnotatedJobFolderPath = null;
+  public void createAnnotationJob(HumanDetectionJob humanDetectionJob, String jobName)
+      throws ApiException {
+    String folderPath = null;
     List<DetectedTile> inDoubtTiles = humanDetectionJob.getDetectedTiles();
     log.info(
         "[DEBUG] AnnotationService InDoubtTiles [size={}, tiles={}]",
@@ -83,16 +87,34 @@ public class AnnotationService {
     if (detectableObjects.isEmpty()) {
       // TODO: switch dynamically default zones values
       var zoneDetectionJob = zoneDetectionJobRepository.findById(zoneDetectionJobId).orElseThrow();
-      if (zoneDetectionJob.getZoneName().equals("cannes")) {
+      if (zoneDetectionJob.getZoneName().equals(CANNES_ZONE_NAME)) {
         DetectableObjectConfiguration newObjectConf =
             DetectableObjectConfiguration.builder()
+                .id(randomUUID().toString())
                 .objectType(POOL)
                 .confidence(DEFAULT_CONFIDENCE)
-                .id(randomUUID().toString())
                 .detectionJobId(zoneDetectionJobId)
                 .build();
         var savedNewConf = detectableObjectRepository.save(newObjectConf);
         detectableObjects.add(savedNewConf);
+      } else if (zoneDetectionJob.getZoneName().equals(CHALON_ZONE_NAME)) {
+        DetectableObjectConfiguration newObjectConf =
+            DetectableObjectConfiguration.builder()
+                .id(randomUUID().toString())
+                .objectType(PATHWAY)
+                .confidence(DEFAULT_CONFIDENCE)
+                .detectionJobId(zoneDetectionJobId)
+                .build();
+        var savedNewConf = detectableObjectRepository.save(newObjectConf);
+        detectableObjects.add(savedNewConf);
+      } else {
+        detectableObjects.add(
+            DetectableObjectConfiguration.builder()
+                .id(randomUUID().toString())
+                .objectType(POOL) // TODO: add UNKNOWN for default
+                .confidence(DEFAULT_CONFIDENCE)
+                .detectionJobId(zoneDetectionJobId)
+                .build());
       }
     }
     List<Label> expectedLabels =
@@ -116,9 +138,9 @@ public class AnnotationService {
             annotationJobId,
             new CrupdateJob()
                 .id(annotationJobId)
-                .name("geo-jobs" + now)
+                .name(jobName)
                 .bucketName(bucketComponent.getBucketName())
-                .folderPath(crupdateAnnotatedJobFolderPath)
+                .folderPath(folderPath)
                 .labels(labels)
                 .ownerEmail("tech@bpartners.app")
                 .status(PENDING)
@@ -132,6 +154,10 @@ public class AnnotationService {
           eventProducer.accept(
               List.of(new CreateAnnotatedTaskExtracted(createdAnnotationJob.getId(), task)));
         });
+  }
+
+  public void createAnnotationJob(HumanDetectionJob humanDetectionJob) throws ApiException {
+    createAnnotationJob(humanDetectionJob, "geo-jobs" + now());
   }
 
   public void addAnnotationTask(String jobId, CreateAnnotatedTask annotatedTask) {

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.*;
 
 import app.bpartners.gen.annotator.endpoint.rest.client.ApiException;
 import app.bpartners.geojobs.conf.FacadeIT;
+import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.rest.model.Feature;
 import app.bpartners.geojobs.file.BucketComponent;
 import app.bpartners.geojobs.repository.DetectableObjectConfigurationRepository;
@@ -42,6 +43,7 @@ public class ZoneDetectionAnnotationProcessorTest extends FacadeIT {
   @MockBean LabelExtractor labelExtractorMock;
   @MockBean HumanDetectionJobRepository humanDetectionJobRepositoryMock;
   @MockBean ZoneDetectionJobService zoneDetectionJobServiceMock;
+  @MockBean EventProducer eventProducerMock;
   public static final String MOCK_JOB_ID = "mock_job_id";
   public static final String MOCK_HUMAN_JOB_ID = "mock_human_job_id";
   private Feature feature;
@@ -123,6 +125,6 @@ public class ZoneDetectionAnnotationProcessorTest extends FacadeIT {
   void accept_event_ok() throws ApiException {
     subject.accept(MOCK_JOB_ID);
 
-    verify(annotationServiceMock, times(2)).createAnnotationJob(any());
+    verify(annotationServiceMock, times(2)).createAnnotationJob(any(), any());
   }
 }
