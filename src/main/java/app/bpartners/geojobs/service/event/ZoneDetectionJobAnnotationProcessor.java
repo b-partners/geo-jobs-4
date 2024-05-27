@@ -117,7 +117,7 @@ public class ZoneDetectionJobAnnotationProcessor {
             humanJob.getZoneName()
                 + " - "
                 + truePositiveDetectedTiles.size()
-                + " tiles with potential true positive objects"
+                + " tiles with confidence >= 95%"
                 + " "
                 + now());
       } else {
@@ -141,7 +141,7 @@ public class ZoneDetectionJobAnnotationProcessor {
             humanJob.getZoneName()
                 + " - "
                 + truePositiveDetectedTiles.size()
-                + " tiles with potential false positive objects"
+                + " tiles with confidence < 95%"
                 + " "
                 + now());
       } else {
