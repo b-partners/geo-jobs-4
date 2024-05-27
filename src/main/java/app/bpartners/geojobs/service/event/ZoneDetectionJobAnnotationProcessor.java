@@ -1,7 +1,7 @@
 package app.bpartners.geojobs.service.event;
 
 import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
-import static java.time.LocalTime.now;
+import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.endpoint.event.EventProducer;
@@ -140,7 +140,7 @@ public class ZoneDetectionJobAnnotationProcessor {
             savedHumanZDJFalsePositive,
             humanJob.getZoneName()
                 + " - "
-                + truePositiveDetectedTiles.size()
+                + falsePositiveTiles.size()
                 + " tiles with confidence < 95%"
                 + " "
                 + now());
@@ -164,7 +164,7 @@ public class ZoneDetectionJobAnnotationProcessor {
             savedHumanDetectionJobWithoutTile,
             humanJob.getZoneName()
                 + " - "
-                + truePositiveDetectedTiles.size()
+                + tilesWithoutObject.size()
                 + " tiles without objects"
                 + " "
                 + now());
