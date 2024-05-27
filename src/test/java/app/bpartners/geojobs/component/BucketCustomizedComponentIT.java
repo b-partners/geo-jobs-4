@@ -42,6 +42,21 @@ public class BucketCustomizedComponentIT extends FacadeIT {
   }
 
   @Test
+  void list_objects_for_zones_ok() {
+    List<S3Object> zoneP1 = subject.listObjects("cannes-qgis-tiles", "cannes_zone_p1");
+    List<S3Object> zoneP2 = subject.listObjects("cannes-qgis-tiles", "cannes_zone_p2");
+    List<S3Object> zoneP3 = subject.listObjects("cannes-qgis-tiles", "cannes_zone_p3");
+    List<S3Object> zoneP4 = subject.listObjects("cannes-qgis-tiles", "cannes_zone_p4");
+    List<S3Object> zoneP5 = subject.listObjects("cannes-qgis-tiles", "cannes_zone_p5");
+
+    assertEquals(2160, zoneP1.size());
+    assertEquals(1652, zoneP2.size());
+    assertEquals(1026, zoneP3.size());
+    assertEquals(10332, zoneP4.size());
+    assertEquals(6336, zoneP5.size());
+  }
+
+  @Test
   void list_objects_with_prefix_ok() {
     List<S3Object> actual = subject.listObjects("cannes-draft", "draft_layer");
     List<S3Object> actual2 = subject.listObjects("cannes-draft", "draft_copy");

@@ -12,6 +12,8 @@ import lombok.*;
 @EqualsAndHashCode
 @ToString
 public class ImportedZoneTilingJobSaved {
+  private Long startFrom;
+  private Long endAt;
   private String jobId;
   private String bucketName;
   private String bucketPathPrefix;

@@ -32,7 +32,78 @@ public class ImportedZoneTilingJobSavedServiceTest {
           bucketCustomizedComponentMock, tilingJobServiceMock, tilingTaskRepositoryMock);
 
   @Test
-  void accept_ok() {
+  void accept_all_ok() {
+    Long startFrom = 0L;
+    Long endAt = null;
+    String jobId = "jobId";
+    String dummyBucketName = "dummyBucketName";
+    String dummyBucketPrefix = "dummyBucketPrefix";
+    GeoServerParameter geoServerParameter = new GeoServerParameter();
+    String dummyGeoServerUrl = "https://dummyGeoServerUrl.com";
+    List<S3Object> s3Objects =
+        List.of(
+            S3Object.builder().key("s3ObjectKeyLayer1/20/100/200").build(),
+            S3Object.builder().key("s3ObjectKeyLayer2/20/200/200").build());
+    when(tilingJobServiceMock.findById(jobId))
+        .thenReturn(
+            ZoneTilingJob.builder()
+                .id(jobId)
+                .zoneName("dummyZoneName")
+                .emailReceiver("dummyEmailReceiver")
+                .statusHistory(
+                    List.of(
+                        JobStatus.builder()
+                            .progression(PENDING)
+                            .health(UNKNOWN)
+                            .creationDatetime(now())
+                            .build()))
+                .build());
+
+    when(bucketCustomizedComponentMock.listObjects(dummyBucketName, dummyBucketPrefix))
+        .thenReturn(s3Objects);
+
+    subject.accept(
+        new ImportedZoneTilingJobSaved(
+            startFrom,
+            endAt,
+            jobId,
+            dummyBucketName,
+            dummyBucketPrefix,
+            geoServerParameter,
+            dummyGeoServerUrl));
+
+    var listCaptor = ArgumentCaptor.forClass(List.class);
+    verify(tilingTaskRepositoryMock, times(1)).saveAll(listCaptor.capture());
+    List<TilingTask> savedTilingTasks = (List<TilingTask>) listCaptor.getValue();
+    var firstTask = savedTilingTasks.getFirst();
+    var lastTask = savedTilingTasks.getLast();
+    assertEquals(2, savedTilingTasks.size());
+    Tile firstTile = firstTask.getParcelContent().getFirstTile();
+    Tile lastTile = lastTask.getParcelContent().getFirstTile();
+    assertEquals(s3Objects.size(), savedTilingTasks.size());
+    assertTrue(savedTilingTasks.stream().allMatch(TilingTask::isSucceeded));
+    assertEquals(
+        Tile.builder()
+            .id(firstTile.getId())
+            .creationDatetime(firstTile.getCreationDatetime())
+            .bucketPath("s3ObjectKeyLayer1/20/100/200")
+            .coordinates(new TileCoordinates().x(100).y(200).z(20))
+            .build(),
+        firstTile);
+    assertEquals(
+        Tile.builder()
+            .id(lastTile.getId())
+            .creationDatetime(lastTile.getCreationDatetime())
+            .bucketPath("s3ObjectKeyLayer2/20/200/200")
+            .coordinates(new TileCoordinates().x(200).y(200).z(20))
+            .build(),
+        lastTile);
+  }
+
+  @Test
+  void accept_truncated_ok() {
+    Long startFrom = 0L;
+    Long endAt = 1L;
     String jobId = "jobId";
     String dummyBucketName = "dummyBucketName";
     String dummyBucketPrefix = "dummyBucketPrefix";
@@ -62,17 +133,21 @@ public class ImportedZoneTilingJobSavedServiceTest {
 
     subject.accept(
         new ImportedZoneTilingJobSaved(
-            jobId, dummyBucketName, dummyBucketPrefix, geoServerParameter, dummyGeoServerUrl));
+            startFrom,
+            endAt,
+            jobId,
+            dummyBucketName,
+            dummyBucketPrefix,
+            geoServerParameter,
+            dummyGeoServerUrl));
 
     var listCaptor = ArgumentCaptor.forClass(List.class);
     verify(tilingTaskRepositoryMock, times(1)).saveAll(listCaptor.capture());
     List<TilingTask> savedTilingTasks = (List<TilingTask>) listCaptor.getValue();
     var firstTask = savedTilingTasks.getFirst();
-    var lastTask = savedTilingTasks.getLast();
-    assertEquals(2, savedTilingTasks.size());
+    assertEquals(1, savedTilingTasks.size());
     Tile firstTile = firstTask.getParcelContent().getFirstTile();
-    Tile lastTile = lastTask.getParcelContent().getFirstTile();
-    assertEquals(s3Objects.size(), savedTilingTasks.size());
+    assertEquals(1, savedTilingTasks.size());
     assertTrue(savedTilingTasks.stream().allMatch(TilingTask::isSucceeded));
     assertEquals(
         Tile.builder()
@@ -82,14 +157,58 @@ public class ImportedZoneTilingJobSavedServiceTest {
             .coordinates(new TileCoordinates().x(100).y(200).z(20))
             .build(),
         firstTile);
-    assertEquals(
-        Tile.builder()
-            .id(lastTile.getId())
-            .creationDatetime(lastTile.getCreationDatetime())
-            .bucketPath("s3ObjectKeyLayer2/20/100/200")
-            .coordinates(new TileCoordinates().x(100).y(200).z(20))
-            .build(),
-        lastTile);
+  }
+
+  @Test
+  void accept_truncated_all_ok() {
+    Long startFrom = 0L;
+    Long endAt = null;
+    String jobId = "jobId";
+    String dummyBucketName = "dummyBucketName";
+    String dummyBucketPrefix = "dummyBucketPrefix";
+    GeoServerParameter geoServerParameter = new GeoServerParameter();
+    String dummyGeoServerUrl = "https://dummyGeoServerUrl.com";
+    List<S3Object> s3Objects =
+        List.of(
+            S3Object.builder().key("s3ObjectKeyLayer1/20/100/200").build(),
+            S3Object.builder().key("s3ObjectKeyLayer2/20/200/200").build(),
+            S3Object.builder().key("s3ObjectKeyLayer1/20/100/900").build());
+    when(tilingJobServiceMock.findById(jobId))
+        .thenReturn(
+            ZoneTilingJob.builder()
+                .id(jobId)
+                .zoneName("dummyZoneName")
+                .emailReceiver("dummyEmailReceiver")
+                .statusHistory(
+                    List.of(
+                        JobStatus.builder()
+                            .progression(PENDING)
+                            .health(UNKNOWN)
+                            .creationDatetime(now())
+                            .build()))
+                .build());
+
+    when(bucketCustomizedComponentMock.listObjects(dummyBucketName, dummyBucketPrefix))
+        .thenReturn(s3Objects);
+
+    subject.accept(
+        new ImportedZoneTilingJobSaved(
+            startFrom,
+            endAt,
+            jobId,
+            dummyBucketName,
+            dummyBucketPrefix,
+            geoServerParameter,
+            dummyGeoServerUrl));
+
+    var listCaptor = ArgumentCaptor.forClass(List.class);
+    verify(tilingTaskRepositoryMock, times(1)).saveAll(listCaptor.capture());
+    List<TilingTask> savedTilingTasks = (List<TilingTask>) listCaptor.getValue();
+    assertEquals(2, savedTilingTasks.size());
+    assertEquals(2, savedTilingTasks.size());
+    assertTrue(savedTilingTasks.stream().allMatch(TilingTask::isSucceeded));
+    assertEquals(2, savedTilingTasks.getFirst().getParcelContent().getTiles().size());
+    assertEquals(1, savedTilingTasks.getLast().getParcelContent().getTiles().size());
   }
 
   @Test

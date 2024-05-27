@@ -22,9 +22,13 @@ import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import app.bpartners.geojobs.service.tiling.ZoneTilingJobService;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,12 +50,16 @@ public class ImportedZoneTilingJobSavedService implements Consumer<ImportedZoneT
     var bucketPathPrefix = importedZoneTilingJobSaved.getBucketPathPrefix();
     var geoServerParameter = importedZoneTilingJobSaved.getGeoServerParameter();
     var geoServerUrlValue = importedZoneTilingJobSaved.getGeoServerUrl();
-    var s3Objects = bucketCustomizedComponent.listObjects(bucketName, bucketPathPrefix);
+    List<S3Object> s3Objects =
+        getS3Objects(importedZoneTilingJobSaved, bucketName, bucketPathPrefix);
+
     log.info("[DEBUG] S3 objects size {}", s3Objects.size());
-    var tilingTasks =
-        s3Objects.stream()
-            .map(s3Object -> getFinishedTasks(s3Object, job, geoServerParameter, geoServerUrlValue))
-            .toList();
+    Map<Integer, List<Tile>> groupedTilesByX = getGroupedTiles(s3Objects);
+    List<TilingTask> tilingTasks = new ArrayList<>();
+    for (Map.Entry<Integer, List<Tile>> entry : groupedTilesByX.entrySet()) {
+      List<Tile> groupedTiles = entry.getValue();
+      tilingTasks.add(getFinishedTasks(job, geoServerUrlValue, geoServerParameter, groupedTiles));
+    }
     log.info(
         "[DEBUG] TilingTasks size {}, values {}",
         tilingTasks.size(),
@@ -65,16 +73,25 @@ public class ImportedZoneTilingJobSavedService implements Consumer<ImportedZoneT
     log.info("[DEBUG] Saved ZoneTilingJob {}", savedJob);
   }
 
+  @NonNull
+  private Map<Integer, List<Tile>> getGroupedTiles(List<S3Object> s3Objects) {
+    var tiles = s3Objects.stream().map(s3Object -> mapFromKey(s3Object.key())).toList();
+    Map<Integer, List<Tile>> groupedByX =
+        tiles.stream()
+            .filter(tile -> tile.getCoordinates() != null & tile.getCoordinates().getX() != null)
+            .collect(Collectors.groupingBy(tile -> tile.getCoordinates().getX()));
+    return groupedByX;
+  }
+
   private TilingTask getFinishedTasks(
-      S3Object s3Object,
       ZoneTilingJob job,
+      String geoServerUrlValue,
       GeoServerParameter geoServerParameter,
-      String geoServerUrlValue) {
+      List<Tile> groupedTiles) {
     try {
       String jobId = job.getId();
       URL geoServerUrl = new URL(geoServerUrlValue);
       String taskId = randomUUID().toString();
-      String bucketPathKey = s3Object.key();
       return TilingTask.builder()
           .id(taskId)
           .jobId(jobId)
@@ -100,20 +117,37 @@ public class ImportedZoneTilingJobSavedService implements Consumer<ImportedZoneT
                               .creationDatetime(now())
                               .geoServerParameter(geoServerParameter)
                               .geoServerUrl(geoServerUrl)
-                              .tiles(
-                                  List.of(
-                                      Tile.builder()
-                                          .id(randomUUID().toString())
-                                          .bucketPath(bucketPathKey)
-                                          .coordinates(fromBucketPathKey(bucketPathKey))
-                                          .creationDatetime(now())
-                                          .build()))
+                              .tiles(groupedTiles)
                               .build())
                       .build()))
           .build();
     } catch (MalformedURLException e) {
       throw new ApiException(SERVER_EXCEPTION, e);
     }
+  }
+
+  private List<S3Object> getS3Objects(
+      ImportedZoneTilingJobSaved importedZoneTilingJobSaved,
+      String bucketName,
+      String bucketPathPrefix) {
+    var defaultS3Objects = bucketCustomizedComponent.listObjects(bucketName, bucketPathPrefix);
+    var startFromValue = importedZoneTilingJobSaved.getStartFrom();
+    var endAtValue = importedZoneTilingJobSaved.getEndAt();
+    long startFrom = startFromValue == null ? 0L : startFromValue;
+    long endAt = endAtValue == null ? defaultS3Objects.size() : endAtValue;
+    if (defaultS3Objects.size() > startFrom || endAt < defaultS3Objects.size()) {
+      return new ArrayList<>(defaultS3Objects.subList((int) startFrom, (int) endAt));
+    }
+    return defaultS3Objects;
+  }
+
+  private Tile mapFromKey(String bucketPathKey) {
+    return Tile.builder()
+        .id(randomUUID().toString())
+        .bucketPath(bucketPathKey)
+        .coordinates(fromBucketPathKey(bucketPathKey))
+        .creationDatetime(now())
+        .build();
   }
 
   public TileCoordinates fromBucketPathKey(String bucketPathKey) {

@@ -57,6 +57,7 @@ public class ZoneTilingJobServiceTest {
           taskRepositoryMock,
           eventProducerMock,
           detectionJobServiceMock,
+          mock(),
           mock());
 
   @Test
@@ -72,6 +73,8 @@ public class ZoneTilingJobServiceTest {
     String bucketName = "bucketName";
     String bucketPathPrefix = "bucketPathPrefix";
     String geoServerUrlDummy = "geoServerUrlDummy";
+    Long startFrom = 0L;
+    Long endAt = 1L;
     GeoServerParameter geoServerParameter = new GeoServerParameter();
     ZoneTilingJob job =
         ZoneTilingJob.builder()
@@ -87,10 +90,15 @@ public class ZoneTilingJobServiceTest {
                         .jobId(importedJobId)
                         .build()))
             .build();
-
     ZoneTilingJob actual =
         subject.importFromBucket(
-            job, bucketName, bucketPathPrefix, geoServerParameter, geoServerUrlDummy);
+            job,
+            bucketName,
+            bucketPathPrefix,
+            geoServerParameter,
+            geoServerUrlDummy,
+            startFrom,
+            endAt);
 
     var eventCaptor = ArgumentCaptor.forClass(List.class);
     verify(eventProducerMock, times(1)).accept(eventCaptor.capture());
@@ -102,6 +110,8 @@ public class ZoneTilingJobServiceTest {
     assertEquals(geoServerUrlDummy, importedZoneTilingJobSaved.getGeoServerUrl());
     assertEquals(bucketName, importedZoneTilingJobSaved.getBucketName());
     assertEquals(bucketPathPrefix, importedZoneTilingJobSaved.getBucketPathPrefix());
+    assertEquals(startFrom, importedZoneTilingJobSaved.getStartFrom());
+    assertEquals(endAt, importedZoneTilingJobSaved.getEndAt());
     assertEquals(job, actual);
   }
 
@@ -329,7 +339,7 @@ public class ZoneTilingJobServiceTest {
     assertEquals(RETRYING, actual.getStatus().getHealth());
   }
 
-  private record StatisticResult(
+  public record StatisticResult(
       TaskStatusStatistic.HealthStatusStatistic unknownPendingTask,
       TaskStatusStatistic.HealthStatusStatistic unknownProcessingTask,
       TaskStatusStatistic.HealthStatusStatistic succeededFinishedTask,
@@ -337,7 +347,7 @@ public class ZoneTilingJobServiceTest {
       TaskStatusStatistic.HealthStatusStatistic unknownFinishedTask) {}
 
   @NonNull
-  private ZoneTilingJobServiceTest.StatisticResult getResult(TaskStatistic actual) {
+  public static ZoneTilingJobServiceTest.StatisticResult getResult(TaskStatistic actual) {
     var pendingTaskStatistic =
         actual.getTaskStatusStatistics().stream()
             .filter(statistic -> statistic.getProgressionStatus().equals(PENDING))
