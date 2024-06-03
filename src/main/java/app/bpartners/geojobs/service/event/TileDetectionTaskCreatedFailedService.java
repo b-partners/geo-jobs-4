@@ -12,6 +12,7 @@ import app.bpartners.geojobs.job.service.RetryableTaskToTaskStatusService;
 import app.bpartners.geojobs.repository.model.TileDetectionTask;
 import app.bpartners.geojobs.repository.model.detection.DetectionTask;
 import app.bpartners.geojobs.repository.model.detection.ZoneDetectionJob;
+import app.bpartners.geojobs.sys.OpenFilesChecker;
 import java.util.List;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,8 @@ public class TileDetectionTaskCreatedFailedService
   private final TileDetectionTaskCreatedConsumer tileDetectionTaskConsumer;
   private final EventProducer eventProducer;
 
+  private final OpenFilesChecker openFilesChecker;
+
   @Override
   public void accept(TileDetectionTaskCreatedFailed tileDetectionTaskCreatedFailed) {
     var tileDetectionTaskCreated = tileDetectionTaskCreatedFailed.getTileDetectionTaskCreated();
@@ -43,7 +46,11 @@ public class TileDetectionTaskCreatedFailedService
       return;
     }
     try {
+      log.info("openFilesChecker: TileDetectionTaskCreatedFailedService::accept...");
+      openFilesChecker.checkOpenFiles();
       tileDetectionTaskConsumer.accept(tileDetectionTaskCreated);
+      log.info("...openFilesChecker: TileDetectionTaskCreatedFailedService::accept");
+      openFilesChecker.checkOpenFiles();
     } catch (Exception e) {
       eventProducer.accept(
           List.of(

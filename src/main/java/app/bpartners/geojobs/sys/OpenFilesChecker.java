@@ -8,7 +8,9 @@ import com.sun.management.UnixOperatingSystemMXBean;
 import java.time.Duration;
 import java.util.concurrent.ScheduledExecutorService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
+@Component
 @Slf4j
 public class OpenFilesChecker {
   private final UnixOperatingSystemMXBean os;
@@ -32,7 +34,7 @@ public class OpenFilesChecker {
     scheduler.scheduleAtFixedRate(this::checkOpenFiles, 0, frequencyCheck.toSeconds(), SECONDS);
   }
 
-  private void checkOpenFiles() {
+  public void checkOpenFiles() {
     var ofCountByMxBean = os.getOpenFileDescriptorCount();
     var maxOfByMxBean = os.getMaxFileDescriptorCount();
     log.info("ofCountByMxBean={}, maxOfByMxBean={}", ofCountByMxBean, maxOfByMxBean);
