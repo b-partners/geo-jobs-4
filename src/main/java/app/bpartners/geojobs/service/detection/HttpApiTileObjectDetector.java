@@ -1,6 +1,7 @@
 package app.bpartners.geojobs.service.detection;
 
 import static app.bpartners.geojobs.model.exception.ApiException.ExceptionType.SERVER_EXCEPTION;
+import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import app.bpartners.geojobs.file.BucketCustomizedComponent;
@@ -18,7 +19,6 @@ import java.util.Base64;
 import java.util.List;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpEntity;
@@ -89,9 +89,8 @@ public class HttpApiTileObjectDetector implements TileObjectDetector {
     headers.setContentType(APPLICATION_JSON);
 
     File file = bucketComponent.download("cannes-qgis-tiles", tile.getBucketPath());
-    File compressedFile = imageJpegCompressor.apply(file, IMAGE_QUALITY);
-    String base64ImgData =
-        Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(compressedFile));
+    // File compressedFile = imageJpegCompressor.apply(file, IMAGE_QUALITY);
+    String base64ImgData = Base64.getEncoder().encodeToString(readFileToByteArray(file));
 
     var payload =
         DetectionPayload.builder()
