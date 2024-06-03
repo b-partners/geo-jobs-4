@@ -11,7 +11,6 @@ import app.bpartners.geojobs.model.exception.NotImplementedException;
 import app.bpartners.geojobs.repository.model.TileDetectionTask;
 import app.bpartners.geojobs.repository.model.detection.DetectableType;
 import app.bpartners.geojobs.repository.model.tiling.Tile;
-import app.bpartners.geojobs.sys.OpenFilesChecker;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,19 +38,15 @@ public class HttpApiTileObjectDetector implements TileObjectDetector {
   private final String tileDetectionRawBaseUrls;
   private final ImageJpegCompressor imageJpegCompressor;
 
-  private final OpenFilesChecker openFilesChecker;
-
   public HttpApiTileObjectDetector(
       ObjectMapper om,
       BucketCustomizedComponent bucketComponent,
       @Value("${tile.detection.api.urls}") String tileDetectionRawBaseUrls,
-      ImageJpegCompressor imageJpegCompressor,
-      OpenFilesChecker openFilesChecker) {
+      ImageJpegCompressor imageJpegCompressor) {
     this.om = om;
     this.bucketComponent = bucketComponent;
     this.tileDetectionRawBaseUrls = tileDetectionRawBaseUrls;
     this.imageJpegCompressor = imageJpegCompressor;
-    this.openFilesChecker = openFilesChecker;
   }
 
   private List<TileDetectorUrl> getDetectorUrls() {
@@ -93,12 +88,7 @@ public class HttpApiTileObjectDetector implements TileObjectDetector {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(APPLICATION_JSON);
 
-    log.info("OpenFilesChecker: HttpApiTileObjectDetector.bucketComponent::download...");
-    openFilesChecker.checkOpenFiles();
     File file = bucketComponent.download("cannes-qgis-tiles", tile.getBucketPath());
-    log.info("OpenFilesChecker: ...HttpApiTileObjectDetector.bucketComponent::download");
-    openFilesChecker.checkOpenFiles();
-
     // File compressedFile = imageJpegCompressor.apply(file, IMAGE_QUALITY);
     // //TODO(too-many-files-leak?)
     String base64ImgData = Base64.getEncoder().encodeToString(readFileToByteArray(file));
@@ -115,12 +105,8 @@ public class HttpApiTileObjectDetector implements TileObjectDetector {
 
     UriComponentsBuilder builder =
         UriComponentsBuilder.fromHttpUrl(retrieveBaseUrl(detectableTypes) + "/detection");
-    log.info("OpenFilesChecker: HttpApiTileObjectDetector.restTemplate::postForEntity...");
-    openFilesChecker.checkOpenFiles();
     ResponseEntity<DetectionResponse> responseEntity =
         restTemplate.postForEntity(builder.toUriString(), request, DetectionResponse.class);
-    log.info("OpenFilesChecker: ...HttpApiTileObjectDetector.restTemplate::postForEntity");
-    openFilesChecker.checkOpenFiles();
 
     if (responseEntity.getStatusCode().value() == 200) {
       return responseEntity.getBody();

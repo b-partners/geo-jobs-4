@@ -8,9 +8,7 @@ import com.sun.management.UnixOperatingSystemMXBean;
 import java.time.Duration;
 import java.util.concurrent.ScheduledExecutorService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
-@Component
 @Slf4j
 public class OpenFilesChecker {
   private final UnixOperatingSystemMXBean os;
