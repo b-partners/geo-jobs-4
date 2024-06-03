@@ -19,7 +19,6 @@ import java.util.Base64;
 import java.util.List;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpEntity;
@@ -90,9 +89,9 @@ public class HttpApiTileObjectDetector implements TileObjectDetector {
     headers.setContentType(APPLICATION_JSON);
 
     File file = bucketComponent.download("cannes-qgis-tiles", tile.getBucketPath());
-    // File compressedFile = imageJpegCompressor.apply(file, IMAGE_QUALITY); //TODO(too-many-files-leak?)
-    String base64ImgData =
-        Base64.getEncoder().encodeToString(readFileToByteArray(file));
+    // File compressedFile = imageJpegCompressor.apply(file, IMAGE_QUALITY);
+    // //TODO(too-many-files-leak?)
+    String base64ImgData = Base64.getEncoder().encodeToString(readFileToByteArray(file));
 
     var payload =
         DetectionPayload.builder()
