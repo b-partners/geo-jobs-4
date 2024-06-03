@@ -1,8 +1,7 @@
-package app.bpartners.geojobs.endpoint.event.gen;
+package app.bpartners.geojobs.endpoint.event.model;
 
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.io.Serializable;
+import java.time.Duration;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +17,17 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode
 @ToString
-public class TilingTaskCreated implements Serializable {
-  @JsonProperty("tilingTask")
+public class TilingTaskFailed extends PojaEvent {
   private TilingTask task;
+  private int attemptNb;
+
+  @Override
+  public Duration maxDuration() {
+    return Duration.ofMinutes(1);
+  }
+
+  @Override
+  public Duration maxBackoffBetweenRetries() {
+    return Duration.ofMinutes(1);
+  }
 }

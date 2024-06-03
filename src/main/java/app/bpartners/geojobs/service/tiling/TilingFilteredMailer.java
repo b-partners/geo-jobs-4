@@ -16,7 +16,7 @@ import org.thymeleaf.context.Context;
 @AllArgsConstructor
 public class TilingFilteredMailer implements Consumer<FilteredTilingJob> {
   private final Mailer mailer;
-  private static final String TEMPLATE_NAME = "tiling_filtering";
+  private static final String TEMPLATE_NAME = "job_filtering";
   private final HTMLTemplateParser htmlTemplateParser;
   private final String env = System.getenv("ENV");
 

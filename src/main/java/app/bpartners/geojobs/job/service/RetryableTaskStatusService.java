@@ -19,15 +19,15 @@ public class RetryableTaskStatusService<T extends Task, J extends Job> {
   private final int maxRetry;
 
   public T process(T task) {
-    return taskStatusService.process(task);
+    return retry(taskStatusService::process, task, 0);
   }
 
   public T succeed(T task) {
-    return taskStatusService.succeed(task);
+    return retry(taskStatusService::succeed, task, 0);
   }
 
   public T fail(T task) {
-    return taskStatusService.fail(task);
+    return retry(taskStatusService::fail, task, 0);
   }
 
   @SneakyThrows
