@@ -46,10 +46,10 @@ public class TileDetectionTaskCreatedFailedService
       return;
     }
     try {
-      log.info("openFilesChecker: TileDetectionTaskCreatedFailedService::accept...");
+      log.info("OpenFilesChecker: TileDetectionTaskCreatedFailedService::accept...");
       openFilesChecker.checkOpenFiles();
       tileDetectionTaskConsumer.accept(tileDetectionTaskCreated);
-      log.info("...openFilesChecker: TileDetectionTaskCreatedFailedService::accept");
+      log.info("OpenFilesChecker: ...TileDetectionTaskCreatedFailedService::accept");
       openFilesChecker.checkOpenFiles();
     } catch (Exception e) {
       eventProducer.accept(

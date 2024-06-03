@@ -93,10 +93,10 @@ public class HttpApiTileObjectDetector implements TileObjectDetector {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(APPLICATION_JSON);
 
-    log.info("openFilesChecker: HttpApiTileObjectDetector.bucketComponent::download...");
+    log.info("OpenFilesChecker: HttpApiTileObjectDetector.bucketComponent::download...");
     openFilesChecker.checkOpenFiles();
     File file = bucketComponent.download("cannes-qgis-tiles", tile.getBucketPath());
-    log.info("...openFilesChecker: HttpApiTileObjectDetector.bucketComponent::download");
+    log.info("OpenFilesChecker: ...HttpApiTileObjectDetector.bucketComponent::download");
     openFilesChecker.checkOpenFiles();
 
     // File compressedFile = imageJpegCompressor.apply(file, IMAGE_QUALITY);
@@ -115,11 +115,11 @@ public class HttpApiTileObjectDetector implements TileObjectDetector {
 
     UriComponentsBuilder builder =
         UriComponentsBuilder.fromHttpUrl(retrieveBaseUrl(detectableTypes) + "/detection");
-    log.info("openFilesChecker: HttpApiTileObjectDetector.restTemplate::postForEntity...");
+    log.info("OpenFilesChecker: HttpApiTileObjectDetector.restTemplate::postForEntity...");
     openFilesChecker.checkOpenFiles();
     ResponseEntity<DetectionResponse> responseEntity =
         restTemplate.postForEntity(builder.toUriString(), request, DetectionResponse.class);
-    log.info("...openFilesChecker: restTemplate.bucketComponent::postForEntity");
+    log.info("OpenFilesChecker: ...HttpApiTileObjectDetector.restTemplate::postForEntity");
     openFilesChecker.checkOpenFiles();
 
     if (responseEntity.getStatusCode().value() == 200) {
