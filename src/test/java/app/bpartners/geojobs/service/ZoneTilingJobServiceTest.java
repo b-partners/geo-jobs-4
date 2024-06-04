@@ -6,12 +6,12 @@ import static app.bpartners.geojobs.repository.model.GeoJobType.DETECTION;
 import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.model.ImportedZoneTilingJobSaved;
+import app.bpartners.geojobs.endpoint.event.model.ZoneTilingJobWithoutTasksCreated;
 import app.bpartners.geojobs.endpoint.rest.model.GeoServerParameter;
 import app.bpartners.geojobs.job.model.JobStatus;
 import app.bpartners.geojobs.job.model.Status;
@@ -45,6 +45,7 @@ public class ZoneTilingJobServiceTest {
   public static final String JOB_4_ID = "job4Id";
   public static final String JOB_5_ID = "job5Id";
   public static final String JOB_ID_NOT_FOUND = "job_id_not_found";
+  public static final String TO_DUPLICATE_JOB = "toDuplicateJob";
   JpaRepository<ZoneTilingJob, String> jobRepositoryMock = mock();
   JobStatusRepository jobStatusRepositoryMock = mock();
   TaskRepository<TilingTask> taskRepositoryMock = mock();
@@ -57,8 +58,38 @@ public class ZoneTilingJobServiceTest {
           taskRepositoryMock,
           eventProducerMock,
           detectionJobServiceMock,
-          mock(),
           mock());
+
+  @Test
+  void duplicate_ok() {
+    ZoneTilingJob expectedJob =
+        ZoneTilingJob.builder()
+            .id(TO_DUPLICATE_JOB)
+            .zoneName("DummyZoneName")
+            .emailReceiver("DummyEmail")
+            .submissionInstant(now())
+            .statusHistory(
+                List.of(
+                    JobStatus.builder()
+                        .progression(FINISHED)
+                        .health(SUCCEEDED)
+                        .creationDatetime(now())
+                        .build()))
+            .build();
+    when(jobRepositoryMock.findById(TO_DUPLICATE_JOB)).thenReturn(Optional.of(expectedJob));
+
+    ZoneTilingJob actual = subject.duplicate(TO_DUPLICATE_JOB);
+
+    var eventCaptor = ArgumentCaptor.forClass(List.class);
+    verify(eventProducerMock, times(1)).accept(eventCaptor.capture());
+    List<ZoneTilingJobWithoutTasksCreated> events =
+        (List<ZoneTilingJobWithoutTasksCreated>) eventCaptor.getValue();
+    var zoneTilingJobWithoutTaskCreated = events.getFirst();
+    assertEquals(expectedJob.duplicate(actual.getId()), actual);
+    assertNotEquals(expectedJob.getId(), actual.getId());
+    assertEquals(actual.getId(), zoneTilingJobWithoutTaskCreated.getDuplicatedJobId());
+    assertEquals(expectedJob, zoneTilingJobWithoutTaskCreated.getOriginalJob());
+  }
 
   @Test
   void import_from_bucket_ok() {
