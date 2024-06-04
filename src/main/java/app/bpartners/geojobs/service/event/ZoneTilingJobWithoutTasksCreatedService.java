@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -22,6 +23,7 @@ public class ZoneTilingJobWithoutTasksCreatedService
   private final TilingJobDuplicatedMailer tilingJobDuplicatedMailer;
 
   @Override
+  @Transactional
   public void accept(ZoneTilingJobWithoutTasksCreated zoneTilingJobWithoutTasksCreated) {
     ZoneTilingJob originalJob = zoneTilingJobWithoutTasksCreated.getOriginalJob();
     String jobId = originalJob.getId();
