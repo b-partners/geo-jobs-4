@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -36,6 +37,7 @@ public class ZoneDetectionJobAnnotationProcessor {
   private final ZoneDetectionJobService zoneDetectionJobService;
   private final KeyPredicateFunction keyPredicateFunction;
 
+  @Transactional
   public AnnotationJobIds accept(
       String zoneDetectionJobId,
       String annotationJobWithObjectsIdTruePositive,
