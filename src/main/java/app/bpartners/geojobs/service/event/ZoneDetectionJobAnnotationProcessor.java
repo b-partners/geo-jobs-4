@@ -11,6 +11,7 @@ import app.bpartners.geojobs.repository.DetectedTileRepository;
 import app.bpartners.geojobs.repository.HumanDetectionJobRepository;
 import app.bpartners.geojobs.repository.model.detection.DetectedTile;
 import app.bpartners.geojobs.repository.model.detection.HumanDetectionJob;
+import app.bpartners.geojobs.service.KeyPredicateFunction;
 import app.bpartners.geojobs.service.annotator.AnnotationService;
 import app.bpartners.geojobs.service.detection.DetectionTaskService;
 import app.bpartners.geojobs.service.detection.ZoneDetectionJobService;
@@ -33,6 +34,7 @@ public class ZoneDetectionJobAnnotationProcessor {
   private final HumanDetectionJobRepository humanDetectionJobRepository;
   private final EventProducer eventProducer;
   private final ZoneDetectionJobService zoneDetectionJobService;
+  private final KeyPredicateFunction keyPredicateFunction;
 
   public AnnotationJobIds accept(
       String zoneDetectionJobId,
@@ -46,7 +48,10 @@ public class ZoneDetectionJobAnnotationProcessor {
     var humanJob = zoneDetectionJobService.getHumanZdjFromZdjId(zoneDetectionJobId);
     var humanZDJId = humanJob.getId();
 
-    List<DetectedTile> detectedTiles = detectedTileRepository.findAllByJobId(zoneDetectionJobId);
+    List<DetectedTile> detectedTiles =
+        detectedTileRepository.findAllByJobId(zoneDetectionJobId).stream()
+            .filter(keyPredicateFunction.apply(DetectedTile::getBucketPath))
+            .toList();
     List<DetectedTile> inDoubtTiles =
         detectionTaskService.findInDoubtTilesByJobId(zoneDetectionJobId, detectedTiles).stream()
             .peek(detectedTile -> detectedTile.setHumanDetectionJobId(humanZDJFalsePositiveId))
@@ -118,7 +123,7 @@ public class ZoneDetectionJobAnnotationProcessor {
             humanJob.getZoneName()
                 + " - "
                 + truePositiveDetectedTiles.size()
-                + " tiles with confidence >= 95%"
+                + " tiles with confidence >= 80%"
                 + " "
                 + now());
       } else {
