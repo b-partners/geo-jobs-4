@@ -8,10 +8,7 @@ import static java.time.Instant.now;
 import static java.util.UUID.randomUUID;
 
 import app.bpartners.geojobs.endpoint.event.EventProducer;
-import app.bpartners.geojobs.endpoint.event.model.ImportedZoneTilingJobSaved;
-import app.bpartners.geojobs.endpoint.event.model.TilingTaskCreated;
-import app.bpartners.geojobs.endpoint.event.model.ZoneTilingJobCreated;
-import app.bpartners.geojobs.endpoint.event.model.ZoneTilingJobStatusChanged;
+import app.bpartners.geojobs.endpoint.event.model.*;
 import app.bpartners.geojobs.endpoint.rest.model.GeoServerParameter;
 import app.bpartners.geojobs.job.model.JobStatus;
 import app.bpartners.geojobs.job.model.Status;
@@ -24,7 +21,6 @@ import app.bpartners.geojobs.job.repository.TaskRepository;
 import app.bpartners.geojobs.job.service.JobService;
 import app.bpartners.geojobs.model.exception.BadRequestException;
 import app.bpartners.geojobs.model.exception.NotFoundException;
-import app.bpartners.geojobs.repository.model.DuplicatedTilingJob;
 import app.bpartners.geojobs.repository.model.FilteredTilingJob;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
 import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
@@ -42,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> {
   private final ZoneDetectionJobService detectionJobService;
   private final TilingFilteredMailer tilingFilteredMailer;
-  private final TilingJobDuplicatedMailer tilingJobDuplicatedMailer;
 
   public ZoneTilingJobService(
       JpaRepository<ZoneTilingJob, String> repository,
@@ -50,12 +45,10 @@ public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> 
       TaskRepository<TilingTask> taskRepository,
       EventProducer eventProducer,
       ZoneDetectionJobService detectionJobService,
-      TilingFilteredMailer tilingFilteredMailer,
-      TilingJobDuplicatedMailer tilingJobDuplicatedMailer) {
+      TilingFilteredMailer tilingFilteredMailer) {
     super(repository, jobStatusRepository, taskRepository, eventProducer, ZoneTilingJob.class);
     this.detectionJobService = detectionJobService;
     this.tilingFilteredMailer = tilingFilteredMailer;
-    this.tilingJobDuplicatedMailer = tilingJobDuplicatedMailer;
   }
 
   public ZoneTilingJob importFromBucket(
@@ -258,13 +251,15 @@ public class ZoneTilingJobService extends JobService<TilingTask, ZoneTilingJob> 
   public ZoneTilingJob duplicate(String jobId) {
     String duplicatedJobId = randomUUID().toString();
     ZoneTilingJob originalJob = getZoneTilingJob(jobId);
-    List<TilingTask> tilingTasks = taskRepository.findAllByJobId(jobId);
-    boolean saveZDJ = true;
-    JobStatus newStatus = null;
-    ZoneTilingJob duplicatedJob =
-        duplicateWithNewStatus(duplicatedJobId, originalJob, tilingTasks, saveZDJ, newStatus);
-    tilingJobDuplicatedMailer.accept(new DuplicatedTilingJob(originalJob, duplicatedJob));
-    return duplicatedJob;
+
+    eventProducer.accept(
+        List.of(
+            ZoneTilingJobWithoutTasksCreated.builder()
+                .duplicatedJobId(duplicatedJobId)
+                .originalJob(originalJob)
+                .build()));
+
+    return originalJob.duplicate(duplicatedJobId);
   }
 
   public ZoneTilingJob duplicateWithNewStatus(

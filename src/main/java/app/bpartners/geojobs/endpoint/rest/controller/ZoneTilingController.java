@@ -80,7 +80,8 @@ public class ZoneTilingController {
 
   @PostMapping("/tilingJobs/{id}/duplications")
   public ZoneTilingJob duplicateTilingJob(@PathVariable String id) {
-    return mapper.toRest(service.duplicate(id), List.of());
+    boolean jobNotSaved = true;
+    return mapper.toRest(service.duplicate(id), List.of(), jobNotSaved);
   }
 
   @PutMapping("/tilingJobs/{id}/retry")

@@ -8,6 +8,7 @@ import static java.util.UUID.randomUUID;
 import app.bpartners.geojobs.endpoint.rest.model.CreateZoneTilingJob;
 import app.bpartners.geojobs.job.model.JobStatus;
 import app.bpartners.geojobs.repository.model.ArcgisImageZoom;
+import app.bpartners.geojobs.repository.model.Parcel;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
 import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import app.bpartners.geojobs.service.ParcelService;
@@ -44,6 +45,18 @@ public class ZoneTilingJobMapper {
   public app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob toRest(
       ZoneTilingJob domain, List<TilingTask> tilingTaskList) {
     var parcels = parcelService.getParcelsByJobId(domain.getId());
+    return toRest(domain, tilingTaskList, parcels);
+  }
+
+  public app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob toRest(
+      ZoneTilingJob domain, List<TilingTask> tilingTaskList, boolean jobNotSaved) {
+    List<Parcel> parcels =
+        jobNotSaved ? List.of() : parcelService.getParcelsByJobId(domain.getId());
+    return toRest(domain, tilingTaskList, parcels);
+  }
+
+  private app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob toRest(
+      ZoneTilingJob domain, List<TilingTask> tilingTaskList, List<Parcel> parcels) {
     var parcel0 = parcels.isEmpty() ? null : parcels.get(0); // only need one
     var parcelContent = parcel0 == null ? null : parcel0.getParcelContent();
 

@@ -88,9 +88,9 @@ public class HttpApiTileObjectDetector implements TileObjectDetector {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(APPLICATION_JSON);
 
-    File file = bucketComponent.download("cannes-qgis-tiles", tile.getBucketPath());
-    // File compressedFile = imageJpegCompressor.apply(file, IMAGE_QUALITY);
-    // //TODO(too-many-files-leak?)
+    File file =
+        bucketComponent.download(
+            bucketComponent.getBucketConf().getBucketName(), tile.getBucketPath());
     String base64ImgData = Base64.getEncoder().encodeToString(readFileToByteArray(file));
 
     var payload =

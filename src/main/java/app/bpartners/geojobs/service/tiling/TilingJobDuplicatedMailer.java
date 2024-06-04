@@ -9,11 +9,13 @@ import java.util.List;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class TilingJobDuplicatedMailer implements Consumer<DuplicatedTilingJob> {
   private final Mailer mailer;
   private static final String TEMPLATE_NAME = "tiling_duplicated";
@@ -42,5 +44,6 @@ public class TilingJobDuplicatedMailer implements Consumer<DuplicatedTilingJob> 
                 + ") términée",
             emailBody,
             List.of()));
+    log.info("TilingJob duplication finished. Email sent to {}", duplicatedJob.getEmailReceiver());
   }
 }
