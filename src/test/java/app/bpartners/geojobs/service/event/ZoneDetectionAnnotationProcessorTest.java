@@ -49,15 +49,15 @@ public class ZoneDetectionAnnotationProcessorTest extends FacadeIT {
   private Feature feature;
   private final List<DetectedTile> detectedTiles =
       List.of(
-          detectedTile(List.of()),
-          detectedTile(
+          differentDetectedTile(List.of()),
+          differentDetectedTile(
               List.of(
                   inDoubtDetectedObject(TREE),
                   inDoubtDetectedObject(TREE),
                   inDoubtDetectedObject(ROOF),
                   inDoubtDetectedObject(ROOF),
                   inDoubtDetectedObject(SOLAR_PANEL))),
-          detectedTile(
+          differentDetectedTile(
               List.of(
                   inDoubtDetectedObject(TREE),
                   inDoubtDetectedObject(TREE),
@@ -65,10 +65,10 @@ public class ZoneDetectionAnnotationProcessorTest extends FacadeIT {
                   inDoubtDetectedObject(ROOF),
                   inDoubtDetectedObject(SOLAR_PANEL))));
 
-  public static DetectedTile detectedTile(List<DetectedObject> detectedObjects) {
+  public static DetectedTile differentDetectedTile(List<DetectedObject> detectedObjects) {
     return DetectedTile.builder()
         .id(randomUUID().toString())
-        .bucketPath(LAYER_20_10_1_PNG)
+        .bucketPath(LAYER_20_10_1_PNG + randomUUID())
         .tile(Tile.builder().build())
         .jobId(MOCK_JOB_ID)
         .parcelId(PARCEL_MOCK_ID)
@@ -123,7 +123,14 @@ public class ZoneDetectionAnnotationProcessorTest extends FacadeIT {
 
   @Test
   void accept_event_ok() throws ApiException {
-    subject.accept(MOCK_JOB_ID);
+    String annotationJobWithObjectsIdTruePositive = randomUUID().toString();
+    String annotationJobWithObjectsIdFalsePositive = randomUUID().toString();
+    String annotationJobWithoutObjectsId = randomUUID().toString();
+    subject.accept(
+        MOCK_JOB_ID,
+        annotationJobWithObjectsIdTruePositive,
+        annotationJobWithObjectsIdFalsePositive,
+        annotationJobWithoutObjectsId);
 
     verify(annotationServiceMock, times(2)).createAnnotationJob(any(), any());
   }

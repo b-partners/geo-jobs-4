@@ -11,6 +11,7 @@ import app.bpartners.geojobs.repository.DetectedTileRepository;
 import app.bpartners.geojobs.repository.HumanDetectionJobRepository;
 import app.bpartners.geojobs.repository.model.detection.DetectedTile;
 import app.bpartners.geojobs.repository.model.detection.HumanDetectionJob;
+import app.bpartners.geojobs.service.KeyPredicateFunction;
 import app.bpartners.geojobs.service.annotator.AnnotationService;
 import app.bpartners.geojobs.service.detection.DetectionTaskService;
 import app.bpartners.geojobs.service.detection.ZoneDetectionJobService;
@@ -21,31 +22,38 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class ZoneDetectionJobAnnotationProcessor {
-  public static final double MIN_CONFIDENCE_TRUE_POSITIVE = 0.95;
+  public static final double MIN_CONFIDENCE_TRUE_POSITIVE = 0.8;
   private final AnnotationService annotationService;
   private final DetectionTaskService detectionTaskService;
   private final DetectedTileRepository detectedTileRepository;
   private final HumanDetectionJobRepository humanDetectionJobRepository;
   private final EventProducer eventProducer;
   private final ZoneDetectionJobService zoneDetectionJobService;
+  private final KeyPredicateFunction keyPredicateFunction;
 
-  public AnnotationJobIds accept(String zoneDetectionJobId) {
+  @Transactional
+  public AnnotationJobIds accept(
+      String zoneDetectionJobId,
+      String annotationJobWithObjectsIdTruePositive,
+      String annotationJobWithObjectsIdFalsePositive,
+      String annotationJobWithoutObjectsId) {
     String humanZDJTruePositiveId = randomUUID().toString();
     String humanZDJFalsePositiveId = randomUUID().toString();
     String inDoubtHumanDetectionJobId = randomUUID().toString();
-    String annotationJobWithoutObjectsId = randomUUID().toString();
-    String annotationJobWithObjectsIdTruePositive = randomUUID().toString();
-    String annotationJobWithObjectsIdFalsePositive = randomUUID().toString();
 
     var humanJob = zoneDetectionJobService.getHumanZdjFromZdjId(zoneDetectionJobId);
     var humanZDJId = humanJob.getId();
 
-    List<DetectedTile> detectedTiles = detectedTileRepository.findAllByJobId(zoneDetectionJobId);
+    List<DetectedTile> detectedTiles =
+        detectedTileRepository.findAllByJobId(zoneDetectionJobId).stream()
+            .filter(keyPredicateFunction.apply(DetectedTile::getBucketPath))
+            .toList();
     List<DetectedTile> inDoubtTiles =
         detectionTaskService.findInDoubtTilesByJobId(zoneDetectionJobId, detectedTiles).stream()
             .peek(detectedTile -> detectedTile.setHumanDetectionJobId(humanZDJFalsePositiveId))
@@ -117,7 +125,7 @@ public class ZoneDetectionJobAnnotationProcessor {
             humanJob.getZoneName()
                 + " - "
                 + truePositiveDetectedTiles.size()
-                + " tiles with confidence >= 95%"
+                + " tiles with confidence >= 80%"
                 + " "
                 + now());
       } else {
