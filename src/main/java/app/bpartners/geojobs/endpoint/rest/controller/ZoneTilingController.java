@@ -4,6 +4,8 @@ import static app.bpartners.geojobs.endpoint.rest.model.SuccessStatus.NOT_SUCCEE
 import static app.bpartners.geojobs.endpoint.rest.model.SuccessStatus.SUCCEEDED;
 import static java.util.stream.Collectors.toList;
 
+import app.bpartners.geojobs.endpoint.event.EventProducer;
+import app.bpartners.geojobs.endpoint.event.model.ZTJStatusRecomputingSubmitted;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.StatusMapper;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.TaskStatisticMapper;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.TilingTaskMapper;
@@ -48,6 +50,7 @@ public class ZoneTilingController {
   private final TaskStatisticMapper taskStatisticMapper;
   private final ZoneTilingJobValidator zoneTilingJobValidator;
   private final StatusMapper<JobStatus> jobStatusMapper;
+  private final EventProducer eventProducer;
 
   @PostMapping("/tilingJobs/import")
   public ZoneTilingJob importZTJ(@RequestBody ImportZoneTilingJob importZoneTilingJob) {
@@ -71,7 +74,8 @@ public class ZoneTilingController {
 
   @GetMapping("/tilingJobs/{id}/recomputedStatus")
   public Status getZTJRecomputedStatus(@PathVariable String id) {
-    return jobStatusMapper.toRest(service.recomputeStatus(id).getStatus());
+    eventProducer.accept(List.of(new ZTJStatusRecomputingSubmitted(id)));
+    return jobStatusMapper.toRest(service.findById(id).getStatus());
   }
 
   @GetMapping("/tilingJobs/{id}/taskStatistics")

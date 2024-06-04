@@ -45,7 +45,7 @@ public class ZoneDetectionController {
   private final DetectionTaskMapper taskMapper;
   private final ZoneDetectionJobValidator jobValidator;
   private final TaskStatisticMapper taskStatisticMapper;
-  private final StatusMapper<JobStatus> jobStatusStatusMapper;
+  private final StatusMapper<JobStatus> jobStatusMapper;
 
   @PutMapping("/detectionJobs/{id}/taskFiltering")
   public List<FilteredDetectionJob> filteredDetectionJobs(@PathVariable String id) {
@@ -60,8 +60,9 @@ public class ZoneDetectionController {
   }
 
   @GetMapping("/detectionJobs/{id}/recomputedStatus")
-  public Status getZTJRecomputedStatus(@PathVariable String id) {
-    return jobStatusStatusMapper.toRest(service.recomputeStatus(id).getStatus());
+  public Status getZDJRecomputedStatus(@PathVariable String id) {
+    // TODO: eventProducer.accept(List.of(new ZDJStatusRecomputingSubmitted(id)));
+    return jobStatusMapper.toRest(service.findById(id).getStatus());
   }
 
   @GetMapping("/detectionJobs/{id}/taskStatistics")

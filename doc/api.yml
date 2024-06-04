@@ -126,7 +126,7 @@ paths:
           schema:
             type: string
       operationId: getRecomputedZTJStatus
-      description: Get freshly recomputed ZTJ status
+      description: Get last recomputed ZTJ status while submitting new recomputing again
       responses:
         200:
           description: The recomputed status
@@ -295,7 +295,7 @@ paths:
           schema:
             type: string
       operationId: getRecomputedZDJStatus
-      description: Get freshly recomputed ZDJ status
+      description: Get last recomputed ZDJ status while submitting new recomputing again
       responses:
         200:
           description: The recomputed status
