@@ -6,12 +6,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.transfer.s3.model.DownloadFileRequest;
 import software.amazon.awssdk.transfer.s3.model.FileDownload;
 
+@Getter
 @Component
 @AllArgsConstructor
 // TODO: must be available from BucketComponent so update POJA BucketComponent
