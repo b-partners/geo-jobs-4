@@ -6,8 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import app.bpartners.geojobs.conf.BucketConf;
 import app.bpartners.geojobs.conf.FacadeIT;
-import app.bpartners.geojobs.file.BucketComponent;
+import app.bpartners.geojobs.file.BucketCustomizedComponent;
 import app.bpartners.geojobs.model.exception.NotImplementedException;
 import app.bpartners.geojobs.repository.model.Parcel;
 import app.bpartners.geojobs.repository.model.ParcelContent;
@@ -19,12 +20,10 @@ import app.bpartners.geojobs.service.detection.TileObjectDetector;
 import java.io.File;
 import java.time.Instant;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-@Disabled("TODO: fail to 500 internal server error")
 public class ObjectsDetectorIT extends FacadeIT {
   private static final String FILE_NAME =
       "src"
@@ -36,12 +35,13 @@ public class ObjectsDetectorIT extends FacadeIT {
           + "mockData"
           + File.separator
           + "image-to-detect.jpg";
-  @MockBean BucketComponent bucketComponent;
+  @MockBean BucketConf bucketConf;
+  @MockBean BucketCustomizedComponent bucketComponent;
   @Autowired TileObjectDetector objectsDetector;
 
   @Test
   void process_detection_ok() {
-    var actual = objectsDetector.apply(detectionTask(), List.of(DetectableType.ROOF));
+    var actual = objectsDetector.apply(detectionTask(), List.of(DetectableType.PATHWAY));
 
     assertNotNull(actual);
     assertNotNull(actual.getRstImageUrl());
@@ -59,7 +59,9 @@ public class ObjectsDetectorIT extends FacadeIT {
   }
 
   public TileDetectionTask detectionTask() {
-    when(bucketComponent.download(any())).thenReturn(new File(FILE_NAME));
+    when(bucketComponent.getBucketConf())
+        .thenReturn(new app.bpartners.geojobs.file.BucketConf("dummyRegion", "dummyBucketName"));
+    when(bucketComponent.download(any(), any())).thenReturn(new File(FILE_NAME));
 
     var task =
         DetectionTask.builder()

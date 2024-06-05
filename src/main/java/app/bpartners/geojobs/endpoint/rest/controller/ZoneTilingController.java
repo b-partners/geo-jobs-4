@@ -2,14 +2,25 @@ package app.bpartners.geojobs.endpoint.rest.controller;
 
 import static app.bpartners.geojobs.endpoint.rest.model.SuccessStatus.NOT_SUCCEEDED;
 import static app.bpartners.geojobs.endpoint.rest.model.SuccessStatus.SUCCEEDED;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.FINISHED;
 import static java.util.stream.Collectors.toList;
 
+import app.bpartners.geojobs.endpoint.event.EventProducer;
+import app.bpartners.geojobs.endpoint.event.model.ZTJStatusRecomputingSubmitted;
+import app.bpartners.geojobs.endpoint.rest.controller.mapper.StatusMapper;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.TaskStatisticMapper;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.TilingTaskMapper;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.ZoneTilingJobMapper;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.ZoomMapper;
-import app.bpartners.geojobs.endpoint.rest.model.*;
+import app.bpartners.geojobs.endpoint.rest.model.CreateZoneTilingJob;
+import app.bpartners.geojobs.endpoint.rest.model.FilteredTilingJob;
+import app.bpartners.geojobs.endpoint.rest.model.ImportZoneTilingJob;
+import app.bpartners.geojobs.endpoint.rest.model.Parcel;
+import app.bpartners.geojobs.endpoint.rest.model.Status;
+import app.bpartners.geojobs.endpoint.rest.model.TaskStatistic;
+import app.bpartners.geojobs.endpoint.rest.model.ZoneTilingJob;
 import app.bpartners.geojobs.endpoint.rest.validator.ZoneTilingJobValidator;
+import app.bpartners.geojobs.job.model.JobStatus;
 import app.bpartners.geojobs.model.BoundedPageSize;
 import app.bpartners.geojobs.model.PageFromOne;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
@@ -20,7 +31,13 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
@@ -33,6 +50,8 @@ public class ZoneTilingController {
   private final TilingTaskMapper tilingTaskMapper;
   private final TaskStatisticMapper taskStatisticMapper;
   private final ZoneTilingJobValidator zoneTilingJobValidator;
+  private final StatusMapper<JobStatus> jobStatusMapper;
+  private final EventProducer eventProducer;
 
   @PostMapping("/tilingJobs/import")
   public ZoneTilingJob importZTJ(@RequestBody ImportZoneTilingJob importZoneTilingJob) {
@@ -52,6 +71,16 @@ public class ZoneTilingController {
         service.importFromBucket(
             job, bucketName, bucketPathPrefix, geoServerParameter, geoServerUrl, startFrom, endAt),
         List.of());
+  }
+
+  @GetMapping("/tilingJobs/{id}/recomputedStatus")
+  public Status getZTJRecomputedStatus(@PathVariable String id) {
+    var tilingJob = service.findById(id);
+    JobStatus jobStatus = tilingJob.getStatus();
+    if (!jobStatus.getProgression().equals(FINISHED)) {
+      eventProducer.accept(List.of(new ZTJStatusRecomputingSubmitted(id)));
+    }
+    return jobStatusMapper.toRest(jobStatus);
   }
 
   @GetMapping("/tilingJobs/{id}/taskStatistics")

@@ -9,9 +9,8 @@ import static app.bpartners.geojobs.service.event.TilingTaskConsumer.withNewStat
 import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.model.TilingTaskFailed;
 import app.bpartners.geojobs.endpoint.event.model.TilingTaskSucceeded;
-import app.bpartners.geojobs.job.service.RetryableTaskStatusService;
+import app.bpartners.geojobs.job.service.TaskStatusService;
 import app.bpartners.geojobs.repository.model.tiling.TilingTask;
-import app.bpartners.geojobs.repository.model.tiling.ZoneTilingJob;
 import java.util.List;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
@@ -23,7 +22,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TilingTaskFailedService implements Consumer<TilingTaskFailed> {
 
-  private final RetryableTaskStatusService<TilingTask, ZoneTilingJob> taskStatusService;
+  private final TaskStatusService<TilingTask> taskStatusService;
   private final TilingTaskConsumer tilingTaskConsumer;
   private final EventProducer eventProducer;
   private final ExceptionToStringFunction exceptionToStringFunction;
