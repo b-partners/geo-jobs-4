@@ -74,8 +74,9 @@ public class ZoneTilingController {
 
   @GetMapping("/tilingJobs/{id}/recomputedStatus")
   public Status getZTJRecomputedStatus(@PathVariable String id) {
+    var tilingJob = service.findById(id);
     eventProducer.accept(List.of(new ZTJStatusRecomputingSubmitted(id)));
-    return jobStatusMapper.toRest(service.findById(id).getStatus());
+    return jobStatusMapper.toRest(tilingJob.getStatus());
   }
 
   @GetMapping("/tilingJobs/{id}/taskStatistics")
