@@ -3,6 +3,8 @@ package app.bpartners.geojobs.endpoint.rest.controller;
 import static app.bpartners.geojobs.endpoint.rest.model.SuccessStatus.NOT_SUCCEEDED;
 import static app.bpartners.geojobs.endpoint.rest.model.SuccessStatus.SUCCEEDED;
 
+import app.bpartners.geojobs.endpoint.event.EventProducer;
+import app.bpartners.geojobs.endpoint.event.model.ZDJStatusRecomputingSubmitted;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.DetectableObjectConfigurationMapper;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.DetectionTaskMapper;
 import app.bpartners.geojobs.endpoint.rest.controller.mapper.StatusMapper;
@@ -46,6 +48,7 @@ public class ZoneDetectionController {
   private final ZoneDetectionJobValidator jobValidator;
   private final TaskStatisticMapper taskStatisticMapper;
   private final StatusMapper<JobStatus> jobStatusMapper;
+  private final EventProducer eventProducer;
 
   @PutMapping("/detectionJobs/{id}/taskFiltering")
   public List<FilteredDetectionJob> filteredDetectionJobs(@PathVariable String id) {
@@ -61,8 +64,9 @@ public class ZoneDetectionController {
 
   @GetMapping("/detectionJobs/{id}/recomputedStatus")
   public Status getZDJRecomputedStatus(@PathVariable String id) {
-    // TODO: eventProducer.accept(List.of(new ZDJStatusRecomputingSubmitted(id)));
-    return jobStatusMapper.toRest(service.findById(id).getStatus());
+    var detectionJob = service.findById(id);
+    eventProducer.accept(List.of(new ZDJStatusRecomputingSubmitted(id)));
+    return jobStatusMapper.toRest(detectionJob.getStatus());
   }
 
   @GetMapping("/detectionJobs/{id}/taskStatistics")
