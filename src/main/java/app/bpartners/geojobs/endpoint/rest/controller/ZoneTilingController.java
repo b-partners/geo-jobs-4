@@ -2,6 +2,7 @@ package app.bpartners.geojobs.endpoint.rest.controller;
 
 import static app.bpartners.geojobs.endpoint.rest.model.SuccessStatus.NOT_SUCCEEDED;
 import static app.bpartners.geojobs.endpoint.rest.model.SuccessStatus.SUCCEEDED;
+import static app.bpartners.geojobs.job.model.Status.ProgressionStatus.FINISHED;
 import static java.util.stream.Collectors.toList;
 
 import app.bpartners.geojobs.endpoint.event.EventProducer;
@@ -75,8 +76,11 @@ public class ZoneTilingController {
   @GetMapping("/tilingJobs/{id}/recomputedStatus")
   public Status getZTJRecomputedStatus(@PathVariable String id) {
     var tilingJob = service.findById(id);
-    eventProducer.accept(List.of(new ZTJStatusRecomputingSubmitted(id)));
-    return jobStatusMapper.toRest(tilingJob.getStatus());
+    JobStatus jobStatus = tilingJob.getStatus();
+    if (!jobStatus.getProgression().equals(FINISHED)) {
+      eventProducer.accept(List.of(new ZTJStatusRecomputingSubmitted(id)));
+    }
+    return jobStatusMapper.toRest(jobStatus);
   }
 
   @GetMapping("/tilingJobs/{id}/taskStatistics")
