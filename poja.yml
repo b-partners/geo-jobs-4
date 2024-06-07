@@ -5,7 +5,7 @@ aurora_min_capacity: 8
 aurora_scale_point: 60
 aurora_sleep: 900
 aws_account_id: 'null'
-cli_version: 13.1.1
+cli_version: 13.4.0
 codeartifact_domain_name: 'null'
 codeartifact_repository_name: 'null'
 custom_java_deps: poja-custom-java-deps.txt
@@ -36,7 +36,7 @@ with_own_vpc: 'true'
 with_publish_to_npm_registry: 'false'
 with_sentry: 'true'
 with_snapstart: 'true'
-with_sonar: 'false'
+with_sonar: 'true'
 with_swagger_ui: 'false'
 worker_batch: 1
 worker_memory: 512

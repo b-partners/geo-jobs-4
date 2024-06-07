@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 @Slf4j
 public class ZoneDetectionJobAnnotationProcessor {
-  public static final double MIN_CONFIDENCE_TRUE_POSITIVE = 0.8;
+  public static final double MIN_CONFIDENCE_TRUE_POSITIVE = 0.9;
   private final AnnotationService annotationService;
   private final DetectionTaskService detectionTaskService;
   private final DetectedTileRepository detectedTileRepository;
