@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @AllArgsConstructor
 @Component
@@ -31,6 +32,7 @@ public class ParcelDetectionTaskConsumer implements Consumer<ParcelDetectionTask
   private final ParcelDetectionTaskRepository parcelDetectionTaskRepository;
 
   @Override
+  @Transactional
   public void accept(ParcelDetectionTask task) {
     String detectionTaskId = task.getId();
     String jobId = task.getJobId();
