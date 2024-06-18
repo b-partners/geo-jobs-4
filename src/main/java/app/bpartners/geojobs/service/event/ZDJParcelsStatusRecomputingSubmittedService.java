@@ -22,9 +22,12 @@ public class ZDJParcelsStatusRecomputingSubmittedService
   public void accept(ZDJParcelsStatusRecomputingSubmitted zdjParcelsStatusRecomputingSubmitted) {
     var zoneDetectionJobId = zdjParcelsStatusRecomputingSubmitted.getZoneDetectionJobId();
     var parcelDetectionTasks = parcelDetectionTaskRepository.findAllByJobId(zoneDetectionJobId);
-    parcelDetectionTasks.forEach(
-        task ->
-            eventProducer.accept(
-                List.of(new ParcelDetectionStatusRecomputingSubmitted(task.getAsJobId()))));
+    parcelDetectionTasks.stream()
+        .filter(task -> task.getAsJobId() != null)
+        .toList()
+        .forEach(
+            task ->
+                eventProducer.accept(
+                    List.of(new ParcelDetectionStatusRecomputingSubmitted(task.getAsJobId()))));
   }
 }

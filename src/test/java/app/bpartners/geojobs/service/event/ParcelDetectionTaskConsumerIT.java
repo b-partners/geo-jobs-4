@@ -32,9 +32,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-public class ParcelParcelDetectionTaskConsumerIT extends FacadeIT {
+public class ParcelDetectionTaskConsumerIT extends FacadeIT {
   public static final String JOB_ID = "JOB_ID";
   public static final String DETECTION_TASK_ID = "detection_task1";
+  public static final String PARCEL_ID = "parcelId";
   @MockBean TileObjectDetector objectDetector;
   @MockBean DetectionMapper detectionMapper;
   @MockBean EventProducer eventProducer;
@@ -68,7 +69,7 @@ public class ParcelParcelDetectionTaskConsumerIT extends FacadeIT {
   private static List<Parcel> getParcels() {
     return List.of(
         Parcel.builder()
-            .id("parcel1Id")
+            .id("parcelId")
             .parcelContent(ParcelContent.builder().tiles(List.of(new Tile())).build())
             .build());
   }
@@ -92,7 +93,7 @@ public class ParcelParcelDetectionTaskConsumerIT extends FacadeIT {
 
   @Test
   void accept_ok() {
-    subject.accept(someDetectionTask(JOB_ID, DETECTION_TASK_ID));
+    subject.accept(someDetectionTask(JOB_ID, DETECTION_TASK_ID, PARCEL_ID));
 
     var eventsCaptor = ArgumentCaptor.forClass(List.class);
     verify(eventProducer, times(detectionTask().getParcels().size()))

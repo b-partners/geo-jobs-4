@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 class ParcelParcelDetectionTaskConsumerTest {
   ParcelDetectionTaskConsumer subject =
-      new ParcelDetectionTaskConsumer(mock(), mock(), mock(), new KeyPredicateFunction());
+      new ParcelDetectionTaskConsumer(mock(), mock(), mock(), new KeyPredicateFunction(), mock());
 
   @Test
   void consumes_task_without_parcels_ko() {

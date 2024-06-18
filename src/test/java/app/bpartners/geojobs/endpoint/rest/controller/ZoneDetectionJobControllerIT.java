@@ -117,13 +117,15 @@ public class ZoneDetectionJobControllerIT extends FacadeIT {
   }
 
   public static ParcelDetectionTask someDetectionTask(String jobId, String taskId) {
+    return someDetectionTask(jobId, taskId, randomUUID().toString());
+  }
+
+  public static ParcelDetectionTask someDetectionTask(
+      String jobId, String taskId, String parcelId) {
     return ParcelDetectionTask.builder()
         .id(taskId)
         .jobId(jobId)
-        .parcels(
-            List.of(
-                someParcel(
-                    randomUUID().toString(), randomUUID().toString(), randomUUID().toString())))
+        .parcels(List.of(someParcel(parcelId, randomUUID().toString(), randomUUID().toString())))
         .statusHistory(
             List.of(
                 TaskStatus.builder()

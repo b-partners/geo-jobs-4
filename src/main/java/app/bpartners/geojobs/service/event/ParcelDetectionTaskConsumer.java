@@ -6,6 +6,7 @@ import static java.time.Instant.now;
 import app.bpartners.geojobs.endpoint.event.EventProducer;
 import app.bpartners.geojobs.endpoint.event.model.ParcelDetectionJobCreated;
 import app.bpartners.geojobs.job.model.Status;
+import app.bpartners.geojobs.repository.ParcelDetectionTaskRepository;
 import app.bpartners.geojobs.repository.model.TileDetectionTask;
 import app.bpartners.geojobs.repository.model.detection.ParcelDetectionJob;
 import app.bpartners.geojobs.repository.model.detection.ParcelDetectionTask;
@@ -27,6 +28,7 @@ public class ParcelDetectionTaskConsumer implements Consumer<ParcelDetectionTask
   private final TaskToJobConverter<ParcelDetectionTask, ParcelDetectionJob> taskToJobConverter;
   private final ParcelDetectionJobService parcelDetectionJobService;
   private final KeyPredicateFunction keyPredicateFunction;
+  private final ParcelDetectionTaskRepository parcelDetectionTaskRepository;
 
   @Override
   public void accept(ParcelDetectionTask task) {
@@ -45,17 +47,19 @@ public class ParcelDetectionTaskConsumer implements Consumer<ParcelDetectionTask
               + ") has parcel without tiles");
     }
     ParcelDetectionJob parcelDetectionJob = taskToJobConverter.apply(task);
+    task.setAsJobId(parcelDetectionJob.getId());
+    ParcelDetectionTask savedParcelTask = parcelDetectionTaskRepository.save(task);
     List<TileDetectionTask> tileDetectionTasks =
-        task.getTiles().stream()
+        savedParcelTask.getTiles().stream()
             .filter(keyPredicateFunction.apply(Tile::getBucketPath))
-            .map(tile -> taskToJobConverter.apply(task, tile))
+            .map(tile -> taskToJobConverter.apply(savedParcelTask, tile))
             .toList();
-    ParcelDetectionJob createdparcelDetectionJob =
+    ParcelDetectionJob createdParcelDetectionJob =
         parcelDetectionJobService.create(parcelDetectionJob, tileDetectionTasks);
     eventProducer.accept(
         List.of(
             ParcelDetectionJobCreated.builder()
-                .parcelDetectionJob(createdparcelDetectionJob)
+                .parcelDetectionJob(createdParcelDetectionJob)
                 .build()));
   }
 
